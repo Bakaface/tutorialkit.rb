@@ -58,7 +58,7 @@ export function getInlineContentForPackage({ name, pattern, root }: { name: stri
 }
 
 function readCustomIcons() {
-  const iconPaths = globSync('./icons/languages/*.svg');
+  const iconPaths = globSync('./icons/**/*.svg');
 
   return iconPaths.reduce<Record<string, Record<string, () => Promise<string>>>>((acc, iconPath) => {
     const collectionName = basename(dirname(iconPath));

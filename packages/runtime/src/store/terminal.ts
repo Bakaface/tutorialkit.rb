@@ -57,6 +57,8 @@ export class TerminalStore {
         this._bootWebContainer(panel)
           .then(async (webcontainerInstance) => {
             panel.attachProcess(await newJSHProcess(webcontainerInstance, panel, panel.processOptions));
+
+            this.terminalConfig.notify(this.terminalConfig.get());
           })
           .catch(() => {
             // do nothing

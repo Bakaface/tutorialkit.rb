@@ -37,6 +37,9 @@ export async function newJSHProcess(
       cols: terminal.cols ?? 80,
       rows: terminal.rows ?? 15,
     },
+    env: {
+      PATH: `${webcontainer.workdir}/bin:${webcontainer.path}`,
+    },
   });
 
   const input = process.input.getWriter();

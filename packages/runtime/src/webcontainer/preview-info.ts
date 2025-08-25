@@ -32,6 +32,10 @@ export class PreviewInfo {
     this.portInfo = portInfo;
   }
 
+  set path(val: string | undefined) {
+    this.pathname = val;
+  }
+
   static parse(preview: Exclude<PreviewSchema, boolean>[0]): Preview {
     if (typeof preview === 'number') {
       return {

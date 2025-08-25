@@ -2,7 +2,7 @@ import { useStore } from '@nanostores/react';
 import type { PreviewInfo, TutorialStore } from '@tutorialkit/runtime';
 import type { I18n } from '@tutorialkit/types';
 import { reloadPreview } from '@webcontainer/api/utils';
-import { createElement, forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { createElement, forwardRef, memo, useCallback, useState, useEffect, useImperativeHandle, useRef } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { BootScreen } from '../BootScreen.js';
 import resizePanelStyles from '../styles/resize-panel.module.css';
@@ -152,6 +152,7 @@ interface PreviewProps {
 
 function Preview({ preview, iframe, previewCount, first, last, toggleTerminal, i18n }: PreviewProps) {
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [currentUrlPath, setCurrentUrlPath] = useState('');
 
   useEffect(() => {
     if (!iframe.ref) {
@@ -168,6 +169,30 @@ function Preview({ preview, iframe, previewCount, first, last, toggleTerminal, i
       iframe.ref.title = preview.title;
     }
   }, [preview.url, iframe.ref]);
+
+  useEffect(() => {
+    if (!iframe.ref) {
+      return;
+    }
+
+    const handleLoadMessage = (event: any) => {
+      if (event.data && event.data.type === '$locationChange') {
+        const iframeSrc = event.data.location.href;
+
+        if (iframeSrc) {
+          const url = new URL(iframeSrc);
+          const path = url.pathname.replace('/', '') + url.search;
+          setCurrentUrlPath(path);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleLoadMessage);
+
+    return () => {
+      window.removeEventListener('message', handleLoadMessage);
+    };
+  }, [iframe.ref]);
 
   function reload() {
     if (iframe.ref) {

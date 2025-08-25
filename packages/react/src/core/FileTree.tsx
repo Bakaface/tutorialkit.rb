@@ -399,4 +399,8 @@ const extensionsToIcons = new Map([
   ['png', 'i-ph-file-image-duotone'],
 
   ['svg', 'i-ph-file-svg-duotone'],
+
+  ['rb', 'i-phosphor-file-rb'],
+  ['ru', 'i-phosphor-file-rb'],
+  ['erb', 'i-phosphor-file-erb'],
 ]);

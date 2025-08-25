@@ -158,7 +158,13 @@ export class TutorialStore {
         const templatePromise = this._lessonFilesFetcher.getLessonTemplate(lesson);
         const filesPromise = this._lessonFilesFetcher.getLessonFiles(lesson);
 
-        const preparePromise = this._runner.prepareFiles({ template: templatePromise, files: filesPromise, signal });
+        const removePaths = lesson?.data?.custom?.fs?.remove;
+        const preparePromise = this._runner.prepareFiles({
+          template: templatePromise,
+          files: filesPromise,
+          signal,
+          removePaths,
+        });
 
         this._runner.runCommands();
 

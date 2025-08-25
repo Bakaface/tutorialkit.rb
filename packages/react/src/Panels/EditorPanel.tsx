@@ -176,6 +176,15 @@ function getFileIcon(fileName: string) {
     case 'json': {
       return 'i-languages-json?mask';
     }
+    case 'rb': {
+      return 'i-languages-ruby?mask';
+    }
+    case 'ru': {
+      return 'i-languages-ruby?mask';
+    }
+    case 'erb': {
+      return 'i-languages-erb?mask';
+    }
     case 'gif':
     case 'jpg':
     case 'jpeg':

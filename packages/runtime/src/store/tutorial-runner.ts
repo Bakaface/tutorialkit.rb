@@ -29,6 +29,11 @@ interface LoadFilesOptions {
   removeAllFiles?: boolean;
 
   /**
+   * Paths to remove before loading new files.
+   */
+  removePaths?: string[];
+
+  /**
    * Abort the previous load files operation.
    *
    * @default true
@@ -108,7 +113,7 @@ export class TutorialRunner {
 
     // if we already know that there's a change we can update the steps now
     if (anyChange) {
-      this._stepController.setFromCommands([...newCommands]);
+      this._stepController.setFromCommands(Array.from(newCommands));
       this._currentRunCommands = newCommands;
       this._commandsChanged = true;
     }
@@ -239,7 +244,13 @@ export class TutorialRunner {
    *
    * @see {LoadFilesOptions}
    */
-  prepareFiles({ files, template, signal, abortPreviousLoad = true }: LoadFilesOptions): Promise<void | TaskCancelled> {
+  prepareFiles({
+    files,
+    template,
+    signal,
+    abortPreviousLoad = true,
+    removePaths,
+  }: LoadFilesOptions): Promise<void | TaskCancelled> {
     const previousLoadPromise = this._currentLoadTask?.promise;
 
     if (abortPreviousLoad) {
@@ -265,6 +276,20 @@ export class TutorialRunner {
         signal.throwIfAborted();
 
         if (this._currentFiles || this._currentTemplate) {
+          if (removePaths) {
+            for (const path of removePaths) {
+              if (this._currentFiles) {
+                for (const filePath of Object.keys(this._currentFiles)) {
+                  if (filePath.startsWith(path)) {
+                    delete this._currentFiles[filePath];
+                  }
+                }
+              }
+
+              await webcontainer.fs.rm(path, { recursive: true });
+            }
+          }
+
           await updateFiles(
             webcontainer,
             { ...this._currentTemplate, ...this._currentFiles },
@@ -449,7 +474,7 @@ export class TutorialRunner {
     let shouldClearDirtyFlag = true;
 
     try {
-      const commandList = [...commands];
+      const commandList = Array.from(commands);
 
       this._stepController.setFromCommands(commandList);
 
@@ -647,7 +672,7 @@ export class TutorialRunner {
       timeoutId = setTimeout(readFiles, 100);
     };
 
-    this._watcher = webcontainer.fs.watch('.', { recursive: true }, (eventType, filename) => {
+    this._watcher = webcontainer.fs.watch('.', { recursive: true }, async (eventType, filename) => {
       const filePath = `/${filename}`;
 
       // events we should ignore because we caused them in the TutorialRunner
@@ -683,17 +708,15 @@ export class TutorialRunner {
         } else {
           // add file
           const segments = filePath.split('/');
-          segments.forEach((_, index) => {
-            if (index == segments.length - 1) {
-              return;
-            }
 
+          for (let index = 0; index < segments.length - 1; index++) {
             const folderPath = segments.slice(0, index + 1).join('/');
 
             if (!this._editorStore.documents.get()[folderPath]) {
-              this._editorStore.addFileOrFolder({ path: folderPath, type: 'folder' });
+              const isDirectory = await _isDirectory(webcontainer, folderPath);
+              this._editorStore.addFileOrFolder({ path: folderPath, type: isDirectory ? 'folder' : 'file' });
             }
-          });
+          }
 
           if (!this._editorStore.documents.get()[filePath]) {
             this._editorStore.addFileOrFolder({ path: filePath, type: 'file' });
@@ -738,7 +761,7 @@ export class TutorialRunner {
 
 function commandsToList(commands: Commands | CommandsSchema) {
   if (commands instanceof Commands) {
-    return [...commands].filter((command) => command.isRunnable());
+    return Array.from(commands).filter((command) => command.isRunnable());
   }
 
   return commandsToList(new Commands(commands));
@@ -752,4 +775,13 @@ async function updateFiles(webcontainer: WebContainer, previousFiles: Files, new
   }
 
   await webcontainer.mount(toFileTree(addedOrModified));
+}
+
+async function _isDirectory(webcontainer: WebContainer, filePath: string) {
+  try {
+    await webcontainer.fs.readdir(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -1,4 +1,4 @@
-import { LanguageDescription } from '@codemirror/language';
+import { LanguageDescription, LanguageSupport, StreamLanguage } from '@codemirror/language';
 
 export const supportedLanguages = [
   LanguageDescription.of({
@@ -90,6 +90,23 @@ export const supportedLanguages = [
     extensions: ['svelte'],
     async load() {
       return import('@replit/codemirror-lang-svelte').then((module) => module.svelte());
+    },
+  }),
+  LanguageDescription.of({
+    name: 'Ruby',
+    extensions: ['rb', 'rake', 'erb'],
+    filename: /(Gemfile|Rakefile|config\.ru|bin\/(rails|rubocop))/,
+    async load() {
+      return import('@codemirror/legacy-modes/mode/ruby').then((module) => {
+        return new LanguageSupport(StreamLanguage.define(module.ruby));
+      });
+    },
+  }),
+  LanguageDescription.of({
+    name: 'YAML',
+    extensions: ['yaml', 'yml'],
+    async load() {
+      return import('@codemirror/lang-yaml').then((module) => module.yaml());
     },
   }),
 ];

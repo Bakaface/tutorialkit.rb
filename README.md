@@ -4,12 +4,13 @@
     <img src="media/logo.svg" alt="tutorialkit-logo" width="440px" height="120px" />
   </picture>
   <br>
-  TutorialKit by <a href="https://stackblitz.com">StackBlitz</a> enables you to create interactive coding tutorials effortlessly, boosting the adoption of
-  your framework, UI library or design system.
+  <strong>TutorialKit.rb - Ruby on Rails Edition</strong><br>
+  A fork of TutorialKit by <a href="https://stackblitz.com">StackBlitz</a> with added support for Ruby on Rails WebAssembly.<br>
+  Create interactive Ruby/Rails tutorials that run entirely in the browser.
 </p>
 
 <p align="center">
-  <a href="https://tutorialkit.dev/"><strong>tutorialkit.dev</strong></a>
+  <a href="https://tutorialkit.dev/"><strong>Original: tutorialkit.dev</strong></a>
   <br>
 </p>
 
@@ -20,6 +21,36 @@
   <br>
   <br>
 </p>
+
+<hr>
+
+## 🚀 Ruby on Rails WebAssembly Support
+
+This fork extends TutorialKit with the ability to run Ruby on Rails applications directly in the browser using WebAssembly. No server infrastructure required - everything runs client-side!
+
+### Key Features
+
+- **Full Ruby/Rails Environment**: Complete Rails framework running in WebContainers
+- **Interactive Development**: Live code editing, terminal access, and instant preview
+- **Zero Backend**: All computation happens in the user's browser
+- **Educational Focus**: Perfect for creating interactive Rails tutorials and workshops
+
+### Quick Start
+
+```bash
+# Create a new TutorialKit.rb project
+npx create-tutorialkitrb my-rails-tutorial
+
+# Configure your Ruby dependencies
+cd my-rails-tutorial
+# Edit ruby-wasm/Gemfile to add your gems
+
+# Build the Ruby WASM module
+npm run build:wasm
+
+# Start the development server
+npm run dev
+```
 
 <hr>
 

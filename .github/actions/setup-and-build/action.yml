@@ -19,6 +19,10 @@ runs:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
 
+    - name: Install yarn
+      shell: bash
+      run: npm install -g yarn
+
     - name: Install & Build
       shell: bash
       run: |

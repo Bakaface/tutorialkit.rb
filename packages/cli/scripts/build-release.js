@@ -4,13 +4,16 @@ import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import fsExtra from 'fs-extra';
 import ignore from 'ignore';
-import { temporaryDirectoryTask } from 'tempy';
-import { distFolder, overwritesFolder, templateDest, templatePath } from './_constants.js';
+import { distFolder, templateDest, templatePath } from './_constants.js';
 import { success } from './logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const version = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
+const baseVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
+const forkVersion = process.env.FORK_VERSION;
+const version = forkVersion ? `${baseVersion}-rb.${forkVersion}` : baseVersion;
 const env = { ...process.env, COREPACK_ENABLE_STRICT: '0' };
+
+console.log(`Using version: ${version} (base: ${baseVersion}, fork: ${forkVersion})`);
 
 await execa('node', [path.join(__dirname, './build.js')], {
   stdio: 'inherit',
@@ -21,12 +24,6 @@ await execa('node', [path.join(__dirname, './build.js')], {
 });
 
 const gitignore = ignore().add(fs.readFileSync(path.join(templatePath, '.gitignore'), 'utf8'));
-
-/**
- * Do not copy over the content and the templates because they will be different
- * for the production version of the cli.
- */
-gitignore.add(['src/content/tutorial', 'src/templates/*']);
 
 // copy over template
 await fsExtra.copy(templatePath, templateDest, {
@@ -39,16 +36,23 @@ await fsExtra.copy(templatePath, templateDest, {
       return false;
     }
 
+    const relativePath = path.relative(templatePath, src);
+
+    // exclude ruby-wasm build artifacts
+    if (
+      relativePath.includes('ruby-wasm/tmp/') ||
+      relativePath.includes('ruby-wasm/build/') ||
+      relativePath.includes('ruby-wasm/rubies/') ||
+      relativePath.includes('.wasm')
+    ) {
+      return false;
+    }
+
     return true;
   },
 });
 
 success('Template copied');
-
-// copy overwrites
-fs.cpSync(path.join(overwritesFolder), path.join(templateDest), {
-  recursive: true,
-});
 
 // remove project references from tsconfig.json
 updateJSON('tsconfig.json', (tsconfig) => {
@@ -57,28 +61,17 @@ updateJSON('tsconfig.json', (tsconfig) => {
 
 // update dependencies
 updateJSON('package.json', (packageJson) => {
+  if (packageJson.name === 'tutorialkit-starter') {
+    packageJson.name = 'tutorialkit-rb-starter';
+  }
+
   updateWorkspaceVersions(packageJson.dependencies, version);
   updateWorkspaceVersions(packageJson.devDependencies, version);
+  updatePackageNames(packageJson.dependencies);
+  updatePackageNames(packageJson.devDependencies);
 });
 
-// generate lockfiles
-await temporaryDirectoryTask(async (tmp) => {
-  fs.cpSync(path.join(templateDest, 'package.json'), path.join(tmp, 'package.json'));
-
-  await execa('npm', ['install', '--package-lock-only'], { cwd: tmp, env });
-  await execa('pnpm', ['install', '--lockfile-only'], { cwd: tmp, env });
-  await execa('yarn', ['install'], { cwd: tmp, env });
-
-  fs.cpSync(path.join(tmp, 'package-lock.json'), path.join(templateDest, 'package-lock.json'));
-  fs.cpSync(path.join(tmp, 'pnpm-lock.yaml'), path.join(templateDest, 'pnpm-lock.yaml'));
-  fs.cpSync(path.join(tmp, 'yarn.lock'), path.join(templateDest, 'yarn.lock'));
-
-  success(`Created ${path.join(templateDest, 'package-lock.json')}`);
-  success(`Created ${path.join(templateDest, 'pnpm-lock.yaml')}`);
-  success(`Created ${path.join(templateDest, 'yarn.lock')}`);
-});
-
-success('Lockfiles generated');
+success('Template prepared');
 
 function updateWorkspaceVersions(dependencies, version) {
   for (const dependency in dependencies) {
@@ -86,6 +79,26 @@ function updateWorkspaceVersions(dependencies, version) {
 
     if (depVersion === 'workspace:*') {
       dependencies[dependency] = version;
+    }
+  }
+}
+
+function updatePackageNames(dependencies) {
+  const nameMapping = {
+    '@tutorialkit/astro': '@tutorialkit-rb/astro',
+    '@tutorialkit/react': '@tutorialkit-rb/react',
+    '@tutorialkit/runtime': '@tutorialkit-rb/runtime',
+    '@tutorialkit/theme': '@tutorialkit-rb/theme',
+    '@tutorialkit/types': '@tutorialkit-rb/types',
+    '@tutorialkit/cli': '@tutorialkit-rb/cli',
+    '@tutorialkit/test-utils': '@tutorialkit-rb/test-utils',
+  };
+
+  for (const oldName in nameMapping) {
+    if (dependencies[oldName]) {
+      const version = dependencies[oldName];
+      delete dependencies[oldName];
+      dependencies[nameMapping[oldName]] = version;
     }
   }
 }

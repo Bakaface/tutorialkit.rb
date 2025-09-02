@@ -1,17 +1,18 @@
 ---
 type: tutorial
-logoLink: https://tutorialkit.dev
-previews:
-  - 8080
-autoReload: true
-mainCommand: ['npm start', 'Starting HTTP server']
+openInStackBlitz: false
 prepareCommands:
-  - ['npm install', 'Installing dependencies']
-i18n:
-  partTemplate: ${title}
-openInStackBlitz:
-  projectTitle: Example Title
-  projectDescription: Example Description
-downloadAsZip:
-  filename: custom-lesson-name-without-extension
+  - ['npm install', 'Preparing Ruby runtime']
+previews: false
+filesystem:
+  watch: ['/*.json', '/workspace/**/*']
+terminal:
+  open: true
+  activePanel: 0
+  panels:
+    - type: terminal
+      id: 'cmds'
+      title: 'Command Line'
+      allowRedirects: true
+    - ['output', 'Setup Logs']
 ---

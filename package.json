@@ -1,4 +1,5 @@
 {
+  "name": "tutorialkit-workspace",
   "private": true,
   "scripts": {
     "build": "pnpm run --stream --filter='@tutorialkit/*' --filter=create-tutorial build",
@@ -10,6 +11,7 @@
     "extension:build": "pnpm run --filter='./extensions/**' build",
     "template:dev": "TUTORIALKIT_DEV=true pnpm run build && pnpm run --filter=tutorialkit-starter dev",
     "template:build": "pnpm run build && pnpm run --filter=tutorialkit-starter build",
+    "template:build:wasm": "pnpm run --filter=tutorialkit-starter build:wasm",
     "cli:build-release": "pnpm run --filter=@tutorialkit/cli build-release",
     "docs": "pnpm run --filter=tutorialkit.dev dev",
     "docs:build": "pnpm run build && pnpm run --filter=tutorialkit.dev build",

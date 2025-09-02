@@ -26,3 +26,7 @@ tsconfig.build.tsbuildinfo
 .tmp-*
 /e2e/**/test-results
 /e2e/**/.astro
+
+packages/template/ruby-wasm/.bundle/
+packages/template/ruby-wasm/vendor/
+

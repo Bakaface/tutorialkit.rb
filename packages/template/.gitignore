@@ -9,3 +9,5 @@ pnpm-debug.log*
 .env.production
 .DS_Store
 .idea
+
+public/ruby.wasm

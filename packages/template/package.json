@@ -6,12 +6,17 @@
   "scripts": {
     "astro": "astro",
     "build": "astro check && astro build",
+    "build:wasm": "./bin/build-wasm",
     "dev": "astro dev",
     "preview": "astro preview",
     "start": "astro dev"
   },
   "dependencies": {
+    "@codemirror/lang-yaml": "^6.1.2",
+    "@codemirror/legacy-modes": "^6.5.1",
+    "@nanostores/react": "0.7.2",
     "@tutorialkit/react": "workspace:*",
+    "nanostores": "^0.10.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -21,10 +26,12 @@
     "@tutorialkit/astro": "workspace:*",
     "@tutorialkit/theme": "workspace:*",
     "@tutorialkit/types": "workspace:*",
+    "@types/mdast": "^4.0.4",
     "@types/node": "^20.14.6",
     "@types/react": "^18.3.3",
     "astro": "^4.15.0",
     "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "unist-util-visit": "^5.0.0"
   }
 }

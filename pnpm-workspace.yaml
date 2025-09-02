@@ -1,6 +1,7 @@
 packages:
   - 'packages/*'
-  - 'docs/*'
+  - 'packages/template' # The tutorialkit-starter template for development
+  - 'docs'
+  - 'e2e'
   - 'extensions/*'
   - 'integration'
-  - 'e2e'

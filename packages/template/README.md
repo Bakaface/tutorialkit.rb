@@ -9,8 +9,7 @@ This README includes everything you need to start writing your tutorial content 
 ```bash
 .
 ├── astro.config.mjs    # TutorialKit uses Astro 🚀 (https://astro.build)
-├── src
-│   ├── ...
+├── src │   ├── ...
 │   ├── content
 │   │   └── tutorial    # Your tutorial content lives here
 │   └── templates       # Your templates (see below for more information)
@@ -30,6 +29,37 @@ Make sure you have all dependencies installed and started the dev server:
 <% pkgManager %> install
 <% pkgManager %> run dev
 ```
+
+## Ruby on Rails WebAssembly Support
+
+This TutorialKit template includes support for running Ruby on Rails applications directly in the browser using WebAssembly. This enables you to create interactive Rails tutorials without requiring any server-side infrastructure.
+
+### Setting Up Ruby WASM
+
+1. **Configure Dependencies**: Edit `ruby-wasm/Gemfile` to add the Ruby gems needed for your tutorial
+2. **Build WASM Module**: Run the build command to compile Ruby and your dependencies:
+   ```bash
+   <% pkgManager %> run build:wasm
+   ```
+3. **Start Development**: Run the dev server as usual:
+   ```bash
+   <% pkgManager %> run dev
+   ```
+
+### How It Works
+
+The Ruby WASM build pipeline (`ruby-wasm/` directory):
+- Compiles the Ruby interpreter to WebAssembly
+- Bundles Rails framework and all specified gems
+- Creates a self-contained WASM module that runs entirely in the browser
+- Integrates seamlessly with WebContainers for file system and terminal operations
+
+### Features
+
+- **Full Rails Environment**: Run complete Rails applications client-side
+- **Interactive Terminal**: Execute Rails commands (rails new, generate, migrate, etc.)
+- **Live Code Editing**: Edit Ruby/Rails code with instant feedback
+- **No Backend Required**: Everything runs in the user's browser
 
 ## UI Structure
 

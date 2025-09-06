@@ -1,3 +1,30 @@
+## 0.0.1 "@tutorialkit/theme" (2025-09-06)
+
+
+### Bug Fixes
+
+* mobile fixes and basic i18n support ([#127](https://github.com/Bakaface/tutorialkit.rb/issues/127)) ([f85e8eb](https://github.com/Bakaface/tutorialkit.rb/commit/f85e8eb6058473b0ad2e061d39e14d111f3f34fe))
+* **theme:** apply `fast-glob` Windows work-around for all `\@` matches ([#383](https://github.com/Bakaface/tutorialkit.rb/issues/383)) ([9f4bd13](https://github.com/Bakaface/tutorialkit.rb/commit/9f4bd13270f877b9f52e6b85eca5693c283ee249))
+
+
+### Features
+
+* add "Edit this page" link ([#130](https://github.com/Bakaface/tutorialkit.rb/issues/130)) ([dd9c52c](https://github.com/Bakaface/tutorialkit.rb/commit/dd9c52c6f1d3c90cc1d993d8c0fec61dadfc5815))
+* add `@tutorialkit/theme` package to use the theme without astro ([#105](https://github.com/Bakaface/tutorialkit.rb/issues/105)) ([9805996](https://github.com/Bakaface/tutorialkit.rb/commit/9805996a4211a1c8a3e1bfbbd958a27f1957d4d7))
+* add initial adjustments for packages ([c2a64f2](https://github.com/Bakaface/tutorialkit.rb/commit/c2a64f25e4a842bfa9bf4a3c7b2a56a46c22aaf7))
+* add link to webcontainers.io ([#202](https://github.com/Bakaface/tutorialkit.rb/issues/202)) ([70d20c7](https://github.com/Bakaface/tutorialkit.rb/commit/70d20c7b3801b458aa11c7d70a11ea1392d0fa60))
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` ([#155](https://github.com/Bakaface/tutorialkit.rb/issues/155)) ([e3c0fee](https://github.com/Bakaface/tutorialkit.rb/commit/e3c0fee902a7bfc312fb01b30531209815d460c3))
+* simplify UnoCSS integration ([#270](https://github.com/Bakaface/tutorialkit.rb/issues/270)) ([8d49ef8](https://github.com/Bakaface/tutorialkit.rb/commit/8d49ef81272d84cbfa2c1a10742f01540fe3650c))
+* support glob patterns in `editor.fileTree.allowEdits` ([#332](https://github.com/Bakaface/tutorialkit.rb/issues/332)) ([c1a59f5](https://github.com/Bakaface/tutorialkit.rb/commit/c1a59f54c5b5700b8ec8ed5a4a3ebf2169b2409c))
+
+
+### BREAKING CHANGES
+
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` (#155)
+* simplify UnoCSS integration (#270)
+
+
+
 ## [1.5.2](https://github.com/stackblitz/tutorialkit/compare/1.5.0...1.5.2) "@tutorialkit/theme" (2025-06-17)
 
 

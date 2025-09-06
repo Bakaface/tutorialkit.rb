@@ -1,3 +1,51 @@
+## 0.0.1 "@tutorialkit/types" (2025-09-06)
+
+
+### Bug Fixes
+
+* **astro:** allow URLs in `meta.image` ([#422](https://github.com/Bakaface/tutorialkit.rb/issues/422)) ([3125547](https://github.com/Bakaface/tutorialkit.rb/commit/3125547c043fe4a76dca95b1eb973362967ccf02))
+* **astro:** better default meta tags ([#342](https://github.com/Bakaface/tutorialkit.rb/issues/342)) ([d81d1cc](https://github.com/Bakaface/tutorialkit.rb/commit/d81d1cc01fdbce702ae91a6a5f371bd03c38b338))
+* **astro:** webcontainers link to be in plural ([#227](https://github.com/Bakaface/tutorialkit.rb/issues/227)) ([0b86ebd](https://github.com/Bakaface/tutorialkit.rb/commit/0b86ebd4e6e2b28dd2ef0ff97a5c66f9eb780973))
+* esm uses .js for relative imports ([#19](https://github.com/Bakaface/tutorialkit.rb/issues/19)) ([b8ad686](https://github.com/Bakaface/tutorialkit.rb/commit/b8ad68646e5afe11c1f65d5a11f8b7304f0f3ac1))
+* missing preview i18n ([#255](https://github.com/Bakaface/tutorialkit.rb/issues/255)) ([095ed57](https://github.com/Bakaface/tutorialkit.rb/commit/095ed570702d1b8de9370565b94103cd0740c408))
+* mobile fixes and basic i18n support ([#127](https://github.com/Bakaface/tutorialkit.rb/issues/127)) ([f85e8eb](https://github.com/Bakaface/tutorialkit.rb/commit/f85e8eb6058473b0ad2e061d39e14d111f3f34fe))
+* prevent overwriting template files via `<FileTree>` ([#336](https://github.com/Bakaface/tutorialkit.rb/issues/336)) ([23ed41c](https://github.com/Bakaface/tutorialkit.rb/commit/23ed41c827073a205a2ceaa78973a9200a84c72d))
+* support inheritance for `editor`/`focus` and fix bug with logo ([#67](https://github.com/Bakaface/tutorialkit.rb/issues/67)) ([a7eb31d](https://github.com/Bakaface/tutorialkit.rb/commit/a7eb31dcaa039292870a78fae979efd6c0ece134))
+* **terminal:** change behaviour of terminal configuration ([#44](https://github.com/Bakaface/tutorialkit.rb/issues/44)) ([2cd9fec](https://github.com/Bakaface/tutorialkit.rb/commit/2cd9fecacae10f473f9c000375861e2f59539d41))
+* **validation:** allow activePanel to be 0 ([#46](https://github.com/Bakaface/tutorialkit.rb/issues/46)) ([4ab76f5](https://github.com/Bakaface/tutorialkit.rb/commit/4ab76f54e94dd7d47400ae558257f23763919ea9))
+
+
+### Features
+
+* add 'Open in StackBlitz'-button ([#219](https://github.com/Bakaface/tutorialkit.rb/issues/219)) ([af428c8](https://github.com/Bakaface/tutorialkit.rb/commit/af428c84f0cd817debd336dc43e88c19583800ce))
+* add "Edit this page" link ([#130](https://github.com/Bakaface/tutorialkit.rb/issues/130)) ([dd9c52c](https://github.com/Bakaface/tutorialkit.rb/commit/dd9c52c6f1d3c90cc1d993d8c0fec61dadfc5815))
+* add `@tutorialkit/theme` package to use the theme without astro ([#105](https://github.com/Bakaface/tutorialkit.rb/issues/105)) ([9805996](https://github.com/Bakaface/tutorialkit.rb/commit/9805996a4211a1c8a3e1bfbbd958a27f1957d4d7))
+* add `contentSchema` ([#156](https://github.com/Bakaface/tutorialkit.rb/issues/156)) ([bc0fde2](https://github.com/Bakaface/tutorialkit.rb/commit/bc0fde26025465f5ab1fa71613d92293f0dafa89))
+* add files via file tree ([#314](https://github.com/Bakaface/tutorialkit.rb/issues/314)) ([7782bdc](https://github.com/Bakaface/tutorialkit.rb/commit/7782bdc6e7da0429061c881ac2f95829f149a907))
+* add link to webcontainers.io ([#202](https://github.com/Bakaface/tutorialkit.rb/issues/202)) ([70d20c7](https://github.com/Bakaface/tutorialkit.rb/commit/70d20c7b3801b458aa11c7d70a11ea1392d0fa60))
+* allow ordering to be config based in addition to folder based ([#79](https://github.com/Bakaface/tutorialkit.rb/issues/79)) ([2b131e5](https://github.com/Bakaface/tutorialkit.rb/commit/2b131e597b94671678c2f2e4625e194eb382dab0))
+* **astro:** add "Download lesson as zip" button ([#415](https://github.com/Bakaface/tutorialkit.rb/issues/415)) ([9c6e534](https://github.com/Bakaface/tutorialkit.rb/commit/9c6e5349b6ab7e7399437839f6fc4cf11bd6c5c3))
+* **astro:** add `custom` configuration option for passing custom fields ([#378](https://github.com/Bakaface/tutorialkit.rb/issues/378)) ([7c6ede9](https://github.com/Bakaface/tutorialkit.rb/commit/7c6ede95730150b68be763d4c87f1da1bc42503c))
+* **astro:** support lessons without parts or chapters ([#374](https://github.com/Bakaface/tutorialkit.rb/issues/374)) ([8c44cbe](https://github.com/Bakaface/tutorialkit.rb/commit/8c44cbec3f276a4f788b5d1652f67e4cf8cf7948))
+* **editor:** allow hiding the editor entirely ([#35](https://github.com/Bakaface/tutorialkit.rb/issues/35)) ([4b26db1](https://github.com/Bakaface/tutorialkit.rb/commit/4b26db1b9cf90a28650e31da4ef0004e44bb9c83))
+* **extension:** metadata autocompletion ([#143](https://github.com/Bakaface/tutorialkit.rb/issues/143)) ([be0a096](https://github.com/Bakaface/tutorialkit.rb/commit/be0a0965bbd7b553bc6b5b1f4019e22ee0651d30))
+* finalize basic i18n support ([#133](https://github.com/Bakaface/tutorialkit.rb/issues/133)) ([09d8bf7](https://github.com/Bakaface/tutorialkit.rb/commit/09d8bf7bd7673abb5b92b7de569daad1b44b07fd))
+* folder rework, introduce `@tutorialkit/components-react` ([#17](https://github.com/Bakaface/tutorialkit.rb/issues/17)) ([dd74c49](https://github.com/Bakaface/tutorialkit.rb/commit/dd74c49ec4f021ac53fd320cf5023275fbf12311))
+* hot reload for files in webcontainer ([#61](https://github.com/Bakaface/tutorialkit.rb/issues/61)) ([949fcf3](https://github.com/Bakaface/tutorialkit.rb/commit/949fcf3438e3bf17902d753089372fbc03911136))
+* make the logo link configurable ([#68](https://github.com/Bakaface/tutorialkit.rb/issues/68)) ([2da64ae](https://github.com/Bakaface/tutorialkit.rb/commit/2da64ae811cbb12aeab8fd1fb36bed4845542aa4))
+* **previews:** allow hiding the previews entirely ([#41](https://github.com/Bakaface/tutorialkit.rb/issues/41)) ([84ecef5](https://github.com/Bakaface/tutorialkit.rb/commit/84ecef5aecacba37873977fbb19ef64d65d10c14))
+* **react:** add button to reload a preview ([#305](https://github.com/Bakaface/tutorialkit.rb/issues/305)) ([d14c404](https://github.com/Bakaface/tutorialkit.rb/commit/d14c4045ad692a45b5b388bb4cfcca9762e6142c))
+* **runtime:** `fs.watch` to support syncing new files from webcontainer ([#394](https://github.com/Bakaface/tutorialkit.rb/issues/394)) ([3beda90](https://github.com/Bakaface/tutorialkit.rb/commit/3beda905df20ed9c7d286fc02007cf5b2e74835a))
+* **runtime:** add `preview.pathname` ([#233](https://github.com/Bakaface/tutorialkit.rb/issues/233)) ([9bf2156](https://github.com/Bakaface/tutorialkit.rb/commit/9bf2156df26656427482645d3d134127863de233))
+* **runtime:** option for setting terminal open by default ([#246](https://github.com/Bakaface/tutorialkit.rb/issues/246)) ([5419038](https://github.com/Bakaface/tutorialkit.rb/commit/5419038d1c0a6f80da4d9f31e330d0dc0e41def8))
+* support glob patterns in `editor.fileTree.allowEdits` ([#332](https://github.com/Bakaface/tutorialkit.rb/issues/332)) ([c1a59f5](https://github.com/Bakaface/tutorialkit.rb/commit/c1a59f54c5b5700b8ec8ed5a4a3ebf2169b2409c))
+* sync files from WebContainer to editor ([#334](https://github.com/Bakaface/tutorialkit.rb/issues/334)) ([5c1de69](https://github.com/Bakaface/tutorialkit.rb/commit/5c1de69c0e4e233a25a2f9b70fbb1f6c93f12356))
+* **terminal:** add support for redirects and allow specific commands ([#76](https://github.com/Bakaface/tutorialkit.rb/issues/76)) ([eca5f22](https://github.com/Bakaface/tutorialkit.rb/commit/eca5f22e3120c4d59349f416322b990d37cb0c15))
+* **terminal:** add support for terminals ([#33](https://github.com/Bakaface/tutorialkit.rb/issues/33)) ([53c902b](https://github.com/Bakaface/tutorialkit.rb/commit/53c902bcdc30f3c39f9b2a737e6da1dabd09dabf))
+* **terminal:** support linking terminals between lessons ([#36](https://github.com/Bakaface/tutorialkit.rb/issues/36)) ([f4237b7](https://github.com/Bakaface/tutorialkit.rb/commit/f4237b7401cb7709e4546f11465420bf5aff8f2d))
+
+
+
 ## [1.5.2](https://github.com/stackblitz/tutorialkit/compare/1.5.0...1.5.2) "@tutorialkit/types" (2025-06-17)
 
 

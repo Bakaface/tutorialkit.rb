@@ -26,14 +26,128 @@ jobs:
       - uses: ./.github/actions/resolve-release-version
         id: resolve-release-version
 
+      - name: Update package names for Ruby fork
+        run: |
+          # Define the name mappings
+          declare -A NAME_MAPPING=(
+            ["@tutorialkit/astro"]="@tutorialkit-rb/astro"
+            ["@tutorialkit/react"]="@tutorialkit-rb/react"
+            ["@tutorialkit/runtime"]="@tutorialkit-rb/runtime"
+            ["@tutorialkit/theme"]="@tutorialkit-rb/theme"
+            ["@tutorialkit/types"]="@tutorialkit-rb/types"
+            ["@tutorialkit/cli"]="@tutorialkit-rb/cli"
+            ["@tutorialkit/test-utils"]="@tutorialkit-rb/test-utils"
+            ["create-tutorial"]="create-tutorialkit-rb"
+          )
+
+          # Function to update package.json
+          update_package_json() {
+            local pkg_path=$1
+            local pkg_json="${pkg_path}/package.json"
+
+            if [ ! -f "$pkg_json" ]; then
+              return
+            fi
+
+            # Create backup
+            cp "$pkg_json" "${pkg_json}.bak"
+
+            # Read current package name
+            local current_name=$(node -pe "require('${pkg_json}').name")
+
+            # Check if we have a mapping for this package
+            local new_name="${NAME_MAPPING[$current_name]}"
+            if [ -z "$new_name" ]; then
+              echo "No mapping for $current_name, skipping..."
+              return
+            fi
+
+            echo "Updating $current_name to $new_name"
+
+            # Update package name and dependencies using Node.js
+            node -e "
+              const fs = require('fs');
+              const pkg = require('${pkg_json}');
+
+              // Update package name
+              pkg.name = '${new_name}';
+
+              // Update dependencies
+              const nameMapping = {
+                '@tutorialkit/astro': '@tutorialkit-rb/astro',
+                '@tutorialkit/react': '@tutorialkit-rb/react',
+                '@tutorialkit/runtime': '@tutorialkit-rb/runtime',
+                '@tutorialkit/theme': '@tutorialkit-rb/theme',
+                '@tutorialkit/types': '@tutorialkit-rb/types',
+                '@tutorialkit/cli': '@tutorialkit-rb/cli',
+                '@tutorialkit/test-utils': '@tutorialkit-rb/test-utils',
+                'create-tutorial': 'create-tutorialkit-rb'
+              };
+
+              ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
+                if (pkg[depType]) {
+                  Object.keys(pkg[depType]).forEach(dep => {
+                    if (nameMapping[dep]) {
+                      const version = pkg[depType][dep];
+                      delete pkg[depType][dep];
+                      pkg[depType][nameMapping[dep]] = version;
+                    }
+                  });
+                }
+              });
+
+              // Add repository info for Ruby fork
+              pkg.repository = {
+                type: 'git',
+                url: 'https://github.com/yourusername/tutorialkit.rb',
+                directory: '${pkg_path}'
+              };
+
+              // Add Ruby fork keywords
+              if (!pkg.keywords) pkg.keywords = [];
+              if (!pkg.keywords.includes('ruby')) pkg.keywords.push('ruby');
+              if (!pkg.keywords.includes('rails')) pkg.keywords.push('rails');
+              if (!pkg.keywords.includes('wasm')) pkg.keywords.push('wasm');
+
+              fs.writeFileSync('${pkg_json}', JSON.stringify(pkg, null, 2));
+            "
+          }
+
+          # Update all packages
+          for pkg_dir in packages/*; do
+            if [ -d "$pkg_dir" ]; then
+              update_package_json "$pkg_dir"
+            fi
+          done
+
       - name: Publish to npm
-        run: >
-          pnpm --recursive
-          --filter "!@tutorialkit/cli"
-          --filter "@tutorialkit/*"
-          exec pnpm publish --provenance --access public
+        run: |
+          # Publish each package with the renamed version
+          for pkg_dir in packages/*; do
+            if [ -f "$pkg_dir/package.json" ]; then
+              pkg_name=$(node -pe "require('./${pkg_dir}/package.json').name")
+
+              # Only publish if it's a renamed package
+              if [[ "$pkg_name" == @tutorialkit-rb/* ]] || [[ "$pkg_name" == "create-tutorialkit-rb" ]]; then
+                echo "Publishing $pkg_name..."
+                (cd "$pkg_dir" && npm publish --provenance --access public) || echo "Failed to publish $pkg_name"
+              fi
+            fi
+          done
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Restore original package.json files
+        if: always()
+        run: |
+          # Restore all backup files
+          for backup in packages/**/package.json.bak; do
+            if [ -f "$backup" ]; then
+              original="${backup%.bak}"
+              mv "$backup" "$original"
+              echo "Restored $original"
+            fi
+          done
 
       - name: Create and push git tag
         run: |
@@ -85,7 +199,7 @@ jobs:
       - name: Bump version
         run: >
           pnpm --recursive
-          --filter @tutorialkit/cli
+          --filter @tutorialkit-rb/cli
           exec npm version --no-git-tag-version --allow-same-version ${{ steps.resolve-release-version.outputs.version }}
 
       - name: Create Pull Request
@@ -123,10 +237,66 @@ jobs:
         working-directory: ./integration
         run: pnpm test
 
+      - name: Update CLI package names for Ruby fork
+        working-directory: ./packages/cli
+        run: |
+          # Update CLI package name and dependencies
+          node -e "
+            const fs = require('fs');
+            const pkg = require('./package.json');
+
+            // Update package name
+            pkg.name = '@tutorialkit-rb/cli';
+
+            // Update dependencies
+            const nameMapping = {
+              '@tutorialkit/astro': '@tutorialkit-rb/astro',
+              '@tutorialkit/react': '@tutorialkit-rb/react',
+              '@tutorialkit/runtime': '@tutorialkit-rb/runtime',
+              '@tutorialkit/theme': '@tutorialkit-rb/theme',
+              '@tutorialkit/types': '@tutorialkit-rb/types',
+              '@tutorialkit/test-utils': '@tutorialkit-rb/test-utils',
+              'create-tutorial': 'create-tutorialkit-rb'
+            };
+
+            ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
+              if (pkg[depType]) {
+                Object.keys(pkg[depType]).forEach(dep => {
+                  if (nameMapping[dep]) {
+                    const version = pkg[depType][dep];
+                    delete pkg[depType][dep];
+                    pkg[depType][nameMapping[dep]] = version;
+                  }
+                });
+              }
+            });
+
+            // Add repository info for Ruby fork
+            pkg.repository = {
+              type: 'git',
+              url: 'https://github.com/yourusername/tutorialkit.rb',
+              directory: 'packages/cli'
+            };
+
+            // Add Ruby fork keywords
+            if (!pkg.keywords) pkg.keywords = [];
+            if (!pkg.keywords.includes('ruby')) pkg.keywords.push('ruby');
+            if (!pkg.keywords.includes('rails')) pkg.keywords.push('rails');
+            if (!pkg.keywords.includes('wasm')) pkg.keywords.push('wasm');
+
+            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2));
+          "
+
       - name: Publish to npm
         run: >
           pnpm --recursive
-          --filter @tutorialkit/cli
+          --filter @tutorialkit-rb/cli
           exec pnpm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Restore CLI package.json
+        if: always()
+        working-directory: ./packages/cli
+        run: |
+          git checkout HEAD -- package.json

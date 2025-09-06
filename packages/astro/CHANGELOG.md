@@ -1,3 +1,92 @@
+## 0.0.1 "@tutorialkit/astro" (2025-09-06)
+
+
+### Bug Fixes
+
+* a transition-theme class was missing for the content right border ([#139](https://github.com/Bakaface/tutorialkit.rb/issues/139)) ([c75ef40](https://github.com/Bakaface/tutorialkit.rb/commit/c75ef4089833b8974c2b0877535f1967065ef08a))
+* align `Powered by WebContainers` to the bottom ([#301](https://github.com/Bakaface/tutorialkit.rb/issues/301)) ([98ef05b](https://github.com/Bakaface/tutorialkit.rb/commit/98ef05b828ff8f3ab45a49e62bf1a4b79e65acfc))
+* **astro/types:** `webcontainer` should be a `Promise<WebContainer>` ([#259](https://github.com/Bakaface/tutorialkit.rb/issues/259)) ([c7bad20](https://github.com/Bakaface/tutorialkit.rb/commit/c7bad203045b702afda3176cece645bee4d4f6e3))
+* **astro:** allow URLs in `meta.image` ([#422](https://github.com/Bakaface/tutorialkit.rb/issues/422)) ([3125547](https://github.com/Bakaface/tutorialkit.rb/commit/3125547c043fe4a76dca95b1eb973362967ccf02))
+* **astro:** better default meta tags ([#342](https://github.com/Bakaface/tutorialkit.rb/issues/342)) ([d81d1cc](https://github.com/Bakaface/tutorialkit.rb/commit/d81d1cc01fdbce702ae91a6a5f371bd03c38b338))
+* **astro:** correct error message when chapter not found ([#361](https://github.com/Bakaface/tutorialkit.rb/issues/361)) ([0510474](https://github.com/Bakaface/tutorialkit.rb/commit/05104741a73180dbaeb583317cd77df104d2d2c7))
+* **astro:** don't modify state during re-renders of `<WorkspacePanelWrapper />` ([#240](https://github.com/Bakaface/tutorialkit.rb/issues/240)) ([745be37](https://github.com/Bakaface/tutorialkit.rb/commit/745be37ef20ae97d6ded221fca24670742981879))
+* **astro:** optimize CJS dependency `picomatch` ([#406](https://github.com/Bakaface/tutorialkit.rb/issues/406)) ([17a48a6](https://github.com/Bakaface/tutorialkit.rb/commit/17a48a6858912277942d87b8af28a601adfad8da))
+* **astro:** published package missing `@tutorialkit/astro/types` ([#347](https://github.com/Bakaface/tutorialkit.rb/issues/347)) ([f49e910](https://github.com/Bakaface/tutorialkit.rb/commit/f49e9107d35b98079a0fb16c74b9f37a45357661))
+* **astro:** sub folders not working on Windows ([#225](https://github.com/Bakaface/tutorialkit.rb/issues/225)) ([694f5ca](https://github.com/Bakaface/tutorialkit.rb/commit/694f5ca26dafae33554136ffbedea70c6c87585c))
+* **astro:** types of override components to optional ([#376](https://github.com/Bakaface/tutorialkit.rb/issues/376)) ([0af3848](https://github.com/Bakaface/tutorialkit.rb/commit/0af384889f5a3e7e46ea4803b1b1a631c15d331f))
+* **astro:** webcontainers link to be in plural ([#227](https://github.com/Bakaface/tutorialkit.rb/issues/227)) ([0b86ebd](https://github.com/Bakaface/tutorialkit.rb/commit/0b86ebd4e6e2b28dd2ef0ff97a5c66f9eb780973))
+* **astro:** work-around for dev-mode's `ReferenceError: __WC_CONFIG__ is not defined` errors ([#293](https://github.com/Bakaface/tutorialkit.rb/issues/293)) ([70fa3e2](https://github.com/Bakaface/tutorialkit.rb/commit/70fa3e2895f2f2c4d25aa3410690297afb49a44b))
+* **deps:** update `astro` for Node 18.18 compatibility ([#159](https://github.com/Bakaface/tutorialkit.rb/issues/159)) ([4b50335](https://github.com/Bakaface/tutorialkit.rb/commit/4b50335d284fd22d38d9dab2c0f85e219533a9e5))
+* **dev:** do not optimize components in development ([#28](https://github.com/Bakaface/tutorialkit.rb/issues/28)) ([1aded2a](https://github.com/Bakaface/tutorialkit.rb/commit/1aded2aef21f6821de743260b7efe5d5b788cb5f))
+* hide preview container when `previews: false` ([#412](https://github.com/Bakaface/tutorialkit.rb/issues/412)) ([b35de43](https://github.com/Bakaface/tutorialkit.rb/commit/b35de43d437492d124af232adddd2a30ec70ec0e))
+* ignore platform specific files ([#69](https://github.com/Bakaface/tutorialkit.rb/issues/69)) ([186e2db](https://github.com/Bakaface/tutorialkit.rb/commit/186e2dba86b529fcc5816861e689edf128f520e2))
+* ignore templates `node_modules` ([#198](https://github.com/Bakaface/tutorialkit.rb/issues/198)) ([d7215ca](https://github.com/Bakaface/tutorialkit.rb/commit/d7215ca2a080267a3cc2c660dc997665d2fcfc26))
+* **logo:** support multiple formats and remove styling requirements ([#62](https://github.com/Bakaface/tutorialkit.rb/issues/62)) ([79cb18d](https://github.com/Bakaface/tutorialkit.rb/commit/79cb18dca4e6b80a1f12ec96e1e627678f7b377d))
+* make sure vite-plugin-inspect is only included in dev mode ([#39](https://github.com/Bakaface/tutorialkit.rb/issues/39)) ([efeed8f](https://github.com/Bakaface/tutorialkit.rb/commit/efeed8ff1c603228b58e9b583fe5304c4480a509))
+* missing preview i18n ([#255](https://github.com/Bakaface/tutorialkit.rb/issues/255)) ([095ed57](https://github.com/Bakaface/tutorialkit.rb/commit/095ed570702d1b8de9370565b94103cd0740c408))
+* mobile fixes and basic i18n support ([#127](https://github.com/Bakaface/tutorialkit.rb/issues/127)) ([f85e8eb](https://github.com/Bakaface/tutorialkit.rb/commit/f85e8eb6058473b0ad2e061d39e14d111f3f34fe))
+* send lesson updates as a single mount and preview fixes ([#32](https://github.com/Bakaface/tutorialkit.rb/issues/32)) ([272e4a3](https://github.com/Bakaface/tutorialkit.rb/commit/272e4a3171735334347dd8144913fd952c3e9ff5))
+* sort navigation items numerically in `objectToSortedArray` function ([#56](https://github.com/Bakaface/tutorialkit.rb/issues/56)) ([e45f62b](https://github.com/Bakaface/tutorialkit.rb/commit/e45f62b68952228dd1facd55c2db5bd9f5247e42))
+* support a base different from / in astro config ([#92](https://github.com/Bakaface/tutorialkit.rb/issues/92)) ([3e7830b](https://github.com/Bakaface/tutorialkit.rb/commit/3e7830be7ed1fda9598c569eaad9878aa9d10156))
+* support inheritance for `editor`/`focus` and fix bug with logo ([#67](https://github.com/Bakaface/tutorialkit.rb/issues/67)) ([a7eb31d](https://github.com/Bakaface/tutorialkit.rb/commit/a7eb31dcaa039292870a78fae979efd6c0ece134))
+* switch default `meta.image` to `.png` ([#427](https://github.com/Bakaface/tutorialkit.rb/issues/427)) ([d39bf40](https://github.com/Bakaface/tutorialkit.rb/commit/d39bf404bc1947c48b5cb15164f20f67c0be49bc))
+* **terminal:** change behaviour of terminal configuration ([#44](https://github.com/Bakaface/tutorialkit.rb/issues/44)) ([2cd9fec](https://github.com/Bakaface/tutorialkit.rb/commit/2cd9fecacae10f473f9c000375861e2f59539d41))
+* **terminal:** fix selection background in light mode ([#45](https://github.com/Bakaface/tutorialkit.rb/issues/45)) ([55de9ed](https://github.com/Bakaface/tutorialkit.rb/commit/55de9ed94616caa489750839f2ec65505089d766))
+* **theme:** set correct background and text color for panels ([#94](https://github.com/Bakaface/tutorialkit.rb/issues/94)) ([3ad01a0](https://github.com/Bakaface/tutorialkit.rb/commit/3ad01a0cc1055c1f1ffd7b220785f4be1d8d0669))
+* **theme:** use correct tokens for the breadcrumbs ([#88](https://github.com/Bakaface/tutorialkit.rb/issues/88)) ([1669299](https://github.com/Bakaface/tutorialkit.rb/commit/1669299c988b8680dda4360e8f02d64c601ad48d))
+* use `meta.title` as default `<title>` ([#454](https://github.com/Bakaface/tutorialkit.rb/issues/454)) ([482b0e3](https://github.com/Bakaface/tutorialkit.rb/commit/482b0e3069a1177562dff44917e30e494769ace7))
+* use part title instead of slug for page title ([#40](https://github.com/Bakaface/tutorialkit.rb/issues/40)) ([dc11ccc](https://github.com/Bakaface/tutorialkit.rb/commit/dc11cccde48af65715bac9ab23be0ff3ead3649c))
+* warn when using `.svg` in `meta.image` ([#377](https://github.com/Bakaface/tutorialkit.rb/issues/377)) ([6e1edc1](https://github.com/Bakaface/tutorialkit.rb/commit/6e1edc1af274d0eb65587f358e5db9557d259171))
+
+
+### Features
+
+* `tutorialkit eject` command ([#81](https://github.com/Bakaface/tutorialkit.rb/issues/81)) ([c802668](https://github.com/Bakaface/tutorialkit.rb/commit/c802668aa39875052ac917952bee8d491dde1557))
+* add 'Open in StackBlitz'-button ([#219](https://github.com/Bakaface/tutorialkit.rb/issues/219)) ([af428c8](https://github.com/Bakaface/tutorialkit.rb/commit/af428c84f0cd817debd336dc43e88c19583800ce))
+* add "Edit this page" link ([#130](https://github.com/Bakaface/tutorialkit.rb/issues/130)) ([dd9c52c](https://github.com/Bakaface/tutorialkit.rb/commit/dd9c52c6f1d3c90cc1d993d8c0fec61dadfc5815))
+* add `@tutorialkit/theme` package to use the theme without astro ([#105](https://github.com/Bakaface/tutorialkit.rb/issues/105)) ([9805996](https://github.com/Bakaface/tutorialkit.rb/commit/9805996a4211a1c8a3e1bfbbd958a27f1957d4d7))
+* add eslint ([#90](https://github.com/Bakaface/tutorialkit.rb/issues/90)) ([fcfb3e8](https://github.com/Bakaface/tutorialkit.rb/commit/fcfb3e8109b5be1ef59ac2bfd8efd4db8e635e34))
+* add files via file tree ([#314](https://github.com/Bakaface/tutorialkit.rb/issues/314)) ([7782bdc](https://github.com/Bakaface/tutorialkit.rb/commit/7782bdc6e7da0429061c881ac2f95829f149a907))
+* add link to webcontainers.io ([#202](https://github.com/Bakaface/tutorialkit.rb/issues/202)) ([70d20c7](https://github.com/Bakaface/tutorialkit.rb/commit/70d20c7b3801b458aa11c7d70a11ea1392d0fa60))
+* allow custom `src/pages/index.astro` ([#93](https://github.com/Bakaface/tutorialkit.rb/issues/93)) ([d431d4d](https://github.com/Bakaface/tutorialkit.rb/commit/d431d4d4908f28184cd7d2f75faffe2c77a3ef4c))
+* allow custom components that modify the tutorial state ([#64](https://github.com/Bakaface/tutorialkit.rb/issues/64)) ([1279917](https://github.com/Bakaface/tutorialkit.rb/commit/1279917be042580033f23605e92f903ecd186e19))
+* allow ordering to be config based in addition to folder based ([#79](https://github.com/Bakaface/tutorialkit.rb/issues/79)) ([2b131e5](https://github.com/Bakaface/tutorialkit.rb/commit/2b131e597b94671678c2f2e4625e194eb382dab0))
+* **astro:** add "Download lesson as zip" button ([#415](https://github.com/Bakaface/tutorialkit.rb/issues/415)) ([9c6e534](https://github.com/Bakaface/tutorialkit.rb/commit/9c6e5349b6ab7e7399437839f6fc4cf11bd6c5c3))
+* **astro:** add sensible default canonical url ([#437](https://github.com/Bakaface/tutorialkit.rb/issues/437)) ([1a5ea33](https://github.com/Bakaface/tutorialkit.rb/commit/1a5ea333744c524316a5d6348d8bd0ccf2e76ca7))
+* **astro:** custom expressive code plugins ([#444](https://github.com/Bakaface/tutorialkit.rb/issues/444)) ([d586225](https://github.com/Bakaface/tutorialkit.rb/commit/d586225d11e900b6a63d7e3c9afdf1d04aa6485c))
+* **astro:** override components to support `Dialog` ([#345](https://github.com/Bakaface/tutorialkit.rb/issues/345)) ([61a542e](https://github.com/Bakaface/tutorialkit.rb/commit/61a542e7e13b3eaf52b04624954398a8d95a8d46))
+* **astro:** override components to support `HeadTags` ([#375](https://github.com/Bakaface/tutorialkit.rb/issues/375)) ([e93d11a](https://github.com/Bakaface/tutorialkit.rb/commit/e93d11a11b8a01dc6de859842b0dc675b01008de))
+* **astro:** preserve file path for imported file code blocks ([#446](https://github.com/Bakaface/tutorialkit.rb/issues/446)) ([df69da2](https://github.com/Bakaface/tutorialkit.rb/commit/df69da20e01d4cbed26a3f314f787e4e1ed015b9))
+* **astro:** support lessons without parts or chapters ([#374](https://github.com/Bakaface/tutorialkit.rb/issues/374)) ([8c44cbe](https://github.com/Bakaface/tutorialkit.rb/commit/8c44cbec3f276a4f788b5d1652f67e4cf8cf7948))
+* finalize basic i18n support ([#133](https://github.com/Bakaface/tutorialkit.rb/issues/133)) ([09d8bf7](https://github.com/Bakaface/tutorialkit.rb/commit/09d8bf7bd7673abb5b92b7de569daad1b44b07fd))
+* folder rework, introduce `@tutorialkit/components-react` ([#17](https://github.com/Bakaface/tutorialkit.rb/issues/17)) ([dd74c49](https://github.com/Bakaface/tutorialkit.rb/commit/dd74c49ec4f021ac53fd320cf5023275fbf12311))
+* hot reload for files in webcontainer ([#61](https://github.com/Bakaface/tutorialkit.rb/issues/61)) ([949fcf3](https://github.com/Bakaface/tutorialkit.rb/commit/949fcf3438e3bf17902d753089372fbc03911136))
+* load user provided css for theme customization ([#31](https://github.com/Bakaface/tutorialkit.rb/issues/31)) ([4e8452a](https://github.com/Bakaface/tutorialkit.rb/commit/4e8452a3b3142bc9f4cbd56261bc6cdb8573a8e1))
+* make the logo link configurable ([#68](https://github.com/Bakaface/tutorialkit.rb/issues/68)) ([2da64ae](https://github.com/Bakaface/tutorialkit.rb/commit/2da64ae811cbb12aeab8fd1fb36bed4845542aa4))
+* **markdown:** add ability to load file for code blocks ([#18](https://github.com/Bakaface/tutorialkit.rb/issues/18)) ([9b57454](https://github.com/Bakaface/tutorialkit.rb/commit/9b57454eb46dee76949f67c5c31edf1103f7110c))
+* mobile support ([#91](https://github.com/Bakaface/tutorialkit.rb/issues/91)) ([030ca1e](https://github.com/Bakaface/tutorialkit.rb/commit/030ca1ee688f75f6e59ae25a1b2433823ade384f))
+* **previews:** allow hiding the previews entirely ([#41](https://github.com/Bakaface/tutorialkit.rb/issues/41)) ([84ecef5](https://github.com/Bakaface/tutorialkit.rb/commit/84ecef5aecacba37873977fbb19ef64d65d10c14))
+* **react:** add button to reload a preview ([#305](https://github.com/Bakaface/tutorialkit.rb/issues/305)) ([d14c404](https://github.com/Bakaface/tutorialkit.rb/commit/d14c4045ad692a45b5b388bb4cfcca9762e6142c))
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` ([#155](https://github.com/Bakaface/tutorialkit.rb/issues/155)) ([e3c0fee](https://github.com/Bakaface/tutorialkit.rb/commit/e3c0fee902a7bfc312fb01b30531209815d460c3))
+* simplify astro config ([#20](https://github.com/Bakaface/tutorialkit.rb/issues/20)) ([b2b2bfb](https://github.com/Bakaface/tutorialkit.rb/commit/b2b2bfbfd224657d114a537a96064d55bd069b91))
+* simplify UnoCSS integration ([#270](https://github.com/Bakaface/tutorialkit.rb/issues/270)) ([8d49ef8](https://github.com/Bakaface/tutorialkit.rb/commit/8d49ef81272d84cbfa2c1a10742f01540fe3650c))
+* support glob patterns in `editor.fileTree.allowEdits` ([#332](https://github.com/Bakaface/tutorialkit.rb/issues/332)) ([c1a59f5](https://github.com/Bakaface/tutorialkit.rb/commit/c1a59f54c5b5700b8ec8ed5a4a3ebf2169b2409c))
+* support overriding `TopBar` ([#112](https://github.com/Bakaface/tutorialkit.rb/issues/112)) ([3792aa9](https://github.com/Bakaface/tutorialkit.rb/commit/3792aa99103ed2461c9b4922838fec7fbcb5dec7))
+* sync files from WebContainer to editor ([#334](https://github.com/Bakaface/tutorialkit.rb/issues/334)) ([5c1de69](https://github.com/Bakaface/tutorialkit.rb/commit/5c1de69c0e4e233a25a2f9b70fbb1f6c93f12356))
+* template inheritance ([#99](https://github.com/Bakaface/tutorialkit.rb/issues/99)) ([c4350a8](https://github.com/Bakaface/tutorialkit.rb/commit/c4350a8032d0d24ac9250be8b81869ddae88a538))
+* **terminal:** add support for terminals ([#33](https://github.com/Bakaface/tutorialkit.rb/issues/33)) ([53c902b](https://github.com/Bakaface/tutorialkit.rb/commit/53c902bcdc30f3c39f9b2a737e6da1dabd09dabf))
+* **terminal:** allow styling terminal with css tokens ([#34](https://github.com/Bakaface/tutorialkit.rb/issues/34)) ([80ccfe7](https://github.com/Bakaface/tutorialkit.rb/commit/80ccfe75eff511583de8d1155652714a65edc1ed))
+* **theme:** add support for setting text and code colors in callouts ([#96](https://github.com/Bakaface/tutorialkit.rb/issues/96)) ([623b04d](https://github.com/Bakaface/tutorialkit.rb/commit/623b04da18e5545a6d29b03a60571b1fb5bc2db1))
+* **theme:** create proper tokens for callouts ([#87](https://github.com/Bakaface/tutorialkit.rb/issues/87)) ([6d01620](https://github.com/Bakaface/tutorialkit.rb/commit/6d01620f65c2386d98864246f8fe87e53c76c78f))
+
+
+### BREAKING CHANGES
+
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` (#155)
+* simplify UnoCSS integration (#270)
+
+
+
 ## [1.5.2](https://github.com/stackblitz/tutorialkit/compare/1.5.0...1.5.2) "@tutorialkit/astro" (2025-06-17)
 
 

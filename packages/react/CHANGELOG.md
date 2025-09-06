@@ -1,3 +1,35 @@
+## 0.0.1 "@tutorialkit/react" (2025-09-06)
+
+
+### Bug Fixes
+
+* hide preview container when `previews: false` ([#412](https://github.com/Bakaface/tutorialkit.rb/issues/412)) ([b35de43](https://github.com/Bakaface/tutorialkit.rb/commit/b35de43d437492d124af232adddd2a30ec70ec0e))
+* prevent overwriting template files via `<FileTree>` ([#336](https://github.com/Bakaface/tutorialkit.rb/issues/336)) ([23ed41c](https://github.com/Bakaface/tutorialkit.rb/commit/23ed41c827073a205a2ceaa78973a9200a84c72d))
+* **react:** allow preview panel to be fully collapsed ([#445](https://github.com/Bakaface/tutorialkit.rb/issues/445)) ([11aa9ad](https://github.com/Bakaface/tutorialkit.rb/commit/11aa9ad338de76cf0fe18d18d889504faea1c40c))
+* **react:** file tree scroll visibility ([#399](https://github.com/Bakaface/tutorialkit.rb/issues/399)) ([e1e9160](https://github.com/Bakaface/tutorialkit.rb/commit/e1e916044cc225dab925bd846d9208181f2080e1))
+* **react:** refresh preview when `autoReload: true` ([#303](https://github.com/Bakaface/tutorialkit.rb/issues/303)) ([9754b26](https://github.com/Bakaface/tutorialkit.rb/commit/9754b2671c9e896a63ca49053fc1dde78a88e0c7))
+* **react:** stale lesson data after navigation ([#318](https://github.com/Bakaface/tutorialkit.rb/issues/318)) ([2b5fc92](https://github.com/Bakaface/tutorialkit.rb/commit/2b5fc92fe962fee63b4d2f2efcce04602157268b))
+
+
+### Features
+
+* add file extension based icons ([#369](https://github.com/Bakaface/tutorialkit.rb/issues/369)) ([ff39cdc](https://github.com/Bakaface/tutorialkit.rb/commit/ff39cdc258764c8d4d1bebe2dce2795fe10e1870))
+* add files via file tree ([#314](https://github.com/Bakaface/tutorialkit.rb/issues/314)) ([7782bdc](https://github.com/Bakaface/tutorialkit.rb/commit/7782bdc6e7da0429061c881ac2f95829f149a907))
+* add initial adjustments for packages ([c2a64f2](https://github.com/Bakaface/tutorialkit.rb/commit/c2a64f25e4a842bfa9bf4a3c7b2a56a46c22aaf7))
+* **astro:** add "Download lesson as zip" button ([#415](https://github.com/Bakaface/tutorialkit.rb/issues/415)) ([9c6e534](https://github.com/Bakaface/tutorialkit.rb/commit/9c6e5349b6ab7e7399437839f6fc4cf11bd6c5c3))
+* **astro:** override components to support `Dialog` ([#345](https://github.com/Bakaface/tutorialkit.rb/issues/345)) ([61a542e](https://github.com/Bakaface/tutorialkit.rb/commit/61a542e7e13b3eaf52b04624954398a8d95a8d46))
+* **astro:** support lessons without parts or chapters ([#374](https://github.com/Bakaface/tutorialkit.rb/issues/374)) ([8c44cbe](https://github.com/Bakaface/tutorialkit.rb/commit/8c44cbec3f276a4f788b5d1652f67e4cf8cf7948))
+* **react:** add button to reload a preview ([#305](https://github.com/Bakaface/tutorialkit.rb/issues/305)) ([d14c404](https://github.com/Bakaface/tutorialkit.rb/commit/d14c4045ad692a45b5b388bb4cfcca9762e6142c))
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` ([#155](https://github.com/Bakaface/tutorialkit.rb/issues/155)) ([e3c0fee](https://github.com/Bakaface/tutorialkit.rb/commit/e3c0fee902a7bfc312fb01b30531209815d460c3))
+* support glob patterns in `editor.fileTree.allowEdits` ([#332](https://github.com/Bakaface/tutorialkit.rb/issues/332)) ([c1a59f5](https://github.com/Bakaface/tutorialkit.rb/commit/c1a59f54c5b5700b8ec8ed5a4a3ebf2169b2409c))
+
+
+### BREAKING CHANGES
+
+* rename `@tutorialkit/components-react` to `@tutorialkit/react` (#155)
+
+
+
 ## [1.5.2](https://github.com/stackblitz/tutorialkit/compare/1.5.0...1.5.2) "@tutorialkit/react" (2025-06-17)
 
 

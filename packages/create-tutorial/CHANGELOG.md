@@ -1,3 +1,19 @@
+## 0.0.3 "create-tutorial" (2025-09-06)
+
+
+### Bug Fixes
+
+* **cli:** `create-tutorial` not depending on `@tutorialkit/cli` package ([#254](https://github.com/Bakaface/tutorialkit.rb/issues/254)) ([3b480db](https://github.com/Bakaface/tutorialkit.rb/commit/3b480dbd682a8c7657151dc93054f8209fdad312))
+
+
+### Features
+
+* add `@tutorialkit/theme` package to use the theme without astro ([#105](https://github.com/Bakaface/tutorialkit.rb/issues/105)) ([9805996](https://github.com/Bakaface/tutorialkit.rb/commit/9805996a4211a1c8a3e1bfbbd958a27f1957d4d7))
+* add create-tutorial package ([#47](https://github.com/Bakaface/tutorialkit.rb/issues/47)) ([e720657](https://github.com/Bakaface/tutorialkit.rb/commit/e7206578ac29212cab211f988ea2c8f7dcbe00d1))
+* rename `tutorialkit` to `@tutorialkit/cli` ([#153](https://github.com/Bakaface/tutorialkit.rb/issues/153)) ([2986157](https://github.com/Bakaface/tutorialkit.rb/commit/298615748b1f2d3ea737c591ce193eb0d28407ca))
+
+
+
 ## [0.0.3](https://github.com/stackblitz/tutorialkit/compare/1.5.0...0.0.3) "create-tutorial" (2025-06-17)
 
 

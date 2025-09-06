@@ -36,7 +36,7 @@ jobs:
             ["@tutorialkit/theme"]="@tutorialkit-rb/theme"
             ["@tutorialkit/types"]="@tutorialkit-rb/types"
             ["@tutorialkit/cli"]="@tutorialkit-rb/cli"
-            ["@tutorialkit/test-utils"]="@tutorialkit-rb/test-utils"
+            ["test-utils"]="@tutorialkit-rb/test-utils"
             ["create-tutorial"]="create-tutorialkit-rb"
           )
 

@@ -1,31 +1,37 @@
-import repl from "node:repl";
+import repl from 'node:repl';
+import { type RubyVM } from './commands.js';
 
-const isRecoverableError = (error) => {
+const isRecoverableError = (error: Error): boolean => {
   if (error.message.includes('SyntaxError')) {
     return true;
   }
 
   return false;
-}
+};
 
-const rubyWriter = (output) => {
-  if (!output) return;
+const rubyWriter = (output: any): string => {
+  if (!output) {
+    return '';
+  }
 
   if (typeof output === 'string') {
     return output;
   }
 
-  return output.toString().replace(/\n$/, "");
-}
+  return output.toString().replace(/\n$/, '');
+};
 
 export default class IRBRepl {
-  constructor(vm) {
+  private vm: RubyVM;
+
+  constructor(vm: RubyVM) {
     this.vm = vm;
     this.eval = this.eval.bind(this);
   }
 
-  async eval (cmd, context, filename, callback) {
-    let result;
+  async eval(cmd: string, context: any, filename: string, callback: Function): Promise<void> {
+    let result: any;
+
     try {
       result = await this.vm.evalAsync(`
 __code__ = <<~'RUBY'
@@ -34,10 +40,11 @@ RUBY
 
 $irb.eval_code(__code__)
 `);
-    } catch (e) {
+    } catch (error) {
       if (e.message.includes('SystemExit')) {
         process.exit();
       }
+
       if (isRecoverableError(e)) {
         return callback(new repl.Recoverable(e));
       }
@@ -47,7 +54,7 @@ $irb.eval_code(__code__)
     callback(null, result);
   }
 
-  async start() {
+  async start(): Promise<void> {
     // Set up IRB
     const promptVal = await this.vm.evalAsync(`
       require "irb"
@@ -97,10 +104,10 @@ $irb.eval_code(__code__)
       IRB.conf[:PROMPT][IRB.conf[:PROMPT_MODE]][:PROMPT_I]
         .gsub(/(%\\d+)?n/, "") # no line number support
         .then { $irb.send(:format_prompt, _1, nil, 0, 0) }
-    `)
+    `);
 
-    const prompt = promptVal.toJS()
-    const local = repl.start({prompt, eval: this.eval, writer: rubyWriter});
+    const prompt = promptVal.toJS();
+    const local = repl.start({ prompt, eval: this.eval, writer: rubyWriter });
 
     local.on('exit', () => {
       // TODO: save history?
@@ -108,3 +115,4 @@ $irb.eval_code(__code__)
     });
   }
 }
+

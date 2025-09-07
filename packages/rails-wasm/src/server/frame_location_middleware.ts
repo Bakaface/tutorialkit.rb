@@ -1,7 +1,11 @@
-const createFrameLocationTrackingMiddleware = (options = {}) => {
-  const {
-    injectionPoint = '</body>'
-  } = options;
+import { type Request, type Response, type NextFunction } from 'express';
+
+export interface FrameLocationTrackingOptions {
+  injectionPoint?: string;
+}
+
+const createFrameLocationTrackingMiddleware = (options: FrameLocationTrackingOptions = {}) => {
+  const { injectionPoint = '</body>' } = options;
 
   const trackingScript = `
     <script>
@@ -54,11 +58,11 @@ const createFrameLocationTrackingMiddleware = (options = {}) => {
     </script>
   `;
 
-  return (req, res, next) => {
-    // Store the original send method
+  return (req: Request, res: Response, next: NextFunction) => {
+    // store the original send method
     const originalSend = res.send;
 
-    res.send = function(data) {
+    res.send = function(data: any) {
       const contentType = res.get('Content-Type');
 
       if (contentType && contentType.includes('text/html') && typeof data === 'string') {

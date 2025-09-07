@@ -1,9 +1,13 @@
 #!/usr/bin/env -S node --disable-warning=ExperimentalWarning
 
-import initVM from "../lib/rails.js";
-import IRBRepl from "../lib/irb.js";
+import { initVM, IRBRepl } from "@tutorialkit-rb/rails-wasm";
+import path from "node:path";
 
-const vm = await initVM();
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const vm = await initVM({
+  workspaceDir: path.join(__dirname, "../workspace"),
+  pgDataDir: path.join(__dirname, "../pgdata")
+});
 const irb = new IRBRepl(vm);
 
 irb.start();

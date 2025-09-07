@@ -2,17 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as prompts from '@clack/prompts';
 import chalk from 'chalk';
-import { execa } from 'execa';
 import yargs from 'yargs-parser';
 import { pkg } from '../../pkg.js';
-import { errorLabel, primaryLabel, printHelp, warnLabel } from '../../utils/messages.js';
+import { errorLabel, primaryLabel, printHelp } from '../../utils/messages.js';
 import { generateProjectName } from '../../utils/project.js';
 import { assertNotCanceled } from '../../utils/tasks.js';
 import { updateWorkspaceVersions } from '../../utils/workspace-version.js';
 import { setupEnterpriseConfig } from './enterprise.js';
+import { promptGemfileEditing, printRubyNextSteps } from './gemfile-editing.js';
 import { generateHostingConfig } from './generate-hosting-config.js';
 import { initGitRepo } from './git.js';
-import { installAndStart } from './install-start.js';
 import { DEFAULT_VALUES, type CreateOptions } from './options.js';
 import { selectPackageManager, type PackageManager } from './package-manager.js';
 import { copyTemplate } from './template.js';
@@ -27,8 +26,6 @@ export async function createTutorial(flags: yargs.Arguments) {
       tables: {
         Options: [
           ['--dir, -d', 'The folder in which the tutorial gets created'],
-          ['--install, --no-install', `Install dependencies (default ${chalk.yellow(DEFAULT_VALUES.install)})`],
-          ['--start, --no-start', `Start project (default ${chalk.yellow(DEFAULT_VALUES.start)})`],
           ['--git, --no-git', `Initialize a local git repository (default ${chalk.yellow(DEFAULT_VALUES.git)})`],
           [
             '--provider <name>, --no-provider',
@@ -56,14 +53,6 @@ export async function createTutorial(flags: yargs.Arguments) {
   }
 
   applyAliases(flags);
-
-  try {
-    verifyFlags(flags);
-  } catch (error) {
-    console.error(`${errorLabel()} ${error.message}`);
-
-    process.exit(1);
-  }
 
   try {
     return _createTutorial(flags);
@@ -160,47 +149,15 @@ async function _createTutorial(flags: CreateOptions): Promise<undefined> {
 
   await initGitRepo(resolvedDest, flags);
 
-  const { install, start } = await installAndStart(flags);
-
   prompts.log.success(chalk.green('Tutorial successfully created!'));
 
-  if (install || start) {
-    let message = 'Please wait while we install the dependencies and start your project...';
+  await promptGemfileEditing(dest, flags);
 
-    if (install && !start) {
-      // change the message if we're only installing dependencies
-      message = 'Please wait while we install the dependencies...';
+  printRubyNextSteps(dest);
 
-      // print the next steps without the install step in case we only install dependencies
-      printNextSteps(dest, selectedPackageManager, true);
-    }
+  prompts.outro(`You're all set!`);
 
-    prompts.outro(message);
-
-    await startProject(resolvedDest, selectedPackageManager, flags, start);
-  } else {
-    printNextSteps(dest, selectedPackageManager, false);
-
-    prompts.outro(`You're all set!`);
-
-    console.log('Until next time 👋');
-  }
-}
-
-async function startProject(cwd: string, packageManager: PackageManager, flags: CreateOptions, startProject: boolean) {
-  if (flags.dryRun) {
-    const message = startProject
-      ? 'Skipped dependency installation and project start'
-      : 'Skipped dependency installation';
-
-    console.warn(`${warnLabel('DRY RUN')} ${message}`);
-  } else {
-    await execa(packageManager, ['install'], { cwd, stdio: 'inherit' });
-
-    if (startProject) {
-      await execa(packageManager, ['run', 'dev'], { cwd, stdio: 'inherit' });
-    }
-  }
+  console.log('Until next time 👋');
 }
 
 async function getTutorialDirectory(tutorialName: string, flags: CreateOptions) {
@@ -230,29 +187,6 @@ async function getTutorialDirectory(tutorialName: string, flags: CreateOptions) 
   assertNotCanceled(promptResult);
 
   return promptResult;
-}
-
-function printNextSteps(dest: string, packageManager: PackageManager, dependenciesInstalled: boolean) {
-  let i = 0;
-
-  prompts.log.message(chalk.bold.underline('Next Steps'));
-
-  const steps: Array<[command: string | undefined, text: string, render?: boolean]> = [
-    [`cd ${dest}`, 'Navigate to project'],
-    [`${packageManager} install`, 'Install dependencies', !dependenciesInstalled],
-    [`${packageManager} run dev`, 'Start development server'],
-    [, `Head over to ${chalk.underline('http://localhost:4321')}`],
-  ];
-
-  for (const [command, text, render] of steps) {
-    if (render === false) {
-      continue;
-    }
-
-    i++;
-
-    prompts.log.step(`${i}. ${command ? `${chalk.blue(command)} - ` : ''}${text}`);
-  }
 }
 
 function updatePackageJson(dest: string, projectName: string, flags: CreateOptions, provider: string) {
@@ -323,11 +257,5 @@ function applyAliases(flags: CreateOptions & Record<string, any>) {
 
   if (flags.e) {
     flags.enterprise = flags.e;
-  }
-}
-
-function verifyFlags(flags: CreateOptions) {
-  if (flags.install === false && flags.start) {
-    throw new Error('Cannot start project without installing dependencies.');
   }
 }

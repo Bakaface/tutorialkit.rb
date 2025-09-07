@@ -124,6 +124,17 @@ jobs:
               if (!pkg.keywords.includes('rails')) pkg.keywords.push('rails');
               if (!pkg.keywords.includes('wasm')) pkg.keywords.push('wasm');
 
+              // Replace workspace:* references with actual versions
+              ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
+                if (pkg[depType]) {
+                  Object.keys(pkg[depType]).forEach(dep => {
+                    if (pkg[depType][dep] === 'workspace:*') {
+                      pkg[depType][dep] = pkg.version;
+                    }
+                  });
+                }
+              });
+
               fs.writeFileSync('${pkg_json}', JSON.stringify(pkg, null, 2));
             "
           }

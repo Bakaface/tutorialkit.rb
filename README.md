@@ -38,18 +38,8 @@ This fork extends TutorialKit with the ability to run Ruby on Rails applications
 ### Quick Start
 
 ```bash
-# Create a new TutorialKit.rb project
-npx create-tutorialkitrb my-rails-tutorial
-
-# Configure your Ruby dependencies
-cd my-rails-tutorial
-# Edit ruby-wasm/Gemfile to add your gems
-
-# Build the Ruby WASM module
-npm run build:wasm
-
-# Start the development server
-npm run dev
+# Create a new TutorialKit.rb project and follow the instructions
+npx create-tutorialkit-rb my-rails-tutorial
 ```
 
 <hr>

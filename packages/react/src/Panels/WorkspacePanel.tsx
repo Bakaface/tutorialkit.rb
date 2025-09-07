@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
-import type { TutorialStore } from '@tutorialkit/runtime';
-import type { I18n } from '@tutorialkit/types';
+import type { TutorialStore } from '@tutorialkit-rb/runtime';
+import type { I18n } from '@tutorialkit-rb/types';
 import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle, type ImperativePanelHandle } from 'react-resizable-panels';
 import { DialogProvider } from '../core/Dialog.js';

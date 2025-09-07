@@ -1,4 +1,4 @@
-import type { I18n } from '@tutorialkit/types';
+import type { I18n } from '@tutorialkit-rb/types';
 import { useEffect, useRef, type ComponentProps } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle, type ImperativePanelHandle } from 'react-resizable-panels';
 import {

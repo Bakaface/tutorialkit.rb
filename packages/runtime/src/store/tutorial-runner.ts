@@ -1,4 +1,4 @@
-import type { CommandsSchema, Files } from '@tutorialkit/types';
+import type { CommandsSchema, Files } from '@tutorialkit-rb/types';
 import type { IFSWatcher, WebContainer, WebContainerProcess } from '@webcontainer/api';
 import picomatch from 'picomatch/posix.js';
 import { newTask, type Task, type TaskCancelled } from '../tasks.js';

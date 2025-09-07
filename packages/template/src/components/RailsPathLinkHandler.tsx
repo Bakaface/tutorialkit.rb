@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import type { PreviewInfo } from '@tutorialkit/runtime';
+import type { PreviewInfo } from '@tutorialkit-rb/runtime';
 import { useEffect } from 'react';
 import tutorialStore from 'tutorialkit:store';
 

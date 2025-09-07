@@ -1,5 +1,5 @@
 {
-  "name": "create-tutorial",
+  "name": "create-tutorialkit-rb",
   "version": "0.0.3",
   "description": "Interactive tutorials powered by WebContainer API",
   "author": "StackBlitz Inc.",
@@ -23,7 +23,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tutorialkit/cli": "latest"
+    "@tutorialkit-rb/cli": "latest"
   },
   "devDependencies": {
     "@types/node": "^20.14.6",

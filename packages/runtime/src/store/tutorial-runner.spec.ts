@@ -1,7 +1,7 @@
 // must be imported first
-import { resetProcessFactory, setProcessFactory } from '@tutorialkit/test-utils';
+import { resetProcessFactory, setProcessFactory } from '@tutorialkit-rb/test-utils';
 
-import type { MockedWebContainer } from '@tutorialkit/test-utils';
+import type { MockedWebContainer } from '@tutorialkit-rb/test-utils';
 import { WebContainer } from '@webcontainer/api';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { withResolvers } from '../utils/promises.js';

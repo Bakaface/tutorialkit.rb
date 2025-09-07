@@ -1,4 +1,4 @@
-import tutorialkit from '@tutorialkit/astro';
+import tutorialkit from '@tutorialkit-rb/astro';
 import { defineConfig } from 'astro/config';
 import remarkRailsPathLinks from './src/plugins/remarkRailsPathLinks';
 

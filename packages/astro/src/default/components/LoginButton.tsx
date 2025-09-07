@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { Button } from '@tutorialkit/react';
+import { Button } from '@tutorialkit-rb/react';
 import { useEffect, useRef, useState } from 'react';
 import { authStore } from '../stores/auth-store';
 import { login, logout } from './webcontainer';

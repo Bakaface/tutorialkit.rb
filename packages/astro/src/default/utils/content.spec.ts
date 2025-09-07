@@ -7,7 +7,7 @@ const getCollection = vi.mocked<() => Omit<CollectionEntryTutorial, 'render'>[]>
 vi.mock('astro:content', () => ({ getCollection: vi.fn() }));
 
 // mock DEFAULT_LOCALIZATION so that we don't need to update test results everytime new keys are added there
-vi.mock(import('@tutorialkit/types'), async (importOriginal) => ({
+vi.mock(import('@tutorialkit-rb/types'), async (importOriginal) => ({
   ...(await importOriginal()),
   DEFAULT_LOCALIZATION: { mocked: 'default localization' } as any,
 }));

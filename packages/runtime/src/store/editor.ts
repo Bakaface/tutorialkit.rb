@@ -1,4 +1,4 @@
-import type { FilesRefList, Files, EditorSchema, FileDescriptor } from '@tutorialkit/types';
+import type { FilesRefList, Files, EditorSchema, FileDescriptor } from '@tutorialkit-rb/types';
 import { atom, map, computed } from 'nanostores';
 import { EditorConfig } from '../webcontainer/editor-config.js';
 

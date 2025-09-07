@@ -370,7 +370,7 @@ exports[`create and eject a project 1`] = `
 `;
 
 exports[`create and eject a project 2`] = `
-"import tutorialkit from '@tutorialkit/astro';
+"import tutorialkit from '@tutorialkit-rb/astro';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({

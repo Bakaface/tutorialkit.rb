@@ -1,4 +1,4 @@
-import type { Lesson } from '@tutorialkit/types';
+import type { Lesson } from '@tutorialkit-rb/types';
 
 /**
  * Tests if the provided lesson needs to show the workspace panel or not.

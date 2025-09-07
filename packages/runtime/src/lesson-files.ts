@@ -1,4 +1,4 @@
-import type { Files, FilesRefList, Lesson } from '@tutorialkit/types';
+import type { Files, FilesRefList, Lesson } from '@tutorialkit-rb/types';
 import { newTask, type Task } from './tasks.js';
 import { wait } from './utils/promises.js';
 

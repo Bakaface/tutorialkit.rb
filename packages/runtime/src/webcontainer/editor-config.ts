@@ -1,4 +1,4 @@
-import type { EditorSchema } from '@tutorialkit/types';
+import type { EditorSchema } from '@tutorialkit-rb/types';
 
 interface NormalizedEditorConfig {
   /** Visibility of editor */

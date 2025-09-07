@@ -62,19 +62,19 @@ importers:
       '@playwright/test':
         specifier: ^1.46.0
         version: 1.46.1
-      '@tutorialkit/astro':
+      '@tutorialkit-rb/astro':
         specifier: workspace:*
         version: link:../packages/astro
-      '@tutorialkit/react':
+      '@tutorialkit-rb/react':
         specifier: workspace:*
         version: link:../packages/react
-      '@tutorialkit/runtime':
+      '@tutorialkit-rb/runtime':
         specifier: workspace:*
         version: link:../packages/runtime
-      '@tutorialkit/theme':
+      '@tutorialkit-rb/theme':
         specifier: workspace:*
         version: link:../packages/theme
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../packages/types
       '@types/node':
@@ -147,7 +147,7 @@ importers:
         specifier: 1.15.0
         version: 1.15.0
     devDependencies:
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../../packages/types
       '@types/node':
@@ -174,7 +174,7 @@ importers:
 
   integration:
     dependencies:
-      '@tutorialkit/theme':
+      '@tutorialkit-rb/theme':
         specifier: workspace:*
         version: link:../packages/theme
       execa:
@@ -207,16 +207,16 @@ importers:
       '@stackblitz/sdk':
         specifier: ^1.11.0
         version: 1.11.0
-      '@tutorialkit/react':
+      '@tutorialkit-rb/react':
         specifier: workspace:*
         version: link:../react
-      '@tutorialkit/runtime':
+      '@tutorialkit-rb/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@tutorialkit/theme':
+      '@tutorialkit-rb/theme':
         specifier: workspace:*
         version: link:../theme
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../types
       '@types/react':
@@ -374,9 +374,9 @@ importers:
 
   packages/create-tutorial:
     dependencies:
-      '@tutorialkit/cli':
+      '@tutorialkit-rb/cli':
         specifier: latest
-        version: 1.6.0
+        version: link:../cli
     devDependencies:
       '@types/node':
         specifier: ^20.14.6
@@ -462,10 +462,10 @@ importers:
       '@replit/codemirror-lang-svelte':
         specifier: ^6.0.0
         version: 6.0.0(@codemirror/autocomplete@6.16.3)(@codemirror/lang-css@6.2.1)(@codemirror/lang-html@6.4.9)(@codemirror/lang-javascript@6.2.2)(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.1)(@lezer/common@1.2.1)(@lezer/highlight@1.2.0)(@lezer/javascript@1.4.17)(@lezer/lr@1.4.1)
-      '@tutorialkit/runtime':
+      '@tutorialkit-rb/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@tutorialkit/theme':
+      '@tutorialkit-rb/theme':
         specifier: workspace:*
         version: link:../theme
       '@webcontainer/api':
@@ -502,7 +502,7 @@ importers:
       '@codemirror/search':
         specifier: ^6.5.6
         version: 6.5.6
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../types
       '@types/picomatch':
@@ -526,7 +526,7 @@ importers:
 
   packages/runtime:
     dependencies:
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../types
       '@webcontainer/api':
@@ -566,7 +566,7 @@ importers:
       '@nanostores/react':
         specifier: 0.7.2
         version: 0.7.2(nanostores@0.10.3)(react@18.3.1)
-      '@tutorialkit/react':
+      '@tutorialkit-rb/react':
         specifier: workspace:*
         version: link:../react
       nanostores:
@@ -585,13 +585,13 @@ importers:
       '@astrojs/react':
         specifier: ^3.6.0
         version: 3.6.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)(vite@5.4.2)
-      '@tutorialkit/astro':
+      '@tutorialkit-rb/astro':
         specifier: workspace:*
         version: link:../astro
-      '@tutorialkit/theme':
+      '@tutorialkit-rb/theme':
         specifier: workspace:*
         version: link:../theme
-      '@tutorialkit/types':
+      '@tutorialkit-rb/types':
         specifier: workspace:*
         version: link:../types
       '@types/mdast':
@@ -3548,27 +3548,6 @@ packages:
       - supports-color
       - typescript
     dev: true
-
-  /@tutorialkit/cli@1.6.0:
-    resolution: {integrity: sha512-SfBxg0dANqIHqlEhaGyoafZ7yttVrdg18rXMjVEjL1/M7wpgRbMT799sqffTUuvCP5Cmwlfk+nyfsv9VO1y3BQ==}
-    engines: {node: '>=18.18.0'}
-    hasBin: true
-    dependencies:
-      '@babel/generator': 7.24.5
-      '@babel/parser': 7.24.5
-      '@babel/traverse': 7.24.5
-      '@babel/types': 7.24.5
-      '@clack/prompts': 0.7.0
-      chalk: 5.3.0
-      detect-indent: 7.0.1
-      execa: 9.2.0
-      ignore: 5.3.1
-      lookpath: 1.2.2
-      which-pm: 2.2.0
-      yargs-parser: 21.1.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
 
   /@types/acorn@4.0.6:
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}

@@ -49,13 +49,13 @@ export function generateAstroConfig(astroConfig: t.File): string {
  * @param ast The astro config parsed by babel.
  */
 export function replaceArgs(newTutorialKitArgs: Options, ast: t.File) {
-  const integrationImport = '@tutorialkit/astro';
+  const integrationImport = '@tutorialkit-rb/astro';
 
   let integrationId: t.Identifier | undefined;
 
   /**
    * In the first pass we search for the tutorialkit name by looking for a default import
-   * to `@tutorialkit/astro`.
+   * to `@tutorialkit-rb/astro`.
    */
   visit(ast, {
     ImportDeclaration(path) {

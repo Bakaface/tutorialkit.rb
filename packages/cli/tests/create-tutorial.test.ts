@@ -251,7 +251,7 @@ test('cannot eject on an astro project that is not using TutorialKit 2', async (
 
   await fs.writeFile(
     path.join(dest, 'package.json'),
-    JSON.stringify({ name: 'astro', dependencies: { astro: '4.11.0', '@tutorialkit/astro': '*' } }),
+    JSON.stringify({ name: 'astro', dependencies: { astro: '4.11.0', '@tutorialkit-rb/astro': '*' } }),
   );
 
   await fs.writeFile(
@@ -271,7 +271,7 @@ test('cannot eject on an astro project that is not using TutorialKit 2', async (
     execa('node', [cli, 'eject', name, '--force', '--defaults'], {
       cwd: tmpDir,
     }),
-  ).rejects.toThrow(`Could not find import to '@tutorialkit/astro'`);
+  ).rejects.toThrow(`Could not find import to '@tutorialkit-rb/astro'`);
 });
 
 test('--help prints out message', async () => {
@@ -279,10 +279,10 @@ test('--help prints out message', async () => {
 
   expect(stdout.replace(version, '[version]')).toMatchInlineSnapshot(`
     "
-     @tutorialkit/cli  v[version] Create tutorial apps powered by WebContainer API
+     @tutorialkit-rb/cli  v[version] Create tutorial apps powered by WebContainer API
 
-    Usage: @tutorialkit/cli [command] [...options]
-           @tutorialkit/cli [ -h | --help | -v | --version ]
+    Usage: @tutorialkit-rb/cli [command] [...options]
+           @tutorialkit-rb/cli [ -h | --help | -v | --version ]
 
     Commands:
       create  Create new tutorial app
@@ -302,11 +302,11 @@ async function runPnpmInstall(dest: string, baseDir: string) {
   packageJson.pnpm = {
     overrides: {
       '@astrojs/language-server': '2.14.1',
-      '@tutorialkit/astro': `file:${baseDir}/packages/astro`,
-      '@tutorialkit/react': `file:${baseDir}/packages/react`,
-      '@tutorialkit/runtime': `file:${baseDir}/packages/runtime`,
-      '@tutorialkit/theme': `file:${baseDir}/packages/theme`,
-      '@tutorialkit/types': `file:${baseDir}/packages/types`,
+      '@tutorialkit-rb/astro': `file:${baseDir}/packages/astro`,
+      '@tutorialkit-rb/react': `file:${baseDir}/packages/react`,
+      '@tutorialkit-rb/runtime': `file:${baseDir}/packages/runtime`,
+      '@tutorialkit-rb/theme': `file:${baseDir}/packages/theme`,
+      '@tutorialkit-rb/types': `file:${baseDir}/packages/types`,
     },
   };
 

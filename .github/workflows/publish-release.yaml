@@ -51,23 +51,15 @@ jobs:
             # Read current package name
             local current_name=$(node -pe "require('./${pkg_json}').name")
 
-            # Check if we have a mapping for this package
-            local new_name=""
-            case "$current_name" in
-              "@tutorialkit/astro") new_name="@tutorialkit-rb/astro" ;;
-              "@tutorialkit/react") new_name="@tutorialkit-rb/react" ;;
-              "@tutorialkit/runtime") new_name="@tutorialkit-rb/runtime" ;;
-              "@tutorialkit/theme") new_name="@tutorialkit-rb/theme" ;;
-              "@tutorialkit/types") new_name="@tutorialkit-rb/types" ;;
-              "@tutorialkit/cli") new_name="@tutorialkit-rb/cli" ;;
-              "test-utils") new_name="@tutorialkit-rb/test-utils" ;;
-              "create-tutorial") new_name="create-tutorialkit-rb" ;;
-              *) echo "No mapping for $current_name, skipping..."; return ;;
-            esac
+            # Only process fork packages
+            if [[ ! "$current_name" =~ ^(@tutorialkit-rb/|create-tutorialkit-rb$) ]]; then
+              echo "Skipping $current_name (not a fork package)"
+              return
+            fi
 
-            echo "Updating $current_name to $new_name"
+            echo "Updating fork package: $current_name"
 
-            # Update package name, version, dependencies, and repo info using Node.js
+            # Update package version and metadata using Node.js
             node -e "
               const fs = require('fs');
               const path = require('path');
@@ -83,33 +75,6 @@ jobs:
               } else {
                 console.warn('FORK_VERSION not set. Publishing with upstream version.');
               }
-
-              // Update package name
-              pkg.name = '${new_name}';
-
-              // Update dependencies to point to fork packages
-              const nameMapping = {
-                '@tutorialkit/astro': '@tutorialkit-rb/astro',
-                '@tutorialkit/react': '@tutorialkit-rb/react',
-                '@tutorialkit/runtime': '@tutorialkit-rb/runtime',
-                '@tutorialkit/theme': '@tutorialkit-rb/theme',
-                '@tutorialkit/types': '@tutorialkit-rb/types',
-                '@tutorialkit/cli': '@tutorialkit-rb/cli',
-                '@tutorialkit/test-utils': '@tutorialkit-rb/test-utils',
-                'create-tutorial': 'create-tutorialkit-rb'
-              };
-
-              ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
-                if (pkg[depType]) {
-                  Object.keys(pkg[depType]).forEach(dep => {
-                    if (nameMapping[dep]) {
-                      const version = pkg[depType][dep];
-                      delete pkg[depType][dep];
-                      pkg[depType][nameMapping[dep]] = version;
-                    }
-                  });
-                }
-              });
 
               // Add repository info for Ruby fork
               pkg.repository = {
@@ -147,21 +112,6 @@ jobs:
           done
         env:
           FORK_VERSION: ${{ env.FORK_VERSION }}
-
-      - name: Update source code imports
-        run: |
-          echo "Updating source code imports..."
-
-          find packages -name "*.ts" -o -name "*.js" -o -name "*.mts" -o -name "*.mjs" | xargs sed -i \
-            -e "s/@tutorialkit\/astro/@tutorialkit-rb\/astro/g" \
-            -e "s/@tutorialkit\/react/@tutorialkit-rb\/react/g" \
-            -e "s/@tutorialkit\/runtime/@tutorialkit-rb\/runtime/g" \
-            -e "s/@tutorialkit\/theme/@tutorialkit-rb\/theme/g" \
-            -e "s/@tutorialkit\/types/@tutorialkit-rb\/types/g" \
-            -e "s/@tutorialkit\/cli/@tutorialkit-rb\/cli/g" \
-            -e "s/@tutorialkit\/test-utils/@tutorialkit-rb\/test-utils/g"
-
-          echo "Source code imports updated"
 
       - name: Publish to npm
         run: |

@@ -1,5 +1,5 @@
 import { Root, Portal, Content, Item, Trigger } from '@radix-ui/react-context-menu';
-import { DEFAULT_LOCALIZATION, type FileDescriptor, type I18n, type FilesystemError } from '@tutorialkit/types';
+import { DEFAULT_LOCALIZATION, type FileDescriptor, type I18n, type FilesystemError } from '@tutorialkit-rb/types';
 import picomatch from 'picomatch/posix';
 import { useRef, useState, type ComponentProps } from 'react';
 import { classNames } from '../utils/classnames.js';

@@ -1,7 +1,7 @@
 /* eslint-disable @blitz/lines-around-comment */
 
 declare module 'tutorialkit:store' {
-  const tutorialStore: import('@tutorialkit/runtime').TutorialStore;
+  const tutorialStore: import('@tutorialkit-rb/runtime').TutorialStore;
 
   export default tutorialStore;
 }

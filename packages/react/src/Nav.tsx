@@ -1,5 +1,5 @@
 import * as Accordion from '@radix-ui/react-accordion';
-import { interpolateString, type Lesson, type NavItem, type NavList } from '@tutorialkit/types';
+import { interpolateString, type Lesson, type NavItem, type NavList } from '@tutorialkit-rb/types';
 import { AnimatePresence, cubicBezier, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useOutsideClick } from './hooks/useOutsideClick.js';

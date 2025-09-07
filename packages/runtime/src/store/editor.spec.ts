@@ -1,4 +1,4 @@
-import type { FileDescriptor } from '@tutorialkit/types';
+import type { FileDescriptor } from '@tutorialkit-rb/types';
 import { expect, test } from 'vitest';
 
 import { EditorStore } from './editor.js';

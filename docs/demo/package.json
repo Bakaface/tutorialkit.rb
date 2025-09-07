@@ -11,16 +11,16 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@tutorialkit/react": "workspace:*",
+    "@tutorialkit-rb/react": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.7.0",
     "@astrojs/react": "^3.6.0",
-    "@tutorialkit/astro": "workspace:*",
-    "@tutorialkit/theme": "workspace:*",
-    "@tutorialkit/types": "workspace:*",
+    "@tutorialkit-rb/astro": "workspace:*",
+    "@tutorialkit-rb/theme": "workspace:*",
+    "@tutorialkit-rb/types": "workspace:*",
     "@types/react": "^18.3.3",
     "astro": "^4.15.0",
     "prettier-plugin-astro": "^0.14.1",

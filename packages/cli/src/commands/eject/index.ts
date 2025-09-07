@@ -20,7 +20,7 @@ interface PackageJson {
 const TUTORIALKIT_VERSION = pkg.version;
 
 const REQUIRED_DEPENDENCIES = [
-  '@tutorialkit/runtime',
+  '@tutorialkit-rb/runtime',
   '@webcontainer/api',
   'nanostores',
   '@nanostores/react',
@@ -153,7 +153,7 @@ function validateDestination(folder: string, force: boolean) {
   const astroConfigPath = assertExists(path.join(folder, 'astro.config.ts'));
   const srcDestPath = assertExists(path.join(folder, 'src'));
 
-  const astroIntegrationPath = assertExists(path.resolve(folder, 'node_modules', '@tutorialkit', 'astro'));
+  const astroIntegrationPath = assertExists(path.resolve(folder, 'node_modules', '@tutorialkit-rb', 'astro'));
 
   const srcPath = path.join(astroIntegrationPath, 'dist', 'default');
 

@@ -1,4 +1,4 @@
-import type { PreviewSchema } from '@tutorialkit/types';
+import type { PreviewSchema } from '@tutorialkit-rb/types';
 import type { WebContainer } from '@webcontainer/api';
 import { atom } from 'nanostores';
 import { PortInfo } from '../webcontainer/port-info.js';

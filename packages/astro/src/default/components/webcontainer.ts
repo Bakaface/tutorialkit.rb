@@ -1,7 +1,7 @@
 // eslint-disable-next-line -- must be imported first
 import { useAuth } from './setup.js';
 
-import { safeBoot, TutorialStore } from '@tutorialkit/runtime';
+import { safeBoot, TutorialStore } from '@tutorialkit-rb/runtime';
 import { auth, WebContainer } from '@webcontainer/api';
 import { joinPaths } from '../utils/url.js';
 

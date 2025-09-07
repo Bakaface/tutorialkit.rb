@@ -1,4 +1,4 @@
-import type { PreviewSchema } from '@tutorialkit/types';
+import type { PreviewSchema } from '@tutorialkit-rb/types';
 import { PortInfo } from './port-info.js';
 
 export class PreviewInfo {

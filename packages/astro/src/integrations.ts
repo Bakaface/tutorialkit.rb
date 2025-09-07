@@ -3,7 +3,7 @@ import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import { pluginCollapsibleSections } from '@expressive-code/plugin-collapsible-sections';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
-import { getInlineContentForPackage } from '@tutorialkit/theme';
+import { getInlineContentForPackage } from '@tutorialkit-rb/theme';
 import expressiveCode, { type ExpressiveCodePlugin } from 'astro-expressive-code';
 import UnoCSS from 'unocss/astro';
 
@@ -58,7 +58,7 @@ export function extraIntegrations({
       injectReset: createRequire(root).resolve('@unocss/reset/tailwind.css'),
       content: {
         inline: getInlineContentForPackage({
-          name: '@tutorialkit/astro',
+          name: '@tutorialkit-rb/astro',
           pattern: '/dist/default/**/*.astro',
           root,
         }),

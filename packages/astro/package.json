@@ -1,5 +1,5 @@
 {
-  "name": "@tutorialkit/astro",
+  "name": "@tutorialkit-rb/astro",
   "version": "1.5.2",
   "description": "TutorialKit integration for Astro (https://astro.build)",
   "author": "StackBlitz Inc.",
@@ -39,10 +39,10 @@
     "@expressive-code/plugin-line-numbers": "^0.35.3",
     "@nanostores/react": "0.7.2",
     "@stackblitz/sdk": "^1.11.0",
-    "@tutorialkit/react": "workspace:*",
-    "@tutorialkit/runtime": "workspace:*",
-    "@tutorialkit/theme": "workspace:*",
-    "@tutorialkit/types": "workspace:*",
+    "@tutorialkit-rb/react": "workspace:*",
+    "@tutorialkit-rb/runtime": "workspace:*",
+    "@tutorialkit-rb/theme": "workspace:*",
+    "@tutorialkit-rb/types": "workspace:*",
     "@types/react": "^18.3.3",
     "@unocss/reset": "^0.62.2",
     "@webcontainer/api": "1.5.1",
@@ -65,7 +65,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@tutorialkit/types": "workspace:*",
+    "@tutorialkit-rb/types": "workspace:*",
     "@types/mdast": "^4.0.4",
     "esbuild": "^0.20.2",
     "esbuild-node-externals": "^1.13.1",

@@ -1,4 +1,4 @@
-import type { FileDescriptor, Files, FilesystemError, Lesson } from '@tutorialkit/types';
+import type { FileDescriptor, Files, FilesystemError, Lesson } from '@tutorialkit-rb/types';
 import type { WebContainer } from '@webcontainer/api';
 import { atom, type ReadableAtom } from 'nanostores';
 import { LessonFilesFetcher } from '../lesson-files.js';

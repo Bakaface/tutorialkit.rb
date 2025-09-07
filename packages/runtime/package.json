@@ -1,5 +1,5 @@
 {
-  "name": "@tutorialkit/runtime",
+  "name": "@tutorialkit-rb/runtime",
   "version": "1.5.2",
   "description": "TutorialKit runtime",
   "author": "StackBlitz Inc.",
@@ -33,7 +33,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@tutorialkit/types": "workspace:*",
+    "@tutorialkit-rb/types": "workspace:*",
     "@webcontainer/api": "1.5.1",
     "nanostores": "^0.10.3",
     "picomatch": "^4.0.2"

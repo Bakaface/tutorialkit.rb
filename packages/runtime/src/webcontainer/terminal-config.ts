@@ -1,4 +1,4 @@
-import type { TerminalPanelType, TerminalSchema } from '@tutorialkit/types';
+import type { TerminalPanelType, TerminalSchema } from '@tutorialkit-rb/types';
 import type { WebContainerProcess } from '@webcontainer/api';
 import type { ITerminal } from '../utils/terminal.js';
 

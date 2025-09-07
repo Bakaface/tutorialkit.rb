@@ -61,14 +61,8 @@ updateJSON('tsconfig.json', (tsconfig) => {
 
 // update dependencies
 updateJSON('package.json', (packageJson) => {
-  if (packageJson.name === 'tutorialkit-starter') {
-    packageJson.name = 'tutorialkit-rb-starter';
-  }
-
   updateWorkspaceVersions(packageJson.dependencies, version);
   updateWorkspaceVersions(packageJson.devDependencies, version);
-  updatePackageNames(packageJson.dependencies);
-  updatePackageNames(packageJson.devDependencies);
 });
 
 success('Template prepared');
@@ -79,26 +73,6 @@ function updateWorkspaceVersions(dependencies, version) {
 
     if (depVersion === 'workspace:*') {
       dependencies[dependency] = version;
-    }
-  }
-}
-
-function updatePackageNames(dependencies) {
-  const nameMapping = {
-    '@tutorialkit/astro': '@tutorialkit-rb/astro',
-    '@tutorialkit/react': '@tutorialkit-rb/react',
-    '@tutorialkit/runtime': '@tutorialkit-rb/runtime',
-    '@tutorialkit/theme': '@tutorialkit-rb/theme',
-    '@tutorialkit/types': '@tutorialkit-rb/types',
-    '@tutorialkit/cli': '@tutorialkit-rb/cli',
-    '@tutorialkit/test-utils': '@tutorialkit-rb/test-utils',
-  };
-
-  for (const oldName in nameMapping) {
-    if (dependencies[oldName]) {
-      const version = dependencies[oldName];
-      delete dependencies[oldName];
-      dependencies[nameMapping[oldName]] = version;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
-import type { TutorialStore } from '@tutorialkit/runtime';
-import type { TerminalPanelType } from '@tutorialkit/types';
+import type { TutorialStore } from '@tutorialkit-rb/runtime';
+import type { TerminalPanelType } from '@tutorialkit-rb/types';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { TerminalRef } from '../core/Terminal/index.js';
 import { classNames } from '../utils/classnames.js';

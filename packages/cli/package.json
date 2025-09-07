@@ -1,5 +1,5 @@
 {
-  "name": "@tutorialkit/cli",
+  "name": "@tutorialkit-rb/cli",
   "version": "1.5.2",
   "description": "Interactive tutorials powered by WebContainer API",
   "author": "StackBlitz Inc.",

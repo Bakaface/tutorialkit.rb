@@ -1,4 +1,4 @@
-import type { Tutorial, NavList, Part, Chapter } from '@tutorialkit/types';
+import type { Tutorial, NavList, Part, Chapter } from '@tutorialkit-rb/types';
 import { joinPaths } from './url';
 
 type NavItem = Required<Omit<NavList[number], 'href'>>;

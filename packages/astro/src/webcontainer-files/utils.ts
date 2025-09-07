@@ -1,4 +1,4 @@
-import { folderPathToFilesRef } from '@tutorialkit/types';
+import { folderPathToFilesRef } from '@tutorialkit-rb/types';
 import glob from 'fast-glob';
 import { FILES_FOLDER_NAME, IGNORED_FILES, SOLUTION_FOLDER_NAME } from './constants.js';
 

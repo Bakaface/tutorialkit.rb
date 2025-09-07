@@ -81,7 +81,7 @@ export default function createPlugin({
   let _config: AstroConfig;
 
   return {
-    name: '@tutorialkit/astro',
+    name: '@tutorialkit-rb/astro',
     hooks: {
       async 'astro:config:setup'(options) {
         const { injectRoute, updateConfig, config } = options;
@@ -99,14 +99,14 @@ export default function createPlugin({
               include: process.env.TUTORIALKIT_DEV
                 ? []
                 : [
-                    '@tutorialkit/react',
+                    '@tutorialkit-rb/react',
 
                     /**
-                     * The `picomatch` is CJS dependency used by `@tutorialkit/runtime`.
-                     * When used via `@tutorialkit/astro`, it's a transitive dependency that's
+                     * The `picomatch` is CJS dependency used by `@tutorialkit-rb/runtime`.
+                     * When used via `@tutorialkit-rb/astro`, it's a transitive dependency that's
                      * not automatically transformed.
                      */
-                    '@tutorialkit/astro > picomatch/posix.js',
+                    '@tutorialkit-rb/astro > picomatch/posix.js',
                   ],
             },
             define: {
@@ -114,7 +114,7 @@ export default function createPlugin({
               __WC_CONFIG__: enterprise ? JSON.stringify(enterprise) : 'undefined',
             },
             ssr: {
-              noExternal: ['@tutorialkit/astro', '@tutorialkit/react'],
+              noExternal: ['@tutorialkit-rb/astro', '@tutorialkit-rb/react'],
             },
             plugins: [
               userlandCSS,
@@ -132,20 +132,20 @@ export default function createPlugin({
           if (defaultRoutes !== 'tutorial-only') {
             injectRoute({
               pattern: '/',
-              entrypoint: '@tutorialkit/astro/default/pages/index.astro',
+              entrypoint: '@tutorialkit-rb/astro/default/pages/index.astro',
               prerender: true,
             });
           }
 
           injectRoute({
             pattern: '[...slug]',
-            entrypoint: '@tutorialkit/astro/default/pages/[...slug].astro',
+            entrypoint: '@tutorialkit-rb/astro/default/pages/[...slug].astro',
             prerender: true,
           });
         }
 
         // inject the additional integrations right after ours
-        const selfIndex = config.integrations.findIndex((integration) => integration.name === '@tutorialkit/astro');
+        const selfIndex = config.integrations.findIndex((integration) => integration.name === '@tutorialkit-rb/astro');
         config.integrations.splice(
           selfIndex + 1,
           0,

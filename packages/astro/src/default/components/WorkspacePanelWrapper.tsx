@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
-import { WorkspacePanel } from '@tutorialkit/react';
-import type { Lesson } from '@tutorialkit/types';
+import { WorkspacePanel } from '@tutorialkit-rb/react';
+import type { Lesson } from '@tutorialkit-rb/types';
 import { useEffect } from 'react';
 import { Dialog } from 'tutorialkit:override-components';
 import { themeStore } from '../stores/theme-store.js';

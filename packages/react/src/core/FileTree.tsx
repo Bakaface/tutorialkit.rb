@@ -1,4 +1,4 @@
-import type { FileDescriptor } from '@tutorialkit/types';
+import type { FileDescriptor } from '@tutorialkit-rb/types';
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from 'react';
 import { classNames } from '../utils/classnames.js';
 import { ContextMenu } from './ContextMenu.js';

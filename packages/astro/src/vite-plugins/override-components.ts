@@ -52,7 +52,7 @@ export interface OverrideComponentsOptions {
    * Component for overriding confirmation dialogs.
    *
    * This component has to be a React component and be the default export of that module.
-   * It will receive same props that `@tutorialkit/react/dialog` supports.
+   * It will receive same props that `@tutorialkit-rb/react/dialog` supports.
    */
   Dialog?: string;
 
@@ -96,7 +96,7 @@ export function overrideComponents({ components, defaultRoutes }: Options): Vite
       if (id === resolvedId) {
         const topBar = components?.TopBar || resolveDefaultTopBar(defaultRoutes);
         const headTags = components?.HeadTags || resolveDefaultHeadTags(defaultRoutes);
-        const dialog = components?.Dialog || '@tutorialkit/react/dialog';
+        const dialog = components?.Dialog || '@tutorialkit-rb/react/dialog';
 
         return `
           export { default as TopBar } from '${topBar}';
@@ -112,7 +112,7 @@ export function overrideComponents({ components, defaultRoutes }: Options): Vite
 
 function resolveDefaultTopBar(defaultRoutes: boolean) {
   if (defaultRoutes) {
-    return '@tutorialkit/astro/default/components/TopBar.astro';
+    return '@tutorialkit-rb/astro/default/components/TopBar.astro';
   }
 
   // default `TopBar` is used from local file when `defaultRoutes` is disabled
@@ -121,7 +121,7 @@ function resolveDefaultTopBar(defaultRoutes: boolean) {
 
 function resolveDefaultHeadTags(defaultRoutes: boolean) {
   if (defaultRoutes) {
-    return '@tutorialkit/astro/default/components/HeadTags.astro';
+    return '@tutorialkit-rb/astro/default/components/HeadTags.astro';
   }
 
   // default `HeadTags` is used from local file when `defaultRoutes` is disabled

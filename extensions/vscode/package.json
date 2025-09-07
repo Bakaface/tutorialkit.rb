@@ -157,7 +157,7 @@
     "yaml-language-server": "1.15.0"
   },
   "devDependencies": {
-    "@tutorialkit/types": "workspace:*",
+    "@tutorialkit-rb/types": "workspace:*",
     "@types/node": "20.14.11",
     "@types/vscode": "^1.80.0",
     "chokidar": "3.6.0",

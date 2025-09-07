@@ -1,4 +1,4 @@
-import type { Lesson } from '@tutorialkit/types';
+import type { Lesson } from '@tutorialkit-rb/types';
 import type { GetStaticPaths, GetStaticPathsItem } from 'astro';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import { getTutorial } from './content';

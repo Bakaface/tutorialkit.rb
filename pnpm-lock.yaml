@@ -375,7 +375,7 @@ importers:
   packages/create-tutorial:
     dependencies:
       '@tutorialkit-rb/cli':
-        specifier: latest
+        specifier: workspace:*
         version: link:../cli
     devDependencies:
       '@types/node':

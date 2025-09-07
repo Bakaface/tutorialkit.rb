@@ -94,7 +94,15 @@ jobs:
                 if (pkg[depType]) {
                   Object.keys(pkg[depType]).forEach(dep => {
                     if (pkg[depType][dep] === 'workspace:*') {
-                      pkg[depType][dep] = pkg.version;
+                      // Read the dependency's package.json to get its correct version
+                      const depPkgPath = 'packages/' + (dep.startsWith('@') ? dep.split('/')[1] : dep.replace('create-tutorialkit-rb', 'create-tutorial')) + '/package.json';
+                      try {
+                        const depPkg = require('./' + depPkgPath);
+                        pkg[depType][dep] = depPkg.version;
+                      } catch (error) {
+                        console.warn(\`Could not find version for \${dep}, using current package version\`);
+                        pkg[depType][dep] = pkg.version;
+                      }
                     }
                   });
                 }
@@ -113,6 +121,12 @@ jobs:
         env:
           FORK_VERSION: ${{ env.FORK_VERSION }}
 
+      - name: Update CLI template versions
+        working-directory: ./packages/cli
+        run: pnpm build-release
+        env:
+          FORK_VERSION: ${{ env.FORK_VERSION }}
+
       - name: Publish to npm
         run: |
           # Publish each package with the renamed version
@@ -127,12 +141,6 @@ jobs:
               fi
             fi
           done
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Update CLI template versions
-        working-directory: ./packages/cli
-        run: pnpm build-release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

@@ -23,7 +23,7 @@
     "dist"
   ],
   "dependencies": {
-    "@tutorialkit-rb/cli": "latest"
+    "@tutorialkit-rb/cli": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.14.6",

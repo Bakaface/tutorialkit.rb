@@ -8,12 +8,11 @@ import { distFolder, templateDest, templatePath } from './_constants.js';
 import { success } from './logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const baseVersion = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
+const version = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
 const forkVersion = process.env.FORK_VERSION;
-const version = forkVersion ? `${baseVersion}-rb.${forkVersion}` : baseVersion;
 const env = { ...process.env, COREPACK_ENABLE_STRICT: '0' };
 
-console.log(`Using version: ${version} (base: ${baseVersion}, fork: ${forkVersion})`);
+console.log(`Using version: ${version}`);
 
 await execa('node', [path.join(__dirname, './build.js')], {
   stdio: 'inherit',

@@ -24,7 +24,17 @@ echo "Building WASM module..."
 echo "WASM build completed successfully!"
 echo "ruby.wasm is now available at ruby-wasm/dist/ruby.wasm"
 
+# Generate hash of Gemfile.lock for cache versioning
+echo "Generating Gemfile.lock hash..."
+GEMFILE_HASH=$(sha256sum Gemfile.lock | cut -c1-16)
+echo "Gemfile.lock hash: $GEMFILE_HASH"
+
 # Copy the built ruby.wasm to the public directory
 echo "Copying ruby.wasm to public directory..."
 cp dist/ruby.wasm ../public/
 echo "ruby.wasm copied to public directory."
+
+# Create ruby.wasm.hash with the hash
+echo "Creating ruby.wasm.hash..."
+echo "$GEMFILE_HASH" > ../public/ruby.wasm.hash
+echo "ruby.wasm.hash created with hash: $GEMFILE_HASH"

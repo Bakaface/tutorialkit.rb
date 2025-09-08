@@ -1,0 +1,61 @@
+{
+  "name": "@tutorialkit-rb/rails-wasm",
+  "version": "0.0.1",
+  "description": "Rails on WebAssembly utilities for TutorialKit",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./commands": {
+      "import": "./dist/commands.js",
+      "types": "./dist/commands.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js", 
+      "types": "./dist/server.d.ts"
+    },
+    "./rails": {
+      "import": "./dist/rails.js",
+      "types": "./dist/rails.d.ts"
+    },
+    "./irb": {
+      "import": "./dist/irb.js",
+      "types": "./dist/irb.d.ts"
+    },
+    "./database": {
+      "import": "./dist/database.js",
+      "types": "./dist/database.d.ts"
+    },
+    "./scripts": {
+      "import": "./dist/scripts/index.js",
+      "types": "./dist/scripts/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src/patches"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@ruby/wasm-wasi": "^2.7.1",
+    "@electric-sql/pglite": "^0.3.1",
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "multer": "^2.0.1",
+    "set-cookie-parser": "^2.7.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.9.0",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.12",
+    "@types/set-cookie-parser": "^2.4.10"
+  }
+}

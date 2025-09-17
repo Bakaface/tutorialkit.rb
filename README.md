@@ -42,6 +42,23 @@ This fork extends TutorialKit with the ability to run Ruby on Rails applications
 npx create-tutorialkit-rb my-rails-tutorial
 ```
 
+FIXME: for now, you'll need to use `pnpm` as a package manager and edit the generated package.json to resolve the temporary issue with the internal package versioning.
+```
+{
+  // ...
+  // Add this section to your package.json
+  "pnpm": {
+    "overrides": {
+      "@tutorialkit-rb/types": "1.5.2-rb.0.1.1",
+      "@tutorialkit-rb/theme": "1.5.2-rb.0.1.1",
+      "@tutorialkit-rb/react": "1.5.2-rb.0.1.1",
+      "@tutorialkit-rb/runtime": "1.5.2-rb.0.1.1",
+      "@tutorialkit-rb/astro": "1.5.2-rb.0.1.1"
+    }
+  }
+}
+```
+
 <hr>
 
 ## Documentation

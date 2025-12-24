@@ -10,7 +10,7 @@ on:
 
 jobs:
   release:
-    if: github.repository == 'Bakaface/tutorialkit.rb' && (github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'pkg-pr-new'))
+    if: false # Disabled in fork - github.repository == 'Bakaface/tutorialkit.rb' && (github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'pkg-pr-new'))
     runs-on: ubuntu-latest
     name: 'Release: pkg.pr.new'
 

@@ -1,17 +1,11 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="media/logo-white.svg">
-    <img src="media/logo.svg" alt="tutorialkit-logo" width="440px" height="120px" />
+    <img src="media/logo.png" alt="tutorialkit-logo" width="440px" height="auto" />
   </picture>
   <br>
-  <strong>TutorialKit.rb - Ruby on Rails Edition</strong><br>
   A fork of TutorialKit by <a href="https://stackblitz.com">StackBlitz</a> with added support for Ruby on Rails WebAssembly.<br>
   Create interactive Ruby/Rails tutorials that run entirely in the browser.
-</p>
-
-<p align="center">
-  <a href="https://tutorialkit.dev/"><strong>Original: tutorialkit.dev</strong></a>
-  <br>
 </p>
 
 <p align="center">
@@ -23,10 +17,6 @@
 </p>
 
 <hr>
-
-## 🚀 Ruby on Rails WebAssembly Support
-
-This fork extends TutorialKit with the ability to run Ruby on Rails applications directly in the browser using WebAssembly. No server infrastructure required - everything runs client-side!
 
 ### Key Features
 

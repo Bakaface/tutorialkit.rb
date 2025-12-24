@@ -4,12 +4,12 @@
   "description": "TutorialKit integration for Astro (https://astro.build)",
   "author": "StackBlitz Inc.",
   "type": "module",
-  "bugs": "https://github.com/stackblitz/tutorialkit/issues",
-  "homepage": "https://github.com/stackblitz/tutorialkit",
+  "bugs": "https://github.com/Bakaface/tutorialkit.rb/issues",
+  "homepage": "https://github.com/Bakaface/tutorialkit.rb",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stackblitz/tutorialkit.git",
+    "url": "git+https://github.com/Bakaface/tutorialkit.rb.git",
     "directory": "packages/astro"
   },
   "types": "./dist/index.d.ts",

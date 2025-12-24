@@ -1,10 +1,10 @@
 import express from 'express';
-import setCookieParser from 'set-cookie-parser';
 import multer from 'multer';
+import setCookieParser from 'set-cookie-parser';
 import createFrameLocationTrackingMiddleware from './server/frame_location_middleware.js';
 
 class IncomingRequest {
-  // We prepare input outside to avoid async Ruby execution for now
+  // we prepare input outside to avoid async Ruby execution for now
   constructor(request, input = nil) {
     this.request = request;
     this.input = input;
@@ -30,7 +30,9 @@ class IncomingRequest {
   }
 
   headers() {
-    if (this._preparedHeaders) return this._preparedHeaders;
+    if (this._preparedHeaders) {
+      return this._preparedHeaders;
+    }
 
     const req = this.request;
 
@@ -53,7 +55,7 @@ class ResponseOutparam {
     this.request = request;
     this.response = response;
     this._resolve = null;
-    this.promise = new Promise(resolve => {
+    this.promise = new Promise((resolve) => {
       this._resolve = resolve;
     });
   }
@@ -67,69 +69,73 @@ class ResponseOutparam {
     const result = this.result;
     const res = this.response;
 
-    if (result.call("tag").toJS() === "ok") {
-      const response = result.call("value");
-      const headers = response.call("headers").toJS();
+    if (result.call('tag').toJS() === 'ok') {
+      const response = result.call('value');
+      const headers = response.call('headers').toJS();
 
       Object.entries(headers).forEach(([key, value]) => {
         res.set(key, value);
       });
 
-      if (headers["set-cookie"]) {
-        const cookies = setCookieParser.parse(headers["set-cookie"]);
-        cookies.forEach(cookie => {
+      if (headers['set-cookie']) {
+        const cookies = setCookieParser.parse(headers['set-cookie']);
+        cookies.forEach((cookie) => {
           res.cookie(cookie.name, cookie.value, {
             domain: cookie.domain,
             path: cookie.path,
             expires: cookie.expires,
-            sameSite: cookie.sameSite.toLowerCase()
+            sameSite: cookie.sameSite.toLowerCase(),
           });
         });
       }
 
-      if (headers["location"]) {
-        const location = headers["location"];
-        if (location.startsWith("http://localhost:3000/")) {
-          res.set("location", location.replace("http://localhost:3000", ""));
+      if (headers.location) {
+        const location = headers.location;
+
+        if (location.startsWith('http://localhost:3000/')) {
+          res.set('location', location.replace('http://localhost:3000', ''));
         }
       }
 
-      let body = response.call("body").toJS();
+      const body = response.call('body').toJS();
 
-      if (headers["content-type"]?.startsWith("image/")) {
+      if (headers['content-type']?.startsWith('image/')) {
         try {
           const buffer = Buffer.from(body, 'base64');
 
           if (buffer.length === 0) {
             console.error('Empty buffer after base64 conversion');
             res.status(500).send('Failed to decode image data');
+
             return;
           }
 
-          res.status(response.call("status_code").toJS());
-          res.type(headers["content-type"]);
+          res.status(response.call('status_code').toJS());
+          res.type(headers['content-type']);
           res.send(buffer);
+
           return;
-        } catch(e) {
-          console.error(`failed to decode image (${headers["content-type"]}):`, e)
+        } catch (error) {
+          console.error(`failed to decode image (${headers['content-type']}):`, e);
           res.status(500).send(`Express Error: ${e.message}`);
         }
       }
 
-      res.status(response.call("status_code").toJS());
+      res.status(response.call('status_code').toJS());
       res.send(body);
     } else {
-      res.status(result.call("error").toJS()).send(`Internal Application Error: ${result.call("value").toJS()}`);
+      res.status(result.call('error').toJS()).send(`Internal Application Error: ${result.call('value').toJS()}`);
     }
   }
 }
 
-// We convert files from forms into data URIs and handle them via Rack DataUriUploads middleware.
-const DATA_URI_UPLOAD_PREFIX = "BbC14y";
+// we convert files from forms into data URIs and handle them via Rack DataUriUploads middleware
+const DATA_URI_UPLOAD_PREFIX = 'BbC14y';
 
 const fileToDataURI = async (file, mimetype) => {
   const base64 = file.toString('base64');
   const mimeType = mimetype || 'application/octet-stream';
+
   return `data:${mimeType};base64,${base64}`;
 };
 
@@ -143,12 +149,12 @@ const flattenObject = (obj, prefix = '') => {
       // ignore
     } else if (typeof value === 'object' && !Array.isArray(value)) {
       const nestedParams = flattenObject(value, paramKey);
-      Object.entries(nestedParams).forEach(([k, v]) => params[k] = v);
+      Object.entries(nestedParams).forEach(([k, v]) => (params[k] = v));
     } else if (Array.isArray(value)) {
       value.forEach((item, index) => {
         if (typeof item === 'object' && item !== null) {
           const nestedParams = flattenObject(item, `${paramKey}[${index}]`);
-          Object.entries(nestedParams).forEach(([k, v]) => params[k] = v);
+          Object.entries(nestedParams).forEach(([k, v]) => (params[k] = v));
         } else {
           params[`${paramKey}[]`] = item.toString();
         }
@@ -164,14 +170,10 @@ const flattenObject = (obj, prefix = '') => {
 const prepareInput = async (req) => {
   let input = null;
 
-  if (
-    req.method === "POST" ||
-    req.method === "PUT" ||
-    req.method === "PATCH"
-  ) {
-    const contentType = req.get("content-type");
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+    const contentType = req.get('content-type');
 
-    if (contentType?.includes("multipart/form-data")) {
+    if (contentType?.includes('multipart/form-data')) {
       const formData = flattenObject({ ...req.body });
 
       if (req.files && req.files.length > 0) {
@@ -180,12 +182,12 @@ const prepareInput = async (req) => {
             try {
               const dataURI = await fileToDataURI(file.buffer, file.mimetype);
               formData[file.fieldname] = DATA_URI_UPLOAD_PREFIX + dataURI;
-            } catch (e) {
+            } catch (error) {
               console.warn(
                 `Failed to convert file into data URI: ${e.message}. Ignoring file form input ${file.fieldname}`,
               );
             }
-          })
+          }),
         );
       }
 
@@ -193,19 +195,19 @@ const prepareInput = async (req) => {
       input = params.toString();
     } else {
       let body = '';
-      req.on('data', chunk => {
+      req.on('data', (chunk) => {
         body += chunk.toString();
       });
-      await new Promise(resolve => req.on('end', resolve));
+      await new Promise((resolve) => req.on('end', resolve));
       input = body;
     }
   }
 
   return input;
-}
+};
 
 export class RequestQueue {
-  constructor(handler){
+  constructor(handler) {
     this._handler = handler;
     this.isProcessing = false;
     this.queue = [];
@@ -217,15 +219,17 @@ export class RequestQueue {
         this.queue.push({ req, res, resolve });
       });
     }
+
     await this.process(req, res);
     queueMicrotask(() => this.tick());
   }
 
   async process(req, res) {
     this.isProcessing = true;
+
     try {
       await this._handler(req, res);
-    } catch (e) {
+    } catch (error) {
       console.error(e);
       res.status(500).send(`Application Error: ${e.message}`);
     } finally {
@@ -237,6 +241,7 @@ export class RequestQueue {
     if (this.queue.length === 0) {
       return;
     }
+
     const { req, res, resolve } = this.queue.shift();
     await this.process(req, res);
     resolve();
@@ -251,8 +256,8 @@ const requestHandler = async (vm, req, res) => {
   const incomingRequest = new IncomingRequest(req, input);
   const responseOut = new ResponseOutparam(req, res);
 
-  const requestId = `req-${counter++}`
-  const responseId = `res-${counter}`
+  const requestId = `req-${counter++}`;
+  const responseId = `res-${counter}`;
 
   global[requestId] = incomingRequest;
   global[responseId] = responseOut;
@@ -262,25 +267,25 @@ const requestHandler = async (vm, req, res) => {
       Rack::WASI::IncomingRequest.new("${requestId}"),
       Rack::WASI::ResponseOutparam.new("${responseId}")
     )
-  `
+  `;
 
   try {
     await vm.evalAsync(command);
     await responseOut.promise;
     await responseOut.finish();
-  } catch (e) {
+  } catch (error) {
     res.status(500).send(`Unexpected Error: ${e.message.slice(0, 100)}`);
   } finally {
     delete global[requestId];
     delete global[responseId];
   }
-}
+};
 
 export const createRackServer = async (vm, opts = {}) => {
   const { skipRackup } = opts;
 
   if (!skipRackup) {
-    // Set up Rack handler (if hasn't been already set up)
+    // set up Rack handler (if hasn't been already set up)
     await vm.evalAsync(`
       require "rack/builder"
       require "rack/wasi/incoming_handler"
@@ -288,7 +293,7 @@ export const createRackServer = async (vm, opts = {}) => {
       app = Rack::Builder.load_file("./config.ru")
 
       $incoming_handler = Rack::WASI::IncomingHandler.new(app)
-    `)
+    `);
   }
 
   const app = express();
@@ -300,8 +305,8 @@ export const createRackServer = async (vm, opts = {}) => {
   const queue = new RequestQueue((req, res) => requestHandler(vm, req, res));
 
   app.all('*path', async (req, res) => {
-    await queue.respond(req, res)
+    await queue.respond(req, res);
   });
 
   return app;
-}
+};

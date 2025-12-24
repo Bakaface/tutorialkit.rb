@@ -3,9 +3,10 @@ name: Prepare Release PR
 on:
   workflow_dispatch:
     inputs:
-      fork_version:
-        description: 'Fork version to release (e.g., "0.1.0")'
+      version:
+        description: 'Version to publish, e.g. 0.0.1'
         required: true
+        default: '0.0.1'
         type: string
 
 jobs:
@@ -20,30 +21,22 @@ jobs:
 
       - uses: ./.github/actions/setup-and-build
 
-      - name: Set fork version
-        run: |
-          current_version=$(cat .tutorialkit-rb-version)
-          new_version="${{ inputs.fork_version }}"
-          echo "Current version: $current_version"
-          echo "Setting version to: $new_version"
-          echo "$new_version" > .tutorialkit-rb-version
-          echo "FORK_VERSION=$new_version" >> $GITHUB_ENV
+      - name: Bump versions
+        run: >
+          pnpm --recursive
+          --filter "!@tutorialkit-rb/cli"
+          --filter "@tutorialkit-rb/*"
+          exec pnpm version --no-git-tag-version --allow-same-version ${{ inputs.version }}
+
+      - name: Generage changelog
+        run: pnpm run changelog
 
       - name: Create Pull Request
-        id: create-pr
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
         with:
-          # Note: `publish-release.yaml` checks explicitly for this commit message.
-          commit-message: 'chore: release core packages v${{ env.FORK_VERSION }}'
-          title: 'chore: release v${{ env.FORK_VERSION }}'
-          body: 'Bump core packages to version ${{ env.FORK_VERSION }}'
-          branch: chore/prepare-release-${{ github.run_number }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Auto-merge Pull Request
-        if: steps.create-pr.outputs.pull-request-number
-        run: |
-          echo "Auto-merging PR #${{ steps.create-pr.outputs.pull-request-number }}"
-          gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --squash --auto
-        env:
-          GH_TOKEN: ${{ secrets.GITOPS_REPO_PAT }}
+          # Note: `publish-release.yaml` checks explicitly for this commit message
+          commit-message: 'chore: release core packages v${{ inputs.version }}'
+          title: 'chore: release core packages v${{ inputs.version }}'
+          body: 'Bump core packages to version ${{ inputs.version }} and generate changelogs.'
+          branch: chore/release-${{ inputs.version }}
+          token: ${{ secrets.GITOPS_REPO_PAT }}

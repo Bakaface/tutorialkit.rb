@@ -9,7 +9,6 @@ import { success } from './logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const version = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
-const forkVersion = process.env.FORK_VERSION;
 const env = { ...process.env, COREPACK_ENABLE_STRICT: '0' };
 
 console.log(`Using version: ${version}`);

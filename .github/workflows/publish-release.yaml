@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    # Note: `prepare-release.yaml` creates PR with branch name containing 'prepare-release'
+    # Note: `prepare-release.yaml` sets this commit message
     if: ${{ contains(github.event.head_commit.message, 'release core packages') }}
     steps:
       - name: Checkout
@@ -22,145 +22,111 @@ jobs:
 
       - uses: ./.github/actions/setup-and-build
 
-      # sets steps.resolve-release-version.outputs.version based on upstream package.json
+      # sets steps.resolve-release-version.outputs.version
       - uses: ./.github/actions/resolve-release-version
         id: resolve-release-version
 
-      - name: Read fork version
-        id: fork-version
-        run: |
-          FORK_VERSION=$(cat .tutorialkit-rb-version)
-          echo "FORK_VERSION=$FORK_VERSION" >> $GITHUB_ENV
-          echo "fork-version=$FORK_VERSION" >> $GITHUB_OUTPUT
-          echo "Fork version: $FORK_VERSION"
-
-      - name: Update package names and versions for Ruby fork
-        run: |
-          # Function to update package.json
-          update_package_json() {
-            local pkg_path=$1
-            local pkg_json="${pkg_path}/package.json"
-
-            if [ ! -f "$pkg_json" ]; then
-              return
-            fi
-
-            # Create backup
-            cp "$pkg_json" "${pkg_json}.bak"
-
-            # Read current package name
-            local current_name=$(node -pe "require('./${pkg_json}').name")
-
-            # Only process fork packages
-            if [[ ! "$current_name" =~ ^(@tutorialkit-rb/|create-tutorialkit-rb$) ]]; then
-              echo "Skipping $current_name (not a fork package)"
-              return
-            fi
-
-            echo "Updating fork package: $current_name"
-
-            # Update package version and metadata using Node.js
-            node -e "
-              const fs = require('fs');
-              const path = require('path');
-              const pkg = require(path.resolve('${pkg_json}'));
-
-              // Dynamic Versioning Logic: [upstream-version]-rb.[fork-version]
-              const upstreamVersion = pkg.version;
-              const forkVersion = process.env.FORK_VERSION; // Get fork version from env
-
-              if (forkVersion) {
-                pkg.version = \`\${upstreamVersion}-rb.\${forkVersion}\`;
-                console.log(\`Updated version to: \${pkg.version}\`);
-              } else {
-                console.warn('FORK_VERSION not set. Publishing with upstream version.');
-              }
-
-              // Add repository info for Ruby fork
-              pkg.repository = {
-                type: 'git',
-                url: 'https://github.com/Bakaface/tutorialkit.rb',
-                directory: '${pkg_path}'
-              };
-
-              // Add Ruby fork keywords
-              if (!pkg.keywords) pkg.keywords = [];
-              if (!pkg.keywords.includes('ruby')) pkg.keywords.push('ruby');
-              if (!pkg.keywords.includes('rails')) pkg.keywords.push('rails');
-              if (!pkg.keywords.includes('wasm')) pkg.keywords.push('wasm');
-
-              // Replace workspace:* references with actual versions
-              ['dependencies', 'devDependencies', 'peerDependencies'].forEach(depType => {
-                if (pkg[depType]) {
-                  Object.keys(pkg[depType]).forEach(dep => {
-                    if (pkg[depType][dep] === 'workspace:*') {
-                      // Read the dependency's package.json to get its correct version
-                      const depPkgPath = 'packages/' + (dep.startsWith('@') ? dep.split('/')[1] : dep.replace('create-tutorialkit-rb', 'create-tutorial')) + '/package.json';
-                      try {
-                        const depPkg = require('./' + depPkgPath);
-                        pkg[depType][dep] = depPkg.version;
-                      } catch (error) {
-                        console.warn(\`Could not find version for \${dep}, using current package version\`);
-                        pkg[depType][dep] = pkg.version;
-                      }
-                    }
-                  });
-                }
-              });
-
-              fs.writeFileSync('${pkg_json}', JSON.stringify(pkg, null, 2));
-            "
-          }
-
-          # Update all packages in the workspace
-          for pkg_dir in packages/*; do
-            if [ -d "$pkg_dir" ]; then
-              update_package_json "$pkg_dir"
-            fi
-          done
-        env:
-          FORK_VERSION: ${{ env.FORK_VERSION }}
-
-      - name: Update CLI template versions
-        working-directory: ./packages/cli
-        run: pnpm build-release
-        env:
-          FORK_VERSION: ${{ env.FORK_VERSION }}
-
       - name: Publish to npm
-        run: |
-          # Publish each package with the renamed version
-          for pkg_dir in packages/*; do
-            if [ -f "$pkg_dir/package.json" ]; then
-              pkg_name=$(node -pe "require('./${pkg_dir}/package.json').name")
-
-              # Only publish if it's a renamed package under the new scope
-              if [[ "$pkg_name" == @tutorialkit-rb/* ]] || [[ "$pkg_name" == "create-tutorialkit-rb" ]]; then
-                echo "Publishing $pkg_name..."
-                (cd "$pkg_dir" && npm publish --provenance --access public) || echo "Failed to publish $pkg_name"
-              fi
-            fi
-          done
+        run: >
+          pnpm --recursive
+          --filter "!@tutorialkit-rb/cli"
+          --filter "@tutorialkit-rb/*"
+          exec pnpm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Restore original package.json files
-        if: always()
-        run: |
-          # Restore all backup files to avoid committing temporary changes
-          for backup in packages/**/package.json.bak; do
-            if [ -f "$backup" ]; then
-              original="${backup%.bak}"
-              mv "$backup" "$original"
-              echo "Restored $original"
-            fi
-          done
-
       - name: Create and push git tag
         run: |
-          FULL_VERSION="${{ steps.resolve-release-version.outputs.version }}-rb.${{ env.FORK_VERSION }}"
-
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@users.noreply.github.com'
-          git tag $FULL_VERSION
-          git push origin $FULL_VERSION
+          git tag ${{ steps.resolve-release-version.outputs.version }}
+          git push origin ${{ steps.resolve-release-version.outputs.version }}
+
+  # Disabled: Docs publishing can be enabled when Cloudflare secrets are configured
+  # publish_docs:
+  #   name: Publish documentation
+  #   needs: [publish_release]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #
+  #     - uses: ./.github/actions/setup-and-build
+  #
+  #     - name: Build docs
+  #       run: pnpm run docs:build
+  #
+  #     - name: Deploy documentation
+  #       uses: cloudflare/pages-action@v1
+  #       with:
+  #         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  #         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  #         projectName: tutorialkit-docs-page
+  #         workingDirectory: 'docs/tutorialkit.dev'
+  #         directory: dist
+
+  prepare_cli_release:
+    name: Prepare Release for CLI
+    needs: [publish_release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-and-build
+
+      # sets steps.resolve-release-version.outputs.version
+      - uses: ./.github/actions/resolve-release-version
+        id: resolve-release-version
+
+      - name: Bump version
+        run: >
+          pnpm --recursive
+          --filter @tutorialkit-rb/cli
+          exec npm version --no-git-tag-version --allow-same-version ${{ steps.resolve-release-version.outputs.version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
+        with:
+          # Note: `publish-release.yaml` checks explicitly for this commit message
+          commit-message: 'chore: release CLI v${{ steps.resolve-release-version.outputs.version }}'
+          title: 'chore: release CLI v${{ steps.resolve-release-version.outputs.version }}'
+          body: 'Bump CLI to version ${{ steps.resolve-release-version.outputs.version }}.'
+          branch: chore/release-cli-${{ steps.resolve-release-version.outputs.version }}
+          token: ${{ secrets.GITOPS_REPO_PAT }}
+
+  publish_release_CLI:
+    name: Publish Release CLI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    # Note: commit message is set by prepare_cli_release above
+    if: ${{ contains(github.event.head_commit.message, 'release CLI') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Update template's versions
+        working-directory: ./packages/cli
+        run: pnpm build-release
+
+      - name: Integration Tests
+        working-directory: ./integration
+        run: pnpm test
+
+      - name: Publish to npm
+        run: >
+          pnpm --recursive
+          --filter @tutorialkit-rb/cli
+          exec pnpm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/react",
-  "version": "1.5.2",
+  "version": "0.1.2",
   "description": "TutorialKit's React components and utilities",
   "author": "StackBlitz Inc.",
   "type": "module",

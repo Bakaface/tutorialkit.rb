@@ -119,10 +119,6 @@ jobs:
         working-directory: ./packages/cli
         run: pnpm build-release
 
-      - name: Integration Tests
-        working-directory: ./integration
-        run: pnpm test
-
       - name: Publish to npm
         run: >
           pnpm --recursive

@@ -1,37 +1,36 @@
 #!/usr/bin/env -S node --disable-warning=ExperimentalWarning
 
-import initVM from "../lib/rails.js";
-import ExternalCommands from "../lib/commands.js";
-import util from "node:util";
-import fs from "node:fs";
+import { initVM, ExternalCommands, runRubyScript, isRubyShebangScript } from "rails-wasm";
+import path from "node:path";
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const commands = new ExternalCommands();
-// Make commands accessible from Ruby via global JS object
 global.externalCommands = commands;
 
 const args = process.argv.slice(2);
 
-if (args[0] && fs.existsSync(process.cwd() + '/' + args[0])) {
-  const firstLine = fs.readFileSync(process.cwd() + '/' + args[0], 'utf8').split('\n')[0];
-  // Check if called via shebang
-  if (firstLine.includes('#!/usr/bin/env ruby')) {
-    const path = args.shift();
-    const vm = await initVM({ env: { "HOME": "/rails-vm" } });
+if (args[0] && isRubyShebangScript(path.join(process.cwd(), args[0]))) {
+  // Handle shebang script execution
+  const scriptPath = args.shift();
+  const vm = await initVM({
+    rubyWasmPath: path.join(__dirname, "../node_modules/@ruby/wasm-wasi/dist/ruby.wasm"),
+    workspaceDir: path.join(__dirname, "../workspace"),
+    pgDataDir: path.join(__dirname, "../pgdata"),
+    env: { HOME: "/rails-vm" }
+  });
 
-    await vm.evalAsync(`
-      args = ${util.inspect(args)}
-      ARGV.replace(args)
-
-      begin
-        load "./${path}"
-        execute_at_exit_hooks unless Wasmify::ExternalCommands.any?
-      rescue SystemExit
-      end
-    `);
-
-    commands.invoke(vm)
-  }
+  await runRubyScript(scriptPath, args, vm);
+  commands.invoke(vm);
 } else {
-  const vm = await initVM({ env: { "HOME": "/rails-vm" }, args, skipRails: true });
-  commands.invoke(vm)
+  // Handle interactive Ruby or direct Ruby execution
+  const vm = await initVM({
+    rubyWasmPath: path.join(__dirname, "../node_modules/@ruby/wasm-wasi/dist/ruby.wasm"),
+    workspaceDir: path.join(__dirname, "../workspace"),
+    pgDataDir: path.join(__dirname, "../pgdata"),
+    args,
+    skipRails: true,
+    env: { HOME: "/rails-vm" }
+  });
+  commands.invoke(vm);
 }

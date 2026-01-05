@@ -1,7 +1,29 @@
-const createFrameLocationTrackingMiddleware = (options = {}) => {
-  const {
-    injectionPoint = '</body>'
-  } = options;
+import type { Request, Response, NextFunction } from 'express';
+
+export interface FrameLocationTrackingOptions {
+  /** HTML tag where the tracking script will be injected. Defaults to '</body>' */
+  injectionPoint?: string;
+}
+
+/**
+ * Express middleware that injects a script into HTML responses to track
+ * navigation changes in iframes and notify the parent frame.
+ *
+ * This is useful when embedding a Rails application in a preview iframe
+ * and you want the parent application to know when the user navigates
+ * within the iframe.
+ *
+ * @example
+ * ```typescript
+ * import express from 'express';
+ * import createFrameLocationTrackingMiddleware from 'rails-wasm/server/frame_location_middleware';
+ *
+ * const app = express();
+ * app.use(createFrameLocationTrackingMiddleware());
+ * ```
+ */
+const createFrameLocationTrackingMiddleware = (options: FrameLocationTrackingOptions = {}) => {
+  const { injectionPoint = '</body>' } = options;
 
   const trackingScript = `
     <script>
@@ -54,11 +76,11 @@ const createFrameLocationTrackingMiddleware = (options = {}) => {
     </script>
   `;
 
-  return (req, res, next) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     // Store the original send method
-    const originalSend = res.send;
+    const originalSend = res.send.bind(res);
 
-    res.send = function(data) {
+    res.send = function (data: unknown) {
       const contentType = res.get('Content-Type');
 
       if (contentType && contentType.includes('text/html') && typeof data === 'string') {
@@ -67,7 +89,7 @@ const createFrameLocationTrackingMiddleware = (options = {}) => {
         }
       }
 
-      return originalSend.call(this, data);
+      return originalSend(data);
     };
 
     next();

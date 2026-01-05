@@ -719,11 +719,16 @@ export class TutorialRunner {
           }
 
           if (!this._editorStore.documents.get()[filePath]) {
-            this._editorStore.addFileOrFolder({ path: filePath, type: 'file' });
-          }
+            const isDirectory = await _isDirectory(webcontainer, filePath);
 
-          this._updateCurrentFiles({ [filePath]: '' });
-          scheduleReadFor(filePath, 'utf-8');
+            if (isDirectory) {
+              this._editorStore.addFileOrFolder({ path: filePath, type: 'folder' });
+            } else {
+              this._editorStore.addFileOrFolder({ path: filePath, type: 'file' });
+              this._updateCurrentFiles({ [filePath]: '' });
+              scheduleReadFor(filePath, 'utf-8');
+            }
+          }
         }
       }
     });

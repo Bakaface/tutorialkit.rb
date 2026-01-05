@@ -38,6 +38,30 @@ export async function copyTemplate(dest: string, flags: CreateOptions) {
       await fsPromises.copyFile(sourceFilePath, destFilePath);
     }
   }
+
+  // Set executable permissions on bin scripts
+  // (npm packaging doesn't preserve executable bits reliably)
+  await setExecutablePermissions(dest);
+}
+
+async function setExecutablePermissions(dest: string) {
+  const binScripts = [
+    path.join(dest, 'bin', 'build-wasm'),
+    path.join(dest, 'ruby-wasm', 'bin', 'pack'),
+    // Node.js wrapper scripts for Rails in WebContainer
+    path.join(dest, 'src', 'templates', 'default', 'bin', 'rails'),
+    path.join(dest, 'src', 'templates', 'default', 'bin', 'ruby'),
+    path.join(dest, 'src', 'templates', 'default', 'bin', 'console'),
+    path.join(dest, 'src', 'templates', 'default', 'bin', 'rackup'),
+  ];
+
+  for (const script of binScripts) {
+    try {
+      await fsPromises.chmod(script, 0o755);
+    } catch {
+      // Script may not exist in some templates, ignore
+    }
+  }
 }
 
 function readIgnoreFile() {

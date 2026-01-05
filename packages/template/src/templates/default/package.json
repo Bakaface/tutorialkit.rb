@@ -10,7 +10,6 @@
     "postinstall": "chmod +x bin/* && node --disable-warning=ExperimentalWarning ./scripts/wait-for-wasm.js"
   },
   "dependencies": {
-    "rails-wasm": "workspace:*",
     "@ruby/wasm-wasi": "^2.7.1"
   },
   "devDependencies": {

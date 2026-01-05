@@ -1,4 +1,4 @@
-import { createDatabase } from "rails-wasm/scripts";
+import { createDatabase } from "../node_modules/rails-wasm/dist/scripts/index.js";
 import path from "node:path";
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);

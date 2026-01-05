@@ -303,6 +303,9 @@ export class TutorialRunner {
         this._currentFiles = { ...files };
 
         this._updateDirtyState({ ...template, ...files });
+
+        // Set up watcher early so file events are captured during prepareCommands
+        this._setupWatcher(webcontainer);
       },
       { ignoreCancel: true, signal },
     );

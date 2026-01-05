@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+TUTORIALKIT_PATH="${TUTORIALKIT_PATH:-../tutorialkit.rb}"
+
+cat > pnpm-workspace.yaml << EOF
+overrides:
+  '@tutorialkit-rb/runtime': link:${TUTORIALKIT_PATH}/packages/runtime
+EOF
+
+echo "Created pnpm-workspace.yaml with link to $TUTORIALKIT_PATH/packages/runtime"
+pnpm install
+echo "Local runtime linked. Remember to run 'npm run unlink:local' before committing."

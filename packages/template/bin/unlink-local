@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+rm -f pnpm-workspace.yaml
+git checkout pnpm-lock.yaml 2>/dev/null || true
+pnpm install
+echo "Local packages unlinked. Lockfile restored."

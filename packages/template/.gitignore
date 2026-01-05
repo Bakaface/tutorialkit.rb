@@ -12,3 +12,6 @@ pnpm-debug.log*
 
 public/ruby.wasm
 public/ruby.wasm.hash
+
+# Local development linking (created by npm run link:local)
+pnpm-workspace.yaml

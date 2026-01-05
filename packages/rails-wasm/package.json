@@ -1,0 +1,79 @@
+{
+  "name": "rails-wasm",
+  "version": "0.1.0",
+  "description": "Run Ruby on Rails in the browser via WebAssembly",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./commands": {
+      "import": "./dist/commands.js",
+      "types": "./dist/commands.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    },
+    "./rails": {
+      "import": "./dist/rails.js",
+      "types": "./dist/rails.d.ts"
+    },
+    "./irb": {
+      "import": "./dist/irb.js",
+      "types": "./dist/irb.d.ts"
+    },
+    "./database": {
+      "import": "./dist/database.js",
+      "types": "./dist/database.d.ts"
+    },
+    "./scripts": {
+      "import": "./dist/scripts/index.js",
+      "types": "./dist/scripts/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src/patches"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "@ruby/wasm-wasi": "^2.7.0"
+  },
+  "peerDependenciesMeta": {
+    "@ruby/wasm-wasi": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.1",
+    "set-cookie-parser": "^2.7.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.9.0",
+    "@types/set-cookie-parser": "^2.4.10",
+    "typescript": "^5.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/tutorialkit.rb.git",
+    "directory": "packages/rails-wasm"
+  },
+  "keywords": [
+    "rails",
+    "ruby",
+    "wasm",
+    "webassembly",
+    "browser"
+  ],
+  "license": "MIT"
+}

@@ -603,6 +603,9 @@ importers:
       '@tutorialkit-rb/react':
         specifier: workspace:*
         version: link:../react
+      '@tutorialkit-rb/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       nanostores:
         specifier: ^0.10.3
         version: 0.10.3
@@ -1841,7 +1844,7 @@ packages:
     resolution: {integrity: sha512-bV21/9LQmcQeCPEg3BDFtvwL6cwiTMksYNWQQ4KOxCZikEGalWtenoZ0wCiukJINlGCIi2KXx01g4FoH/LxpzQ==}
     requiresBuild: true
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
     optional: true
 
   /@esbuild/aix-ppc64@0.20.2:
@@ -9654,7 +9657,6 @@ packages:
 
   /tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
-    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}

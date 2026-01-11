@@ -19,6 +19,7 @@ const ICON_MAP = new Map<TerminalPanelType, string>([
 
 export function TerminalPanel({ theme, tutorialStore }: TerminalPanelProps) {
   const terminalConfig = useStore(tutorialStore.terminalConfig);
+  const isPreparing = useStore(tutorialStore.isPreparing);
 
   const terminalRefs = useRef<Record<number, TerminalRef>>({});
 
@@ -90,27 +91,45 @@ export function TerminalPanel({ theme, tutorialStore }: TerminalPanelProps) {
           </ul>
         </div>
       </div>
-      <div className="h-full overflow-hidden">
+      <div className="h-full overflow-hidden relative">
         {domLoaded && (
           <Suspense>
-            {terminalConfig.panels.map(({ id, type }, index) => (
-              <Terminal
-                key={id}
-                role="tabpanel"
-                id={`tk-terminal-tapbanel-${index}`}
-                aria-labelledby={`tk-terminal-tab-${index}`}
-                className={tabIndex !== index ? 'hidden h-full' : 'h-full'}
-                theme={theme}
-                readonly={type === 'output'}
-                ref={(ref) => (terminalRefs.current[index] = ref!)}
-                onTerminalReady={(terminal) => {
-                  tutorialStore.attachTerminal(id, terminal);
-                }}
-                onTerminalResize={(cols, rows) => {
-                  tutorialStore.onTerminalResize(cols, rows);
-                }}
-              />
-            ))}
+            {terminalConfig.panels.map(({ id, type }, index) => {
+              const isTerminalPanel = type === 'terminal';
+              const showPreparingMessage = isTerminalPanel && isPreparing;
+
+              return (
+                <div
+                  key={id}
+                  role="tabpanel"
+                  id={`tk-terminal-tapbanel-${index}`}
+                  aria-labelledby={`tk-terminal-tab-${index}`}
+                  className={tabIndex !== index ? 'hidden h-full' : 'h-full'}
+                >
+                  {showPreparingMessage ? (
+                    <div
+                      className="h-full bg-tk-elements-terminal-backgroundColor text-tk-elements-terminal-textColor px-4 py-2"
+                      style={{ fontFamily: 'Menlo, courier-new, courier, monospace', fontSize: '13px' }}
+                    >
+                      Preparing runtime...
+                    </div>
+                  ) : (
+                    <Terminal
+                      className="h-full"
+                      theme={theme}
+                      readonly={type === 'output'}
+                      ref={(ref) => (terminalRefs.current[index] = ref!)}
+                      onTerminalReady={(terminal) => {
+                        tutorialStore.attachTerminal(id, terminal);
+                      }}
+                      onTerminalResize={(cols, rows) => {
+                        tutorialStore.onTerminalResize(cols, rows);
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </Suspense>
         )}
       </div>

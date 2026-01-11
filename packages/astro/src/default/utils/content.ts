@@ -87,6 +87,7 @@ export async function getTutorial(): Promise<Tutorial> {
       ...squash(sources, [
         'mainCommand',
         'prepareCommands',
+        'terminalBlockingPrepareCommandsCount',
         'previews',
         'autoReload',
         'template',

@@ -25,6 +25,14 @@ export const commandsSchema = z.object({
     .describe(
       'List of commands to be executed to prepare the environment in WebContainer. Each command executed and its status will be shown in the Prepare Environment section.',
     ),
+  terminalBlockingPrepareCommandsCount: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe(
+      'Number of prepare commands that should block terminal input. If set, only the first N prepare commands will block the terminal. If not set, terminal is not blocked during prepare commands.',
+    ),
 });
 
 export type CommandsSchema = z.infer<typeof commandsSchema>;

@@ -262,6 +262,14 @@ export class TutorialStore {
     return this._stepController.steps;
   }
 
+  /**
+   * Whether the environment is being prepared (prepare commands like npm install are running).
+   * Use this to block terminal input until the environment is ready.
+   */
+  get isPreparing(): ReadableAtom<boolean> {
+    return this._stepController.isPreparing;
+  }
+
   /** Check if file tree is visible */
   hasFileTree(): boolean {
     if (!this._lesson) {

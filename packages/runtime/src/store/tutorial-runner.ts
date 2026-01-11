@@ -111,6 +111,9 @@ export class TutorialRunner {
     const newCommands = new Commands(commands);
     const anyChange = this._changeDetection(commands);
 
+    // update the blocking count (this affects terminal input blocking)
+    this._stepController.setBlockingCount(commands.terminalBlockingPrepareCommandsCount);
+
     // if we already know that there's a change we can update the steps now
     if (anyChange) {
       this._stepController.setFromCommands(Array.from(newCommands));
@@ -304,7 +307,7 @@ export class TutorialRunner {
 
         this._updateDirtyState({ ...template, ...files });
 
-        // Set up watcher early so file events are captured during prepareCommands
+        // set up watcher early so file events are captured during prepareCommands
         this._setupWatcher(webcontainer);
       },
       { ignoreCancel: true, signal },

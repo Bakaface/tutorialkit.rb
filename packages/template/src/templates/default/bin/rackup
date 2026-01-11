@@ -1,9 +1,17 @@
 #!/usr/bin/env -S node --disable-warning=ExperimentalWarning --watch --watch-path=./
 
-import initVM from "../lib/rails.js";
-import { createRackServer } from "../lib/server.js";
+import { initVM, createRackServer } from "rails-wasm";
+import path from "node:path";
 
-const vm = await initVM();
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+const vm = await initVM({
+  rubyWasmPath: path.join(__dirname, "../node_modules/@ruby/wasm-wasi/dist/ruby.wasm"),
+  workspaceDir: path.join(__dirname, "../workspace"),
+  pgDataDir: path.join(__dirname, "../pgdata"),
+  env: { HOME: "/rails-vm" }
+});
+
 const server = await createRackServer(vm);
 
 server.listen(3000, () => {

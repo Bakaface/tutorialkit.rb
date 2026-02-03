@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/theme",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "TutorialKit theme configuration",
   "author": "StackBlitz Inc.",
   "type": "module",

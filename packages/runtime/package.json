@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/runtime",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "TutorialKit runtime",
   "author": "StackBlitz Inc.",
   "type": "module",

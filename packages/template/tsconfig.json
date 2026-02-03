@@ -8,5 +8,5 @@
       "@*": ["src/*"]
     }
   },
-  "exclude": ["dist"]
+  "exclude": ["dist", "ruby-wasm", "src/templates"]
 }

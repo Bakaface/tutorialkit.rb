@@ -37,6 +37,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
     <ViewTransitions />
     <script is:inline>
       setTutorialKitTheme();
+      setTutorialKitEmbed();
 
       function setTutorialKitTheme() {
         let theme = localStorage.getItem('tk_theme');
@@ -47,12 +48,19 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
 
         document.querySelector('html')?.setAttribute('data-theme', theme);
       }
+
+      function setTutorialKitEmbed() {
+        if (new URLSearchParams(window.location.search).get('embed') === 'true') {
+          document.querySelector('html')?.setAttribute('data-embed', 'true');
+        }
+      }
     </script>
     <script>
       import { swapFunctions as builtInSwap } from 'astro:transitions/client';
 
       declare global {
         function setTutorialKitTheme(): void;
+        function setTutorialKitEmbed(): void;
       }
 
       document.addEventListener('astro:before-swap', (event) => {
@@ -63,6 +71,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).toStri
           builtInSwap.swapRootAttributes(newDocument);
 
           setTutorialKitTheme();
+          setTutorialKitEmbed();
 
           /**
            * Keep the dynamically injected style sheet from Codemirror on all transitions.

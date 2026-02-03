@@ -9,3 +9,12 @@ body {
   font-style: normal;
   font-variation-settings: 'slnt' 0;
 }
+
+/* Embed mode: hide top bar and navigation */
+html[data-embed='true'] main[data-swap-root] > nav {
+  display: none;
+}
+
+html[data-embed='true'] main[data-swap-root] header {
+  display: none;
+}

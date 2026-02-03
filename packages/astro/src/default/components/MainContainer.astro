@@ -12,9 +12,10 @@ import { hasWorkspace } from '../utils/workspace';
 interface Props {
   lesson: Lesson<AstroComponentFactory>;
   navList: NavList;
+  showNav?: boolean;
 }
 
-const { lesson, navList } = Astro.props;
+const { lesson, navList, showNav = true } = Astro.props;
 
 const showWorkspacePanel = hasWorkspace(lesson);
 ---
@@ -31,7 +32,7 @@ const showWorkspacePanel = hasWorkspace(lesson);
     class="h-full flex flex-col transition-theme bg-tk-elements-app-backgroundColor text-tk-elements-app-textColor"
     slot="a"
   >
-    <Nav client:load lesson={lesson} navList={navList} />
+    {showNav && <Nav client:load lesson={lesson} navList={navList} />}
     <TutorialContent lesson={lesson} />
   </div>
   <div

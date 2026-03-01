@@ -1,18 +1,34 @@
+import { bootProgress } from './boot-progress.js';
 import { RubyVM } from "@ruby/wasm-wasi";
 import { WASI } from "wasi";
 import fs from "fs/promises";
 import { PGLite4Rails } from "./database.js";
 
-const rubyWasm = new URL("../node_modules/@ruby/wasm-wasi/dist/ruby.wasm", import.meta.url).pathname;
+function timer() {
+  const start = performance.now();
+  return () => {
+    const ms = performance.now() - start;
+    return ms < 1000 ? `${Math.round(ms)}ms` : `${(ms / 1000).toFixed(1)}s`;
+  };
+}
+
+const defaultWasmPath = new URL("../node_modules/@ruby/wasm-wasi/dist/ruby.wasm", import.meta.url).pathname;
 
 const railsRootDir = new URL("../workspace/store", import.meta.url).pathname;
 const pgDataDir = new URL("../pgdata", import.meta.url).pathname;
 
 export default async function initVM(vmopts = {}) {
-  const { args, skipRails } = vmopts;
+  const totalTimer = timer();
+  const { args, skipRails, wasmPath } = vmopts;
   const env = vmopts.env || {};
-  const binary = await fs.readFile(rubyWasm);
+
+  // --- WASM load + compile ---
+  const wasmTimer = timer();
+  bootProgress.updateStep('Loading Ruby WASM...');
+  const binary = await fs.readFile(wasmPath || defaultWasmPath);
   const module = await WebAssembly.compile(binary);
+  bootProgress.updateProgress(100);
+  bootProgress.log(`WASM load + compile (${wasmTimer()})`);
 
   const RAILS_ENV = env.RAILS_ENV || process.env.RAILS_ENV;
   if (RAILS_ENV) env.RAILS_ENV = RAILS_ENV;
@@ -24,6 +40,9 @@ export default async function initVM(vmopts = {}) {
 
   const cliArgs = args?.length ? ['ruby.wasm'].concat(args) : undefined;
 
+  // --- VM instantiation ---
+  const vmTimer = timer();
+  bootProgress.updateStep('Initializing Ruby VM...');
   const wasi = new WASI(
     {
       env: {"RUBYOPT": "-EUTF-8 -W0", ...env},
@@ -41,8 +60,12 @@ export default async function initVM(vmopts = {}) {
     wasip1: wasi,
     args: cliArgs
   });
+  bootProgress.log(`VM instantiation (${vmTimer()})`);
 
   if (!skipRails) {
+    const railsTimer = timer();
+    bootProgress.updateStep('Bootstrapping Rails...');
+
     const pglite = new PGLite4Rails(pgDataDir);
     global.pglite = pglite;
 
@@ -50,11 +73,18 @@ export default async function initVM(vmopts = {}) {
     const appGeneratorPatch = await fs.readFile(new URL("./patches/app_generator.rb", import.meta.url).pathname, 'utf8');
 
     vm.eval(`
+      def _boot_time(label)
+        t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        yield
+        elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t
+        $stderr.puts "[boot] #{label} (#{"%.1f" % elapsed}s)"
+      end
+
       Dir.chdir("${workdir}") unless "${workdir}".empty?
 
       ENV["RACK_HANDLER"] = "wasi"
 
-      require "/rails-vm/boot"
+      _boot_time("require /rails-vm/boot") { require "/rails-vm/boot" }
 
       require "js"
 
@@ -63,7 +93,15 @@ export default async function initVM(vmopts = {}) {
       ${authenticationPatch}
       ${appGeneratorPatch}
     `)
+
+    bootProgress.updateProgress(100);
+    bootProgress.log(`Rails bootstrap (${railsTimer()})`);
   }
+
+  bootProgress.log(`Total (${totalTimer()})`);
+  bootProgress.updateStep('Ready');
 
   return vm;
 }
+
+export { bootProgress };

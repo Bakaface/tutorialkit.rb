@@ -19,7 +19,8 @@
     "demo:build": "pnpm run build && pnpm run --filter=demo.tutorialkit.dev build",
     "lint": "eslint \"{packages,docs,extensions,integration}/**/*\"",
     "test": "pnpm run --stream --filter='@tutorialkit-rb/*' test --run",
-    "test:e2e": "pnpm run --filter='./e2e' test"
+    "test:e2e": "pnpm run --filter='./e2e' test",
+    "template:smoke": "node --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls --loader ./packages/template/src/templates/default/scripts/wasi-loader.mjs ./packages/template/src/templates/default/scripts/smoke-test.js"
   },
   "license": "MIT",
   "packageManager": "pnpm@8.15.6",

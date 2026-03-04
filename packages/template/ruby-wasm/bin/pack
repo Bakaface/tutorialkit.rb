@@ -61,12 +61,17 @@ def find_rbconfig
 end
 
 def find_base_wasm
-  # Installed via ruby-wasm/package.json → npm install
-  candidate = File.join(SCRIPT_DIR, "node_modules", "@ruby", "3.3-wasm-wasi", "dist", "ruby+stdlib.wasm")
-  return candidate if File.exist?(candidate)
+  # 1. Locally-built custom binary (from bin/build-ruby-base)
+  local = File.join(SCRIPT_DIR, "dist", "ruby-base.wasm")
+  return local if File.exist?(local)
 
-  $stderr.puts "Error: Base WASM binary not found at #{candidate}"
-  $stderr.puts "Run 'npm install' in ruby-wasm/ first."
+  # 2. Fallback: official npm package
+  npm = File.join(SCRIPT_DIR, "node_modules", "@ruby", "3.3-wasm-wasi", "dist", "ruby+stdlib.wasm")
+  return npm if File.exist?(npm)
+
+  $stderr.puts "Error: No base WASM binary found."
+  $stderr.puts "Either run 'bin/build-ruby-base' to build a custom binary,"
+  $stderr.puts "or run 'npm install' in ruby-wasm/ for the official binary."
   exit 1
 end
 

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+
+# Build a custom Ruby 3.3 WASM base binary via rbwasm.
+#
+# The official @ruby/3.3-wasm-wasi binary exposes POSIX function stubs
+# (fchmod, chmod, etc.) that WebContainer doesn't implement, causing
+# NotImplementedError at the C level. rbwasm build automatically applies
+# ac_cv_func_fchmod=no etc. (see ruby.wasm crossruby.rb:348-358), producing
+# a binary that avoids these issues entirely.
+#
+# This is a one-time build (5-20 minutes). The resulting binary is used
+# by bin/build-wasm as the base for the hybrid wasi-vfs pipeline.
+#
+# Prerequisites:
+#   - Ruby 3.3+
+#   - ruby_wasm gem (gem install ruby_wasm → provides rbwasm CLI)
+#   - Rust toolchain (for ruby_wasm native extension)
+#   - WASI SDK (auto-downloaded by rbwasm if WASI_SDK_PATH not set)
+#   - ~2GB disk space for build artifacts
+#
+# Usage: ./bin/build-ruby-base
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
+RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+OUTPUT="$RUBY_WASM_DIR/dist/ruby-base.wasm"
+
+echo "=== Building custom Ruby WASM base binary ==="
+echo
+
+# --- Preflight checks --------------------------------------------------------
+
+if ! command -v rbwasm &> /dev/null; then
+  echo "Error: rbwasm CLI not found"
+  echo "Install it with: gem install ruby_wasm"
+  exit 1
+fi
+
+# --- Build -------------------------------------------------------------------
+
+echo "Building Ruby 3.3 for wasm32-unknown-wasip1..."
+echo "  --build-profile full (all stdlib C extensions)"
+echo "  --disable-gems (gems come from wasi-vfs pack step)"
+echo
+echo "This will take 5-20 minutes on first run."
+echo
+
+mkdir -p "$(dirname "$OUTPUT")"
+
+rbwasm build \
+  --ruby-version 3.3 \
+  --target wasm32-unknown-wasip1 \
+  --build-profile full \
+  --disable-gems \
+  -o "$OUTPUT"
+
+SIZE=$(du -h "$OUTPUT" | cut -f1)
+
+echo
+echo "=== Build Complete ==="
+echo "  Output: $OUTPUT"
+echo "  Size:   $SIZE"
+echo
+echo "Now run bin/build-wasm to cross-compile gems and pack the final binary."

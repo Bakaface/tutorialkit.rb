@@ -5,16 +5,18 @@ set -e
 # Build Ruby WASM with cross-compiled gems (hybrid wasi-vfs approach).
 #
 # Flow:
-#   1. npm install in ruby-wasm/ (gets official @ruby/3.3-wasm-wasi binary)
+#   1. Get base binary (custom dist/ruby-base.wasm or npm @ruby/3.3-wasm-wasi)
 #   2. bundle install (host gems for cross-compilation tooling)
 #   3. ruby bin/pack (cross-compile gems + wasi-vfs pack)
 #   4. Copy dist/ruby.wasm → src/templates/default/public/ruby.wasm
 #   5. Generate ruby.wasm.hash from Gemfile.lock SHA256
 #
+# For a custom base binary, run bin/build-ruby-base first (one-time, 5-20 min).
+#
 # Prerequisites:
 #   - wasi-vfs CLI (cargo install wasi-vfs-cli)
 #   - Ruby + Bundler
-#   - Node.js + npm
+#   - Node.js + npm (only if using official base binary)
 #
 # Usage: ./bin/build-wasm
 
@@ -39,11 +41,16 @@ if ! command -v wasi-vfs &> /dev/null; then
   exit 1
 fi
 
-# --- Step 1: Install official WASM binary ------------------------------------
+# --- Step 1: Install base WASM binary ----------------------------------------
 
-echo "Step 1/4: Installing official Ruby WASM binary..."
 cd "$RUBY_WASM_DIR"
-npm install --no-audit --no-fund
+
+if [ -f "dist/ruby-base.wasm" ]; then
+  echo "Step 1/4: Using custom base binary (dist/ruby-base.wasm), skipping npm install."
+else
+  echo "Step 1/4: Installing official Ruby WASM binary..."
+  npm install --no-audit --no-fund
+fi
 echo
 
 # --- Step 2: Install host gems (for cross-compilation tooling) ---------------

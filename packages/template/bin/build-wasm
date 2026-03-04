@@ -2,39 +2,82 @@
 
 set -e
 
-echo "Building Ruby WASM module..."
+# Build Ruby WASM with cross-compiled gems (hybrid wasi-vfs approach).
+#
+# Flow:
+#   1. npm install in ruby-wasm/ (gets official @ruby/3.3-wasm-wasi binary)
+#   2. bundle install (host gems for cross-compilation tooling)
+#   3. ruby bin/pack (cross-compile gems + wasi-vfs pack)
+#   4. Copy dist/ruby.wasm → src/templates/default/public/ruby.wasm
+#   5. Generate ruby.wasm.hash from Gemfile.lock SHA256
+#
+# Prerequisites:
+#   - wasi-vfs CLI (cargo install wasi-vfs-cli)
+#   - Ruby + Bundler
+#   - Node.js + npm
+#
+# Usage: ./bin/build-wasm
 
-# Check if ruby-wasm directory exists
-if [ ! -d "ruby-wasm" ]; then
-  echo "Error: ruby-wasm directory not found. Make sure you're running this from the template root."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
+RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+PUBLIC_DIR="$TEMPLATE_DIR/src/templates/default/public"
+
+echo "=== Building Ruby WASM (hybrid wasi-vfs) ==="
+echo
+
+# --- Preflight checks --------------------------------------------------------
+
+if [ ! -d "$RUBY_WASM_DIR" ]; then
+  echo "Error: ruby-wasm directory not found at $RUBY_WASM_DIR"
   exit 1
 fi
 
-# Change to ruby-wasm directory
-cd ruby-wasm
+if ! command -v wasi-vfs &> /dev/null; then
+  echo "Error: wasi-vfs CLI not found"
+  echo "Install it with: cargo install wasi-vfs-cli"
+  exit 1
+fi
 
-echo "Installing Ruby gems..."
-# Install gems using bundle install
-bundle install --path vendor/bundle
+# --- Step 1: Install official WASM binary ------------------------------------
 
-echo "Building WASM module..."
-# Run the pack script to build ruby.wasm
-./bin/pack
+echo "Step 1/4: Installing official Ruby WASM binary..."
+cd "$RUBY_WASM_DIR"
+npm install --no-audit --no-fund
+echo
 
-echo "WASM build completed successfully!"
-echo "ruby.wasm is now available at ruby-wasm/dist/ruby.wasm"
+# --- Step 2: Install host gems (for cross-compilation tooling) ---------------
 
-# Generate hash of Gemfile.lock for cache versioning
-echo "Generating Gemfile.lock hash..."
+echo "Step 2/4: Installing host gems..."
+bundle install --quiet
+echo
+
+# --- Step 3: Cross-compile gems + wasi-vfs pack -----------------------------
+
+echo "Step 3/4: Cross-compiling gems + packing with wasi-vfs..."
+echo
+bundle exec ruby bin/pack
+echo
+
+# --- Step 4: Copy output + generate hash ------------------------------------
+
+echo "Step 4/4: Copying output..."
+mkdir -p "$PUBLIC_DIR"
+
+if [ ! -f "dist/ruby.wasm" ]; then
+  echo "Error: Build failed — dist/ruby.wasm not created"
+  exit 1
+fi
+
+cp dist/ruby.wasm "$PUBLIC_DIR/"
+SIZE=$(du -h "$PUBLIC_DIR/ruby.wasm" | cut -f1)
+
+# Generate hash from Gemfile.lock for cache versioning
 GEMFILE_HASH=$(sha256sum Gemfile.lock | cut -c1-16)
-echo "Gemfile.lock hash: $GEMFILE_HASH"
+echo "$GEMFILE_HASH" > "$PUBLIC_DIR/ruby.wasm.hash"
 
-# Copy the built ruby.wasm to the public directory
-echo "Copying ruby.wasm to public directory..."
-cp dist/ruby.wasm ../public/
-echo "ruby.wasm copied to public directory."
-
-# Create ruby.wasm.hash with the hash
-echo "Creating ruby.wasm.hash..."
-echo "$GEMFILE_HASH" > ../public/ruby.wasm.hash
-echo "ruby.wasm.hash created with hash: $GEMFILE_HASH"
+echo
+echo "=== Build Complete ==="
+echo "  Output: $PUBLIC_DIR/ruby.wasm"
+echo "  Size:   $SIZE"
+echo "  Hash:   $GEMFILE_HASH"

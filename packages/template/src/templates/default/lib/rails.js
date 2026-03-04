@@ -12,9 +12,8 @@ function timer() {
   };
 }
 
-const defaultWasmPath = new URL("../node_modules/@ruby/wasm-wasi/dist/ruby.wasm", import.meta.url).pathname;
+const defaultWasmPath = new URL("../public/ruby.wasm", import.meta.url).pathname;
 
-const railsRootDir = new URL("../workspace/store", import.meta.url).pathname;
 const pgDataDir = new URL("../pgdata", import.meta.url).pathname;
 
 export default async function initVM(vmopts = {}) {
@@ -84,7 +83,7 @@ export default async function initVM(vmopts = {}) {
 
       ENV["RACK_HANDLER"] = "wasi"
 
-      _boot_time("require /rails-vm/boot") { require "/rails-vm/boot" }
+      _boot_time("require /gems/boot") { require "/gems/boot" }
 
       require "js"
 

@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Build-time dependency: official Ruby 3.3 WASM binary",
+  "dependencies": {
+    "@ruby/3.3-wasm-wasi": "^2.8.1"
+  }
+}

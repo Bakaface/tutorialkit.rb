@@ -1,15 +1,25 @@
-# Put all the code required to initialize the Rails Wasm environment
+# Boot the Rails WASM environment (hybrid wasi-vfs approach).
+#
+# This file is packed into the WASM binary at /gems/boot.rb via wasi-vfs.
+# It sets up Bundler to load gems from /gems/ (the VFS mount point),
+# then loads wasmify-rails shims and patches.
 
-# Common Rails shims
+ENV["BUNDLE_GEMFILE"] = "/gems/Gemfile"
+ENV["BUNDLE_PATH"]    = "/gems/bundle"
+ENV["BUNDLE_WITHOUT"] = "development:test"
+
+require "bundler/setup"
+
+# Prevent wasmify/rails/shim from calling nonexistent /bundle/setup.
+# The shim (line 16) does `require "/bundle/setup"` which only exists in the
+# monolithic binary. Since we already ran bundler/setup above, just mark it loaded.
+$LOADED_FEATURES << "/bundle/setup"
+
 require "wasmify/rails/shim"
-
-# Load Rails patches
 require "wasmify/rails/patches"
-
-# Setup external commands
 require "wasmify/external_commands"
 
-# Patch Bundler.require to only require precompiled deps
+# Patch Bundler.require to only require precompiled deps.
 # (We don't want to deal with group: :wasm here)
 def Bundler.require(*groups)
   %w[

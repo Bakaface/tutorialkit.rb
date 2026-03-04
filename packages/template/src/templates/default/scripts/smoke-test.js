@@ -1,5 +1,5 @@
 /**
- * Smoke test for the Rails WASM boot sequence (monolithic approach).
+ * Smoke test for the Rails WASM boot sequence (hybrid wasi-vfs approach).
  *
  * Exercises the same code paths as WebContainer (WASM load → VM init →
  * Rails bootstrap) directly on the host via Node.js.
@@ -11,8 +11,7 @@
  *
  * WASM binary resolution (first match wins):
  *   1. RAILS_WASM_PATH env var
- *   2. node_modules/@ruby/wasm-wasi/dist/ruby.wasm  (WebContainer placement)
- *   3. node_modules/@rails-tutorial/wasm/dist/rails.wasm  (npm package)
+ *   2. public/ruby.wasm  (built by bin/build-wasm)
  *
  * Requires --no-turbo-fast-api-calls to work around a V8 GC bug in node:wasi's
  * PathFilestatGet fast API callback. The npm script includes this flag.
@@ -58,8 +57,7 @@ if (!existsSync(nodeModules)) {
 
 const wasmCandidates = [
   { path: process.env.RAILS_WASM_PATH, label: 'RAILS_WASM_PATH env var' },
-  { path: new URL('../node_modules/@ruby/wasm-wasi/dist/ruby.wasm', import.meta.url).pathname, label: '@ruby/wasm-wasi' },
-  { path: new URL('../node_modules/@rails-tutorial/wasm/dist/rails.wasm', import.meta.url).pathname, label: '@rails-tutorial/wasm' },
+  { path: new URL('../public/ruby.wasm', import.meta.url).pathname, label: 'public/ruby.wasm' },
 ].filter(c => c.path);
 
 const resolved = wasmCandidates.find(c => existsSync(c.path));
@@ -68,8 +66,7 @@ if (!resolved) {
   console.error(
     '\n  Could not find a Ruby WASM binary. Searched:\n' +
     wasmCandidates.map(c => `    - ${c.label}: ${c.path}`).join('\n') + '\n\n' +
-    '  Set RAILS_WASM_PATH to the path of your monolithic ruby.wasm binary,\n' +
-    '  or ensure @rails-tutorial/wasm is installed.\n',
+    '  Run "bin/build-wasm" to build it, or set RAILS_WASM_PATH.\n',
   );
   process.exit(1);
 }
@@ -79,7 +76,7 @@ log(`Using WASM binary from ${resolved.label}: ${resolved.path}`);
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
-console.log('\n=== Rails WASM Smoke Test (Monolithic) ===\n');
+console.log('\n=== Rails WASM Smoke Test (Hybrid wasi-vfs) ===\n');
 const totalTimer = timer();
 
 // --- Step 1: Load WASM + init VM (+ optional Rails bootstrap) ---

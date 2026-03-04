@@ -12,6 +12,8 @@
     "template:dev": "TUTORIALKIT_DEV=true pnpm run build && pnpm run --filter=tutorialkit-rb-starter dev",
     "template:build": "pnpm run build && pnpm run --filter=tutorialkit-rb-starter build",
     "template:build:wasm": "pnpm run --filter=tutorialkit-rb-starter build:wasm",
+    "template:pack:gems": "pnpm run --filter=tutorialkit-rb-starter pack:gems",
+    "template:smoke": "node --loader ./packages/template/src/templates/default/scripts/wasi-loader.mjs --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls ./packages/template/src/templates/default/scripts/smoke-test.js",
     "cli:build-release": "pnpm run --filter=@tutorialkit-rb/cli build-release",
     "docs": "pnpm run --filter=tutorialkit.dev dev",
     "docs:build": "pnpm run build && pnpm run --filter=tutorialkit.dev build",

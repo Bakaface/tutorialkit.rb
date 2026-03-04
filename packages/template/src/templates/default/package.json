@@ -7,15 +7,17 @@
     "dev": "vite",
     "test": "node --disable-warning=ExperimentalWarning ./scripts/test.js",
     "test:watch": "node --disable-warning=ExperimentalWarning --watch --watch-path=./workspace ./scripts/test.js",
-    "postinstall": "chmod +x bin/* && node --disable-warning=ExperimentalWarning ./scripts/wait-for-wasm.js"
+    "postinstall": "chmod +x bin/* && node --disable-warning=ExperimentalWarning ./scripts/wait-for-wasm.js",
+    "smoke": "node --loader ./scripts/wasi-loader.mjs --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls scripts/smoke-test.js"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.1",
-    "@rails-tutorial/wasm": "^8.0.2-rc.1",
-    "@ruby/wasm-wasi": "^2.7.1",
+    "@ruby/3.3-wasm-wasi": "^2.8.1",
+    "@ruby/wasm-wasi": "^2.8.1",
     "express": "^5.1.0",
     "multer": "^2.0.1",
-    "set-cookie-parser": "^2.7.1"
+    "set-cookie-parser": "^2.7.1",
+    "tar-stream": "^3.1.7"
   },
   "devDependencies": {
     "vite": "^5.2.0"

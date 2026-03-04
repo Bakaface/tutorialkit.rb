@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+# Pack gems into a tarball for distribution.
+#
+# This is the RECOMMENDED approach for gem distribution:
+#   - Official @ruby/3.3-wasm-wasi provides the Ruby WASM binary
+#   - This script creates gems.tar.gz with all Rails dependencies
+#   - Faster rebuilds when changing gems (~30 seconds vs 5-10 minutes)
+#
+# Output:
+#   - src/templates/default/public/gems.tar.gz
+#   - src/templates/default/public/gems.meta.json
+#
+# Usage: ./bin/pack-gems
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
+RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+
+echo "=== Packing Gems Tarball ==="
+echo
+
+# Check if ruby-wasm directory exists
+if [ ! -d "$RUBY_WASM_DIR" ]; then
+  echo "Error: ruby-wasm directory not found at $RUBY_WASM_DIR"
+  exit 1
+fi
+
+cd "$RUBY_WASM_DIR"
+
+# Run the pack-gems script
+./bin/pack-gems
+
+echo
+echo "Gems tarball ready for distribution."
+echo "Run 'npm run dev' to test the tarball loading."

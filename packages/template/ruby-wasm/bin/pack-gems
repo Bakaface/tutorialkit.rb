@@ -1,0 +1,191 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Pack gems into a tarball for runtime extraction.
+# This approach separates gems from the base Ruby WASM, allowing faster rebuilds.
+#
+# Based on the mastodon.wasm approach:
+# https://github.com/kateinoigakukun/mastodon.wasm
+#
+# Note: WASM compatibility shims are provided by wasmify-rails at runtime,
+# so we don't need to create them here.
+
+require "bundler"
+require "fileutils"
+require "json"
+require "find"
+require "time"
+
+# Configuration
+SCRIPT_DIR = File.expand_path("..", __dir__)
+DEST_DIR = File.join(SCRIPT_DIR, "tmp", "gems_bundle")
+OUTPUT_DIR = File.join(SCRIPT_DIR, "..", "src", "templates", "default", "public")
+OUTPUT_FILE = File.join(OUTPUT_DIR, "gems.tar.gz")
+METADATA_FILE = File.join(OUTPUT_DIR, "gems.meta.json")
+GEMFILE_SRC = File.join(SCRIPT_DIR, "Gemfile")
+LOCKFILE_SRC = File.join(SCRIPT_DIR, "Gemfile.lock")
+
+# Target Ruby version for WASM (must match @ruby/X.X-wasm-wasi package)
+WASM_RUBY_VERSION = "3.3"
+
+# Find rbconfig for cross-compilation
+def find_rbconfig
+  rubies_dir = File.join(SCRIPT_DIR, "rubies")
+  return nil unless File.directory?(rubies_dir)
+
+  Dir.glob(File.join(rubies_dir, "*/usr/local/lib/ruby/*/wasm32-wasi/rbconfig.rb")).first
+end
+
+def check_ruby_version!
+  local_version = RUBY_VERSION.split(".")[0, 2].join(".")
+  if local_version != WASM_RUBY_VERSION
+    $stderr.puts "Error: Local Ruby version (#{RUBY_VERSION}) doesn't match WASM target (#{WASM_RUBY_VERSION}.x)"
+    $stderr.puts "Install Ruby #{WASM_RUBY_VERSION}.x or use a version manager (rbenv, asdf, mise)"
+    exit 1
+  end
+end
+
+def human_size(bytes)
+  if bytes < 1024
+    "#{bytes} bytes"
+  elsif bytes < 1024 * 1024
+    "#{(bytes.to_f / 1024).round(1)} KB"
+  else
+    "#{(bytes.to_f / 1024 / 1024).round(1)} MB"
+  end
+end
+
+def count_files(dir)
+  count = 0
+  Find.find(dir) { |_| count += 1 } if File.directory?(dir)
+  count
+end
+
+# Main execution
+check_ruby_version!
+
+puts "Packing gems into tarball..."
+puts
+
+# Clean previous build
+FileUtils.rm_rf(DEST_DIR)
+FileUtils.mkdir_p(DEST_DIR)
+FileUtils.mkdir_p(OUTPUT_DIR)
+
+# Find rbconfig for cross-compilation
+rbconfig_path = find_rbconfig
+unless rbconfig_path
+  $stderr.puts "Error: Could not find rbconfig.rb for cross-compilation"
+  $stderr.puts "Run the base WASM build first to generate the rubies directory"
+  exit 1
+end
+
+puts "Using rbconfig: #{rbconfig_path}"
+puts
+
+# Install gems with cross-compilation
+puts "Installing gems..."
+bundle_path = File.join(SCRIPT_DIR, "vendor", "bundle")
+
+env = {
+  "BUNDLE_FROZEN" => "true",
+  "BUNDLE_WITHOUT" => "development:test",
+  # Ignore local .bundle/config by pointing to empty config
+  "BUNDLE_APP_CONFIG" => File.join(DEST_DIR, ".bundle"),
+  "BUNDLE_PATH" => bundle_path,
+}
+
+# Build the bundle install command with target rbconfig
+cmd = [
+  "bundle", "install",
+  "--target-rbconfig", rbconfig_path
+]
+
+Bundler.with_unbundled_env do
+  env.each { |k, v| ENV[k] = v }
+  success = system(*cmd, chdir: SCRIPT_DIR)
+  unless success
+    $stderr.puts "Bundle install failed"
+    exit 1
+  end
+
+  # Clean up old gem versions (suppress warnings about cross-compiled gems)
+  system("bundle", "clean", chdir: SCRIPT_DIR, err: File::NULL)
+end
+
+puts
+puts "Creating tarball..."
+
+# Exclusions to reduce tarball size
+# Note: Be careful with test/spec exclusions - railties has templates/test/ that must be kept
+# Note: Use ** prefix for patterns that need to match inside ruby/VERSION/ subdirectories
+#
+# IMPORTANT: Keep **/extensions directory! It contains gem.build_complete markers
+# that Bundler needs to know gems are installed. Do NOT exclude gemspecs
+# (specifications/) or extension markers — Bundler needs these to verify installation.
+#
+# Excluded categories:
+#   Build artifacts:  cache, build_info, ext, ports, mkmf.log, gem_make.out, *.o, *.a, *.so
+#   Documentation:    doc, plugins, docs
+#   Type definitions: sig (RBS), rbi (Sorbet)
+#   Dev-only:         rakelib (Rake tasks)
+#   Baked-in gems:    ruby_wasm-*, prism-* source dirs (code is in the WASM binary;
+#                     their gemspecs and extension markers live in specifications/ and
+#                     extensions/ which are NOT excluded)
+excludes = %w[
+  **/cache
+  **/build_info
+  **/doc
+  **/plugins
+  **/gems/ruby_wasm-*
+  **/gems/prism-*
+  **/gems/*/ext
+  **/gems/*/ports
+  **/gems/*/sig
+  **/gems/*/rbi
+  **/gems/*/rakelib
+  **/gems/*/docs
+  **/mkmf.log
+  **/gem_make.out
+  **/*.o
+  **/*.a
+  **/*.so
+]
+
+# Copy Gemfile and Gemfile.lock into bundle for inclusion in tarball
+# These are the source of truth for what gems are in the tarball
+FileUtils.cp(GEMFILE_SRC, File.join(bundle_path, "Gemfile"))
+FileUtils.cp(LOCKFILE_SRC, File.join(bundle_path, "Gemfile.lock"))
+
+# Create tarball from vendor/bundle (now includes Gemfile and Gemfile.lock)
+# Use array form of system() to bypass shell glob expansion of exclude patterns
+tar_args = ["tar", "czf", OUTPUT_FILE] +
+  excludes.flat_map { |e| ["--exclude", e] } +
+  ["-C", bundle_path, "."]
+success = system(*tar_args)
+unless success
+  $stderr.puts "Tar command failed"
+  exit 1
+end
+
+# Generate metadata
+file_count = count_files(bundle_path)
+gem_count = Dir.glob(File.join(bundle_path, "ruby/*/gems/*")).size
+
+metadata = {
+  gem_count: gem_count,
+  file_count: file_count,
+  size_bytes: File.size(OUTPUT_FILE),
+  created_at: Time.now.iso8601,
+  ruby_version: WASM_RUBY_VERSION
+}
+File.write(METADATA_FILE, JSON.pretty_generate(metadata))
+
+puts
+puts "Build complete!"
+puts "  Output: #{OUTPUT_FILE}"
+puts "  Size: #{human_size(metadata[:size_bytes])}"
+puts "  Gems: #{gem_count}"
+puts "  Files: #{file_count}"
+puts "  Metadata: #{METADATA_FILE}"
+puts "  (Gemfile and Gemfile.lock included in tarball)"

@@ -47,7 +47,9 @@ export async function copyTemplate(dest: string, flags: CreateOptions) {
 async function setExecutablePermissions(dest: string) {
   const binScripts = [
     path.join(dest, 'bin', 'build-wasm'),
+    path.join(dest, 'bin', 'pack-gems'),
     path.join(dest, 'ruby-wasm', 'bin', 'pack'),
+    path.join(dest, 'ruby-wasm', 'bin', 'pack-gems'),
     // Node.js wrapper scripts for Rails in WebContainer
     path.join(dest, 'src', 'templates', 'default', 'bin', 'rails'),
     path.join(dest, 'src', 'templates', 'default', 'bin', 'ruby'),

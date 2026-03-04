@@ -7,6 +7,7 @@
     "astro": "astro",
     "build": "astro check && astro build",
     "build:wasm": "./bin/build-wasm",
+    "pack:gems": "cd ruby-wasm && ./bin/pack-gems",
     "dev": "astro dev",
     "link:local": "./bin/link-local",
     "unlink:local": "./bin/unlink-local",

@@ -10,8 +10,25 @@ pnpm-debug.log*
 .DS_Store
 .idea
 
-public/ruby.wasm
-public/ruby.wasm.hash
+# Generated WASM and gems files
+src/templates/default/public/ruby.wasm
+src/templates/default/public/ruby.wasm.hash
+src/templates/default/public/gems.tar.gz
+src/templates/default/public/gems.meta.json
+src/templates/default/public/gems.hash
+
+# Extracted gems (from postinstall)
+src/templates/default/workspace/.gems/
+
+# Legacy public directory (if used)
+public/gems.*
+public/ruby.wasm*
+
+# Ruby build artifacts
+ruby-wasm/tmp/
+ruby-wasm/dist/
+ruby-wasm/vendor/
+ruby-wasm/rubies/
 
 # Local development linking (created by npm run link:local)
 pnpm-workspace.yaml

@@ -2,39 +2,74 @@
 
 set -e
 
-echo "Building Ruby WASM module..."
+# Build custom Ruby WASM with all gems embedded (advanced/optional).
+#
+# DEFAULT APPROACH (recommended):
+#   - Uses official @ruby/3.3-wasm-wasi package (ruby+stdlib.wasm)
+#   - Gems distributed separately via gems.tar.gz (run: bin/pack-gems)
+#   - Faster rebuilds when changing gems
+#
+# THIS SCRIPT (optional):
+#   - Builds a custom ruby.wasm with gems embedded
+#   - Takes 5-10 minutes to build
+#   - Use when you need gems with native extensions
+#
+# Usage: ./bin/build-wasm
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
+RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+PUBLIC_DIR="$TEMPLATE_DIR/src/templates/default/public"
+
+echo "=== Building Custom Ruby WASM ==="
+echo
+echo "Note: This is optional. The default approach uses:"
+echo "  - Official @ruby/3.3-wasm-wasi package"
+echo "  - Gems via gems.tar.gz (run: bin/pack-gems)"
+echo
 
 # Check if ruby-wasm directory exists
-if [ ! -d "ruby-wasm" ]; then
-  echo "Error: ruby-wasm directory not found. Make sure you're running this from the template root."
+if [ ! -d "$RUBY_WASM_DIR" ]; then
+  echo "Error: ruby-wasm directory not found at $RUBY_WASM_DIR"
   exit 1
 fi
 
-# Change to ruby-wasm directory
-cd ruby-wasm
+# Ensure public directory exists
+mkdir -p "$PUBLIC_DIR"
 
-echo "Installing Ruby gems..."
-# Install gems using bundle install
-bundle install --path vendor/bundle
+cd "$RUBY_WASM_DIR"
 
-echo "Building WASM module..."
-# Run the pack script to build ruby.wasm
-./bin/pack
+# Install bundler dependencies
+echo "Installing dependencies..."
+bundle install --quiet
 
-echo "WASM build completed successfully!"
-echo "ruby.wasm is now available at ruby-wasm/dist/ruby.wasm"
+# Build using wasmify-rails pack command
+echo "Building Ruby WASM with embedded gems (this takes 5-10 minutes)..."
+echo
 
-# Generate hash of Gemfile.lock for cache versioning
-echo "Generating Gemfile.lock hash..."
-GEMFILE_HASH=$(sha256sum Gemfile.lock | cut -c1-16)
-echo "Gemfile.lock hash: $GEMFILE_HASH"
+if [ -f "bin/pack" ]; then
+  ./bin/pack "$TEMPLATE_DIR/src/templates/default"
+else
+  # Fallback to bundle exec rbwasm
+  echo "Warning: bin/pack not found, using rbwasm directly"
+  bundle exec rbwasm build \
+    --ruby-version 3.3 \
+    --target wasm32-unknown-wasip1 \
+    -o dist/ruby.wasm
 
-# Copy the built ruby.wasm to the public directory
-echo "Copying ruby.wasm to public directory..."
-cp dist/ruby.wasm ../public/
-echo "ruby.wasm copied to public directory."
+  cp dist/ruby.wasm "$PUBLIC_DIR/"
+fi
 
-# Create ruby.wasm.hash with the hash
-echo "Creating ruby.wasm.hash..."
-echo "$GEMFILE_HASH" > ../public/ruby.wasm.hash
-echo "ruby.wasm.hash created with hash: $GEMFILE_HASH"
+# Verify output
+if [ -f "$PUBLIC_DIR/ruby.wasm" ]; then
+  SIZE=$(du -h "$PUBLIC_DIR/ruby.wasm" | cut -f1)
+  echo
+  echo "=== Build Complete ==="
+  echo "  Output: $PUBLIC_DIR/ruby.wasm"
+  echo "  Size: $SIZE"
+  echo
+  echo "The custom WASM will be used instead of the official package."
+else
+  echo "Error: Build failed - ruby.wasm not created"
+  exit 1
+fi

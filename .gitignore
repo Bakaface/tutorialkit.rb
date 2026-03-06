@@ -30,3 +30,6 @@ tsconfig.build.tsbuildinfo
 packages/template/ruby-wasm/.bundle/
 packages/template/ruby-wasm/vendor/
 
+build/
+rubies/
+

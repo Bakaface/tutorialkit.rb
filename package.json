@@ -11,6 +11,7 @@
     "extension:build": "pnpm run --filter='./extensions/**' build",
     "template:dev": "TUTORIALKIT_DEV=true pnpm run build && pnpm run --filter=tutorialkit-rb-starter dev",
     "template:build": "pnpm run build && pnpm run --filter=tutorialkit-rb-starter build",
+    "template:build:ruby-base": "pnpm run --filter=tutorialkit-rb-starter build:ruby-base",
     "template:build:wasm": "pnpm run --filter=tutorialkit-rb-starter build:wasm",
     "cli:build-release": "pnpm run --filter=@tutorialkit-rb/cli build-release",
     "docs": "pnpm run --filter=tutorialkit.dev dev",

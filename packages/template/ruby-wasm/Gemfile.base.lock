@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    js (2.8.1)
+
+PLATFORMS
+  ruby
+  wasm32-wasi
+  x86_64-linux
+
+DEPENDENCIES
+  js
+
+CHECKSUMS
+  js (2.8.1) sha256=d323712badd700346c6fc1e4f053d48c4ed68a51b6aa259455a80effd7bc4338
+
+BUNDLED WITH
+  4.0.3

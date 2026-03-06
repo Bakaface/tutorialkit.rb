@@ -2,20 +2,25 @@
 
 set -e
 
-# Build a custom Ruby 3.3 WASM base binary via rbwasm.
+# Build a custom Ruby 3.3 WASM base binary with JS interop support.
 #
-# The official @ruby/3.3-wasm-wasi binary exposes POSIX function stubs
-# (fchmod, chmod, etc.) that WebContainer doesn't implement, causing
-# NotImplementedError at the C level. rbwasm build automatically applies
-# ac_cv_func_fchmod=no etc. (see ruby.wasm crossruby.rb:348-358), producing
-# a binary that avoids these issues entirely.
+# Uses Gemfile.base (contains only `gem "js"`) so that the `js` gem's native
+# C extension is statically linked into the binary. This provides:
+#   - Component model ABI exports (canonical_abi_drop_rb-abi-value, etc.)
+#   - Reactor adapter (_initialize instead of _start)
+#   - __wasi_vfs_rt_init call path (activates wasi-vfs packed data at startup)
+#
+# The js gem's extconf.rb unconditionally sets -DJS_ENABLE_COMPONENT_MODEL=1,
+# so these exports appear in the output even without RUBY_WASM_EXPERIMENTAL_COMPONENT_MODEL.
+# The output is a core WASM module (not a component), compatible with both
+# wasi-vfs pack and @ruby/wasm-wasi's RubyVM.instantiateModule.
 #
 # This is a one-time build (5-20 minutes). The resulting binary is used
 # by bin/build-wasm as the base for the hybrid wasi-vfs pipeline.
 #
 # Prerequisites:
 #   - Ruby 3.3+
-#   - ruby_wasm gem (gem install ruby_wasm → provides rbwasm CLI)
+#   - ruby_wasm gem (gem install ruby_wasm)
 #   - Rust toolchain (for ruby_wasm native extension)
 #   - WASI SDK (auto-downloaded by rbwasm if WASI_SDK_PATH not set)
 #   - ~2GB disk space for build artifacts
@@ -27,7 +32,7 @@ TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
 RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
 OUTPUT="$RUBY_WASM_DIR/dist/ruby-base.wasm"
 
-echo "=== Building custom Ruby WASM base binary ==="
+echo "=== Building custom Ruby WASM base binary (with JS interop) ==="
 echo
 
 # --- Preflight checks --------------------------------------------------------
@@ -38,11 +43,18 @@ if ! command -v rbwasm &> /dev/null; then
   exit 1
 fi
 
+# --- Prepare Gemfile.base lockfile -------------------------------------------
+
+echo "Resolving Gemfile.base dependencies..."
+export BUNDLE_GEMFILE="$RUBY_WASM_DIR/Gemfile.base"
+bundle lock --add-platform wasm32-wasi 2>/dev/null || bundle lock
+echo
+
 # --- Build -------------------------------------------------------------------
 
 echo "Building Ruby 3.3 for wasm32-unknown-wasip1..."
 echo "  --build-profile full (all stdlib C extensions)"
-echo "  --disable-gems (gems come from wasi-vfs pack step)"
+echo "  Gemfile.base: gem \"js\" (provides ABI exports + reactor adapter)"
 echo
 echo "This will take 5-20 minutes on first run."
 echo
@@ -53,7 +65,6 @@ rbwasm build \
   --ruby-version 3.3 \
   --target wasm32-unknown-wasip1 \
   --build-profile full \
-  --disable-gems \
   -o "$OUTPUT"
 
 SIZE=$(du -h "$OUTPUT" | cut -f1)

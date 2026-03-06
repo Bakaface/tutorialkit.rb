@@ -6,6 +6,7 @@
   "scripts": {
     "astro": "astro",
     "build": "astro check && astro build",
+    "build:ruby-base": "./bin/build-ruby-base",
     "build:wasm": "./bin/build-wasm",
     "dev": "astro dev",
     "link:local": "./bin/link-local",

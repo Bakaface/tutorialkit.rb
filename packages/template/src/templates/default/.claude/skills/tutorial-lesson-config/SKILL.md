@@ -1,17 +1,15 @@
 ---
 name: tutorial-lesson-config
 description: |
-  Use this skill whenever configuring lesson frontmatter options or understanding the
-  configuration cascade. Trigger when the user says 'frontmatter', 'prepareCommands',
-  'mainCommand', 'editor config', 'terminal config', 'preview config', 'lesson configuration',
-  'configuration inheritance', 'focus file', 'file tree scope', 'i18n', 'allowEdits',
-  'allowCommands', 'previews', 'autoReload', 'downloadAsZip', 'scope', or asks about any
-  YAML frontmatter option for a lesson — even if they don't explicitly mention configuration.
-  This is the authoritative reference for all TutorialKit frontmatter options with
-  Rails-specific defaults. Documents the configuration cascade, all editor/terminal/preview/
-  command options, all 18 i18n keys, and Rails-specific features like custom.shell.workdir.
-  Do NOT guess frontmatter options without this skill. Do NOT use for content hierarchy
-  (use tutorial-content-structure) or file/template organization (use rails-file-management).
+  Use this skill whenever configuring lesson frontmatter or checking inheritance rules.
+  Trigger on: 'frontmatter', 'prepareCommands', 'mainCommand', 'editor config', 'terminal
+  config', 'preview config', 'configuration inheritance', 'focus file', 'i18n', 'allowEdits',
+  'previews', 'autoReload', 'scope', 'defaults', 'what inherits', 'does X inherit',
+  'invalid combination', 'constraint', or any YAML frontmatter question — even without
+  mentioning configuration. Authoritative reference for all frontmatter options, inheritance
+  rules, defaults, and invalid-combination constraints with Rails-specific patterns. Do NOT
+  guess frontmatter without this skill. Do NOT use for content hierarchy
+  (use tutorial-content-structure) or file organization (use rails-file-management).
 ---
 
 # Tutorial Lesson Configuration
@@ -49,6 +47,55 @@ terminal:
 ```
 
 Then override only what changes per-lesson (e.g., enable `previews: [3000]` for lessons with a running server).
+
+## Inheritance Rules
+
+### Properties That Inherit (via cascade)
+
+These properties are resolved through the cascade (Tutorial → Part → Chapter → Lesson). The **most specific** (lesson-level) value wins. For plain objects, child and parent are deep-merged; for arrays and primitives, the child **replaces** the parent entirely.
+
+| Property | Merge behavior |
+|----------|---------------|
+| `mainCommand` | Replace |
+| `prepareCommands` | **Replace** (not merge — if a lesson sets this, it completely overrides the parent) |
+| `terminalBlockingPrepareCommandsCount` | Replace |
+| `previews` | Replace |
+| `autoReload` | Replace |
+| `template` | Replace |
+| `terminal` | Deep-merge if both are objects; replace if either is a primitive (`true`/`false`) |
+| `editor` | Deep-merge if both are objects; replace if either is a primitive |
+| `focus` | Replace |
+| `i18n` | Deep-merge (lesson keys override parent keys; unset keys fall through) |
+| `meta` | Deep-merge |
+| `editPageLink` | Replace |
+| `openInStackBlitz` | Replace |
+| `downloadAsZip` | Replace |
+| `filesystem` | Deep-merge |
+
+### Properties That Do NOT Inherit
+
+These are **per-lesson only** and must be set on each lesson that needs them:
+
+| Property | Why no inheritance |
+|----------|-------------------|
+| `custom` (including `custom.shell.workdir`) | Not in the cascade — set it on every lesson |
+| `scope` | Lesson-specific file tree filter |
+| `hideRoot` | Lesson-specific file tree option |
+
+**Critical:** `custom.shell.workdir` must be set on **every lesson** that needs a custom terminal working directory. It will NOT be inherited from a part or tutorial `meta.md`.
+
+**Critical:** When a lesson overrides `prepareCommands`, it **replaces** the entire array from the parent. If the tutorial root sets `prepareCommands: [['npm install', 'Preparing Ruby runtime']]` and a lesson needs to add `db:prepare`, the lesson must include **both** commands:
+
+```yaml
+# WRONG — npm install is lost
+prepareCommands:
+  - ['node scripts/rails.js db:prepare', 'Prepare database']
+
+# CORRECT — include all commands
+prepareCommands:
+  - ['npm install', 'Preparing Ruby runtime']
+  - ['node scripts/rails.js db:prepare', 'Prepare database']
+```
 
 ## Editor Configuration
 
@@ -218,6 +265,41 @@ filesystem:
 
 For Rails tutorials, watch `/workspace/**/*` so the preview reflects file changes in the Rails app.
 
+## Defaults
+
+When a property is not set at any level in the cascade, these defaults apply:
+
+| Property | Default | Effect |
+|----------|---------|--------|
+| `template` | `'default'` | Uses the base Rails WASM runtime template |
+| `editor` | (unset) | Editor is shown with default file tree |
+| `terminal` | (unset) | One read-only "Output" panel, initially closed |
+| `previews` | `true` | Auto-detect: shows preview for the first port that opens |
+| `autoReload` | (unset) | Preview is not force-reloaded on navigation |
+| `focus` | (unset) | No file auto-opened in editor |
+| `openInStackBlitz` | `true` | "Open in StackBlitz" button shown |
+| `downloadAsZip` | `false` | Download button hidden |
+| `mainCommand` | (unset) | No long-running process started |
+| `prepareCommands` | (unset) | No preparation steps |
+| `filesystem.watch` | (unset) | No file watching |
+| `scope` | (unset) | All files visible in tree |
+| `hideRoot` | `true` | Root "/" node hidden in file tree |
+| `custom` | (unset) | No custom fields |
+
+## Constraints
+
+Invalid or problematic frontmatter combinations that cause silent failures:
+
+| Combination | Problem | Fix |
+|-------------|---------|-----|
+| `focus: /path/...` with `editor: false` | Focus is silently ignored — no editor to open the file in | Remove `focus` or set `editor: true` |
+| `previews: [3000]` without `mainCommand` | Nothing starts a server on port 3000 — preview stays blank | Add `mainCommand: ['node scripts/rails.js server', 'Starting Rails server']` |
+| `mainCommand: 'rails server'` | Bare `rails` won't work — commands must go through the Node.js wrapper | Use `mainCommand: ['node scripts/rails.js server', 'Starting Rails server']` |
+| Lesson `prepareCommands` without `npm install` | WASM runtime never loads — everything else fails | Always include `['npm install', 'Preparing Ruby runtime']` as the first prepare command |
+| `previews` without `prepareCommands` including `npm install` | Runtime not loaded, server can't start | Add `prepareCommands` with `npm install` (or inherit from tutorial root) |
+| `terminal: false` with `mainCommand` set | Terminal hidden but `mainCommand` still runs — output is invisible | Either show terminal or remove `mainCommand` |
+| `custom.shell.workdir` set only in `meta.md` | `custom` doesn't inherit — terminal won't cd in lessons | Set `custom.shell.workdir` on each lesson's `content.md` |
+
 ## Other Options
 
 ### Custom Shell Working Directory
@@ -228,7 +310,9 @@ custom:
     workdir: "/workspace/store"
 ```
 
-Sets the terminal's working directory by sending `cd /home/tutorial<workdir>` to the shell on lesson load. This is a **Rails-tutorial-specific** feature (implemented via `ShellConfigurator` in this template, not upstream TutorialKit). Essential for Rails tutorials where the app lives at `/workspace/<app-name>`.
+Sets the terminal's working directory by sending `cd /home/tutorial<workdir> && clear` to the first terminal panel on lesson load. The path is constructed by prepending `/home/tutorial` to the `workdir` value, so `workdir: "/workspace/store"` sends `cd /home/tutorial/workspace/store && clear`. This is a **Rails-tutorial-specific** feature (implemented via `ShellConfigurator` in this template, not upstream TutorialKit). Essential for Rails tutorials where the app lives at `/workspace/<app-name>`.
+
+**Does not inherit.** Must be set on every lesson that needs it (see Inheritance Rules above).
 
 ### Template Selection
 

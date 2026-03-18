@@ -1,18 +1,15 @@
 ---
 name: rails-wasm-author-constraints
 description: |
-  Use this skill whenever checking whether a Rails feature, gem, or pattern works in the
-  WASM tutorial environment. Trigger when the user says 'does X work in WASM', 'can I use
-  this gem', 'gem compatibility', 'WASM limitation', 'what works', 'what doesn't work',
-  'supported features', 'PGLite', 'database persistence', 'threading', 'Net::HTTP',
-  'ActionCable', 'background jobs', 'WebSockets', 'can I teach X', or asks about any
-  Rails capability in the browser environment — even if they don't explicitly mention WASM
-  or constraints. This skill contains the authoritative compatibility matrix for this
-  specific WASM runtime — which features work, which are shimmed, which are impossible —
-  plus gem compatibility tiers, PGLite behavior, and boot timing. General Ruby/Rails
-  knowledge is insufficient here; the WASM environment has unique constraints that cannot
-  be guessed. Do NOT use for file organization (use rails-file-management) or lesson
-  frontmatter (use tutorial-lesson-config).
+  Use this skill whenever checking if a Rails feature or gem works in WASM, or understanding
+  what's real vs. conceptual in lessons. Trigger on: 'does X work in WASM', 'can I use this
+  gem', 'gem compatibility', 'WASM limitation', 'what works', 'supported features', 'PGLite',
+  'threading', 'Net::HTTP', 'ActionCable', 'background jobs', 'can I teach X', 'bundle
+  install in WASM', 'conceptual vs real', or any Rails capability question — even without
+  mentioning WASM. Authoritative compatibility matrix: which features work, which are shimmed,
+  which are impossible, plus gem tiers, PGLite behavior, boot timing, and conceptual-vs-real
+  operations. General Rails knowledge is insufficient here. Do NOT use for file organization
+  (use rails-file-management) or frontmatter (use tutorial-lesson-config).
 ---
 
 # Rails WASM Author Constraints
@@ -37,7 +34,7 @@ What works, what doesn't, and how to design lessons around the WASM environment.
 | Active Storage (upload) | Partial | Upload works but image processing is a no-op |
 | Background jobs | No | Single-threaded; Solid Queue won't process |
 | ActionCable / WebSockets | No | No `IO.select`, no real socket support |
-| External HTTP requests | No | `Net::HTTP`, `open-uri` are stubbed |
+| External HTTP requests | No | No outbound networking from Ruby — sockets are unimplemented at the WASI level |
 | Threads / parallel processing | No | `Thread.new` uses fibers (cooperative, single-threaded) |
 | System commands from Ruby | No | `system()`, backticks, `Open3` are non-functional |
 
@@ -47,7 +44,7 @@ These are **impossible to work around** in the WASM environment. Do not write le
 
 ### No Outbound Networking
 
-`Net::HTTP`, `open-uri`, `TCPSocket`, `UDPSocket`, and all socket classes are stubbed. You cannot:
+Socket operations (`TCPSocket`, `UDPSocket`, and all socket classes) fail because the underlying WASI syscalls are unimplemented. `Net::HTTP` and `open-uri` will raise errors when attempting connections. You cannot:
 - Call external APIs from Ruby
 - Download files from the internet
 - Connect to external databases or services
@@ -162,10 +159,23 @@ The WASM runtime takes time to load. Set expectations for tutorial users:
 
 ## Auto-Authentication
 
-The runtime includes an auto-login patch: if `tmp/authenticated-user.txt` exists in the Rails app root (containing a user identifier), the first request auto-authenticates that user.
+The runtime includes an auto-login patch: if `tmp/authenticated-user.txt` exists in the Rails app root, the first HTTP request auto-authenticates the user found by `User.find_by(email_address: <file contents>)`. The file should contain a single email address (e.g., `admin@example.com`).
 
-This is useful for lessons that teach features behind authentication without requiring the user to manually log in each time.
+**To use:** Place `workspace/store/tmp/authenticated-user.txt` in `_files/` or a template, containing the email of a seeded user. The first request calls `start_new_session_for(user)`, creating a session cookie for all subsequent requests. Runs once per VM lifetime (the `$__pre_authenticated` global flag prevents repeat attempts).
+
+This requires the Rails 8 `Authentication` concern and a `User` model with an `email_address` column.
 
 ## Filesystem Boundaries
 
 Ruby code can only access `/workspace` (the WASI preopen). Attempting to access paths outside this boundary raises `Errno::ENOENT`. Tutorial code should never navigate above `/workspace` with `Dir.chdir("..")` or absolute paths outside the preopen.
+
+## Conceptual vs. Real Operations
+
+Some tutorial operations are **conceptual** — they teach the correct pattern but the actual execution requires something different in the WASM environment:
+
+| Operation in lesson content | Reality | What the author must do |
+|-----------------------------|---------|------------------------|
+| "Add `gem 'devise'` to your Gemfile" | Gems are baked into the WASM binary at build time | The gem must already be in `ruby-wasm/Gemfile` and rebuilt with `bin/build-wasm` **before** the tutorial is published |
+| "Run `bundle install`" | `bundle install` is a no-op in WASM — all gems come from the binary | Include it for pedagogical completeness; it will appear to succeed |
+| "Run `rails server`" | The Rails server runs through `node scripts/rails.js server` | Use `node scripts/rails.js server` in frontmatter `mainCommand`; in lesson content, show `rails server` since that's what the terminal wrapper understands |
+| "Edit `database.yml`" | Database adapter is PGLite, auto-configured by wasmify-rails | Pre-configure in the template; showing a `database.yml` edit is fine for teaching but won't change the runtime behavior |

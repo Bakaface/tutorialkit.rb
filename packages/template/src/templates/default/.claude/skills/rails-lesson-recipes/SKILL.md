@@ -1,17 +1,16 @@
 ---
 name: rails-lesson-recipes
 description: |
-  Use this skill whenever creating a new tutorial lesson or deciding which lesson pattern
-  fits a topic. Trigger when the user says 'create a lesson', 'lesson recipe', 'lesson
-  pattern', 'lesson template', 'terminal-only lesson', 'code editing lesson', 'database
-  lesson', 'lesson with preview', 'console lesson', 'lesson sequence', 'multi-step lesson',
-  or asks how to structure a specific type of Rails lesson — even if they don't explicitly
-  mention recipes or patterns. This skill provides five tested, copy-paste-ready lesson
+  Use this skill whenever creating a new lesson, choosing a lesson pattern, or validating
+  lesson structure. Trigger on: 'create a lesson', 'lesson recipe', 'lesson pattern',
+  'terminal-only lesson', 'code editing lesson', 'database lesson', 'console lesson',
+  'lesson sequence', 'multi-step lesson', 'validate lesson', 'check lesson', or asking
+  how to structure a Rails lesson — even without mentioning recipes. Provides five tested
   blueprints (terminal-only, code-editing, database, full-app, console/IRB) with correct
-  frontmatter, directory layouts, and content examples specific to the Rails WASM environment.
-  Do NOT create lessons without consulting this skill — incorrect frontmatter or directory
-  structure will cause silent failures. Do NOT use for frontmatter option reference
-  (use tutorial-lesson-config) or file organization rules (use rails-file-management).
+  frontmatter, directory layouts, content examples, and a post-creation validation
+  checklist. Do NOT create lessons without this skill — incorrect structure causes silent
+  failures. Do NOT use for frontmatter reference (use tutorial-lesson-config) or file
+  organization (use rails-file-management).
 ---
 
 # Rails Lesson Recipes
@@ -377,3 +376,41 @@ Each template captures the **expected state** at the start of that lesson. This 
 1. Use `prepareCommands` for setup (npm install, db:prepare)
 2. Use templates or `_files/` for starting code state
 3. Don't rely on user actions from a previous lesson
+
+## Post-Creation Checklist
+
+After creating a lesson, verify these structural requirements. Violations cause silent failures at runtime.
+
+### Required
+
+- [ ] `content.md` exists in the lesson directory and has `type: lesson` in frontmatter
+- [ ] `content.md` has a `title` in frontmatter
+- [ ] All file paths in `_files/` start with `workspace/` (not `/workspace/`)
+- [ ] All file paths in `_solution/` start with `workspace/` (not `/workspace/`)
+- [ ] If `.tk-config.json` exists in `_files/`, its `extends` path resolves to an existing template directory under `src/templates/`
+- [ ] `_solution/` mirrors the `_files/` directory structure (paths must match for "Solve" to replace correctly)
+- [ ] `custom.shell.workdir` is set on the lesson itself (it does NOT inherit from parent `meta.md`)
+
+### If previews are enabled
+
+- [ ] `previews` is set (e.g., `previews: [3000]`)
+- [ ] `mainCommand` is set to start the server (e.g., `['node scripts/rails.js server', 'Starting Rails server']`)
+- [ ] `prepareCommands` includes `npm install` (either inherited from tutorial root or set explicitly)
+
+### If database is used
+
+- [ ] `prepareCommands` includes **both** `npm install` and `node scripts/rails.js db:prepare` (remember: arrays replace, not merge)
+- [ ] Migration files have timestamp prefixes in filenames
+- [ ] Seeds file exists if the lesson needs starting data
+
+### If focus is set
+
+- [ ] `focus` path is absolute from WebContainer root (e.g., `/workspace/store/app/...`)
+- [ ] The file at `focus` path exists in `_files/` or in the referenced template
+- [ ] `editor` is not set to `false` (focus is silently ignored when editor is hidden)
+
+### Path verification
+
+- [ ] `.tk-config.json` `extends` uses correct `../` count: 4 + number of intermediate levels above the lesson (typically 5 for `tutorial/part/lesson/_files/`)
+- [ ] `focus` paths use `/workspace/...` (absolute), while `_files/` paths use `workspace/...` (relative, no leading slash)
+- [ ] `scope` paths use `/workspace/...` (absolute)

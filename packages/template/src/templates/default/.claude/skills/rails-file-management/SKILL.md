@@ -1,18 +1,15 @@
 ---
 name: rails-file-management
 description: |
-  Use this skill whenever organizing files for Rails tutorial lessons — managing _files/,
-  _solution/, templates, and workspace paths. Trigger when the user says 'create _files',
-  'add _solution', 'set up template', 'template inheritance', '.tk-config.json', 'workspace
-  path', 'which files go where', 'add a gem', 'Gemfile', 'build-wasm', 'create a template',
-  'override files', or asks where to put Rails app code in a lesson — even if they don't
-  explicitly mention file management. This skill contains project-specific knowledge about
-  the three-layer merge model (template / _files / _solution), the built-in templates,
-  workspace path conventions, runtime infrastructure files that must never be overridden,
-  and the WASM gem build workflow — none of which can be inferred from general knowledge.
-  Do NOT attempt file organization without consulting this skill first. Do NOT use for
-  frontmatter configuration (use tutorial-lesson-config) or content hierarchy
-  (use tutorial-content-structure).
+  Use this skill whenever organizing files for Rails tutorial lessons — _files/, _solution/,
+  templates, workspace paths. Trigger on: 'create _files', 'add _solution', 'template
+  inheritance', '.tk-config.json', 'extends path', 'workspace path', 'which files go where',
+  'add a gem', 'Gemfile', 'build-wasm', 'create a template', 'protected files', 'do not
+  override', or asking where to put Rails app code — even without mentioning file management.
+  Covers the three-layer merge model, built-in templates, `.tk-config.json` path formula for
+  different nesting depths, protected infrastructure files, and WASM gem build workflow. Do
+  NOT attempt file organization without this skill. Do NOT use for frontmatter (use
+  tutorial-lesson-config) or content hierarchy (use tutorial-content-structure).
 ---
 
 # Rails File Management
@@ -33,6 +30,12 @@ _solution/ (lesson)    ← Completed/answer code
 
 Files from each layer **overlay** the previous — same-path files are replaced, new files are added.
 
+**Two template mechanisms (don't confuse them):**
+- **`template` frontmatter field** (e.g., `template: default`) — selects which base template JSON is loaded as the "Template (base)" layer. Almost always `default` (provides the WASM runtime). Set once in tutorial root `meta.md`.
+- **`_files/.tk-config.json` with `extends`** — extends the `_files` layer with files from another template directory (e.g., `rails-app`, `crud-products`). These provide the Rails app code that overlays on top of the base template.
+
+A typical lesson uses both: `template: default` for the runtime (inherited from tutorial root) + `_files/.tk-config.json` extending `rails-app` for the app code.
+
 ## Templates
 
 Templates live in `src/templates/` and provide the base project structure for WebContainer.
@@ -41,9 +44,9 @@ Templates live in `src/templates/` and provide the base project structure for We
 
 | Template | Purpose | Inherits From |
 |----------|---------|---------------|
-| `default` | Base Rails WASM runtime — Node.js wrappers, Express server, PGLite, WASM loader | (none) |
-| `rails-app` | Pre-generated Rails app at `workspace/store/` with full runtime | (standalone) |
-| `crud-products` | Rails app with Product model, controller, views, migrations, seeds | `rails-app` |
+| `default` | Base Rails WASM runtime — Node.js wrappers, Express server, PGLite, WASM loader. Selected via `template: default` in frontmatter (the default). | (none) |
+| `rails-app` | Pre-generated Rails app at `workspace/store/`. Used via `_files/.tk-config.json`, not via the `template` frontmatter field. | (standalone — only contains `workspace/`) |
+| `crud-products` | Rails app with Product model, controller, views, migrations, seeds. Used via `_files/.tk-config.json`. | `rails-app` |
 
 ### Template Inheritance
 
@@ -131,6 +134,20 @@ _files/
 
 The `extends` path is **relative to the `_files/` directory**. Count the `../` segments carefully to reach `src/templates/`.
 
+### `.tk-config.json` Path Formula
+
+The `extends` path in `.tk-config.json` is **relative to the directory containing the `.tk-config.json` file**. To reach `src/templates/<name>`, count the `../` segments based on your content nesting depth:
+
+| Content structure | `../` count | Example `extends` value |
+|-------------------|-------------|------------------------|
+| `tutorial/lesson/_files/` | 4 | `"../../../../templates/rails-app"` |
+| `tutorial/part/lesson/_files/` | 5 | `"../../../../../templates/rails-app"` |
+| `tutorial/part/chapter/lesson/_files/` | 6 | `"../../../../../../templates/rails-app"` |
+
+The count is: 1 (`_files/`) + 1 (lesson dir) + N (intermediate dirs: part, chapter) + 1 (`tutorial/`) + 1 (`content/`) = **4 + number of intermediate levels**.
+
+For the standard `tutorial/part/lesson/_files/` structure used by most Rails tutorials, the path is always `"../../../../../templates/<name>"` (5 segments).
+
 ### Empty Workspace
 
 For lessons where the user creates the app from scratch (e.g., `rails new`), use an empty workspace:
@@ -178,7 +195,9 @@ The following files are **runtime infrastructure** provided by the `default` tem
 | `bin/rails`, `bin/ruby`, `bin/console`, `bin/rackup` | Node.js CLI wrappers |
 | `lib/rails.js`, `lib/server.js`, `lib/database.js` | WASM runtime, HTTP bridge, DB |
 | `lib/boot-progress.js`, `lib/commands.js`, `lib/irb.js` | Boot progress, command dispatch, IRB |
-| `lib/patches/` | Ruby monkey-patches for WASM compat |
+| `lib/server/frame_location_middleware.js` | Express middleware for frame location |
+| `lib/patches/authentication.rb` | Auto-login patch |
+| `lib/patches/app_generator.rb` | Rails generator WASM compat patch |
 | `scripts/` | Build and automation scripts |
 | `pgdata/` | PGLite database storage |
 

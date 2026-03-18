@@ -49,11 +49,10 @@ function log(msg) {
 const nodeModules = new URL('../node_modules', import.meta.url).pathname;
 
 if (!existsSync(nodeModules)) {
-  console.error(
-    '\n  Missing node_modules/\n' +
-    '  Run "npm install" in packages/template/src/templates/default/ first.\n',
-  );
-  process.exit(1);
+  log('node_modules/ not found — running npm install --ignore-scripts...');
+  const { execSync } = await import('node:child_process');
+  const templateDir = new URL('..', import.meta.url).pathname;
+  execSync('npm install --ignore-scripts', { cwd: templateDir, stdio: 'inherit' });
 }
 
 const wasmCandidates = [

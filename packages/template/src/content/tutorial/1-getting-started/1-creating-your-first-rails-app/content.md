@@ -4,7 +4,7 @@ title: Creating your first Rails app
 editor: false
 custom:
   shell:
-    workdir: "/workspace/store"
+    workdir: "/workspace"
 ---
 
 Creating Your First Rails App
@@ -16,10 +16,10 @@ all of the commands.
 `rails new` generates the foundation of a fresh Rails application for you, so
 let's start there.
 
-To create our `store` application, run the following command in your terminal:
+To create our application, run the following command in your terminal:
 
 ```bash
-$ rails new store
+$ rails new demo_app
 ```
 
 :::info
@@ -30,5 +30,5 @@ these options, run `rails new --help`.
 After your new application is created, switch to its directory:
 
 ```bash
-$ cd store
+$ cd demo_app
 ```

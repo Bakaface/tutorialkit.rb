@@ -15,6 +15,7 @@ export const ShellConfigurator: React.FC = () => {
   const storeRef = useStore(tutorialStore.ref);
   const terminalConfig = useStore(tutorialStore.terminalConfig);
   const lessonLoaded = useStore(tutorialStore.lessonFullyLoaded);
+  const isPreparing = useStore(tutorialStore.isPreparing);
   const [state, set] = useState(0);
 
   useEffect(() => {
@@ -37,6 +38,10 @@ export const ShellConfigurator: React.FC = () => {
     }
 
     if (!lesson) {
+      return;
+    }
+
+    if (isPreparing) {
       return;
     }
 
@@ -89,7 +94,7 @@ export const ShellConfigurator: React.FC = () => {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [boot, terminalConfig, storeRef, lessonLoaded]);
+  }, [boot, terminalConfig, storeRef, isPreparing, lessonLoaded]);
 
   return null;
 };

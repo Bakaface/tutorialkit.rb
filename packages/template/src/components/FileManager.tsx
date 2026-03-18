@@ -134,6 +134,16 @@ export function FileManager() {
         }
       });
 
+      // Also ensure template workspace bin files are executable
+      try {
+        const templateBins = await wc.fs.readdir('workspace/bin');
+        templateBins.forEach((bin) => {
+          chmodx(wc, `/home/tutorial/workspace/bin/${bin}`);
+        });
+      } catch {
+        // workspace/bin may not exist for all templates
+      }
+
       if (!wasmCached.current) {
         await wc.fs.writeFile(WC_WASM_LOG_PATH, 'status: init');
 

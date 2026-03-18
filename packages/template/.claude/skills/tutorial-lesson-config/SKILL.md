@@ -115,8 +115,8 @@ editor:
     allowEdits: true                   # Allow creating files/folders anywhere
     allowEdits: "/workspace/**"        # Allow edits matching glob
     allowEdits:                        # Multiple glob patterns
-      - "/workspace/store/app/**"
-      - "/workspace/store/config/**"
+      - "/workspace/app/**"
+      - "/workspace/config/**"
 ```
 
 ### Focus File
@@ -124,7 +124,7 @@ editor:
 Auto-open a specific file in the editor when the lesson loads:
 
 ```yaml
-focus: /workspace/store/app/controllers/products_controller.rb
+focus: /workspace/app/controllers/products_controller.rb
 ```
 
 **Path must be absolute** from the WebContainer root. For Rails apps, this is typically `/workspace/<app-name>/...`.
@@ -132,7 +132,7 @@ focus: /workspace/store/app/controllers/products_controller.rb
 ### File Tree Scope and Root
 
 ```yaml
-scope: /workspace/store        # Only show files under this path in the tree
+scope: /workspace              # Only show files under this path in the tree
 hideRoot: true                 # Hide the "/" root node (default: true)
 ```
 
@@ -307,10 +307,10 @@ Invalid or problematic frontmatter combinations that cause silent failures:
 ```yaml
 custom:
   shell:
-    workdir: "/workspace/store"
+    workdir: "/workspace"
 ```
 
-Sets the terminal's working directory by sending `cd /home/tutorial<workdir> && clear` to the first terminal panel on lesson load. The path is constructed by prepending `/home/tutorial` to the `workdir` value, so `workdir: "/workspace/store"` sends `cd /home/tutorial/workspace/store && clear`. This is a **Rails-tutorial-specific** feature (implemented via `ShellConfigurator` in this template, not upstream TutorialKit). Essential for Rails tutorials where the app lives at `/workspace/<app-name>`.
+Sets the terminal's working directory by sending `cd /home/tutorial<workdir> && clear` to the first terminal panel on lesson load. The path is constructed by prepending `/home/tutorial` to the `workdir` value, so `workdir: "/workspace"` sends `cd /home/tutorial/workspace && clear`. This is a **Rails-tutorial-specific** feature (implemented via `ShellConfigurator` in this template, not upstream TutorialKit). Essential for Rails tutorials where the app lives at `/workspace`.
 
 **Does not inherit.** Must be set on every lesson that needs it (see Inheritance Rules above).
 

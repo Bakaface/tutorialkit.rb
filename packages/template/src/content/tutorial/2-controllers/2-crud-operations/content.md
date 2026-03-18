@@ -1,7 +1,7 @@
 ---
 type: lesson
 title: CRUD Operations
-focus: /workspace/store/app/controllers/products_controller.rb
+focus: /workspace/app/controllers/products_controller.rb
 previews: [3000]
 mainCommand: ['node scripts/rails.js server', 'Starting Rails server']
 prepareCommands:
@@ -9,7 +9,7 @@ prepareCommands:
   - ['node scripts/rails.js db:prepare', 'Prepare development database']
 custom:
   shell:
-    workdir: '/workspace/store'
+    workdir: '/workspace'
 ---
 
 # CRUD Operations in Rails

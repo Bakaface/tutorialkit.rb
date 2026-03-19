@@ -1,0 +1,9 @@
+[build]
+  publish = "./dist"
+  command = "# no build needed — built in CI"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"

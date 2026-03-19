@@ -85,6 +85,17 @@ GEM
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
+    event_stream_parser (1.0.0)
+    faraday (2.14.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-multipart (1.2.0)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ffi (1.17.1-aarch64-linux-gnu)
     ffi (1.17.1-aarch64-linux-musl)
     ffi (1.17.1-arm-linux-gnu)
@@ -116,6 +127,7 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     js (2.7.1)
+    json (2.7.6)
     logger (1.7.0)
     loofah (2.24.0)
       crass (~> 1.0.2)
@@ -129,6 +141,9 @@ GEM
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.5)
+    multipart-post (2.4.1)
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.5.8)
       date
       net-protocol
@@ -213,6 +228,17 @@ GEM
     ruby-vips (2.2.2)
       ffi (~> 1.12)
       logger
+    ruby_llm (1.14.0)
+      base64
+      event_stream_parser (~> 1)
+      faraday (>= 1.10.0)
+      faraday-multipart (>= 1)
+      faraday-net_http (>= 1)
+      faraday-retry (>= 1)
+      marcel (~> 1)
+      ruby_llm-schema (~> 0)
+      zeitwerk (~> 2)
+    ruby_llm-schema (0.3.0)
     ruby_wasm (2.7.1)
     ruby_wasm (2.7.1-aarch64-linux)
     ruby_wasm (2.7.1-aarch64-linux-musl)
@@ -278,8 +304,10 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  json (< 2.8)
   propshaft
   rails (~> 8.0.0)
+  ruby_llm
   solid_cable
   solid_cache
   solid_queue

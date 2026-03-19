@@ -8,7 +8,9 @@
     "test": "node --disable-warning=ExperimentalWarning ./scripts/test.js",
     "test:watch": "node --disable-warning=ExperimentalWarning --watch --watch-path=./workspace ./scripts/test.js",
     "postinstall": "chmod +x bin/* && node --disable-warning=ExperimentalWarning ./scripts/wait-for-wasm.js",
-    "smoke": "node --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls --loader ./scripts/wasi-loader.mjs ./scripts/smoke-test.js"
+    "smoke": "node --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls --loader ./scripts/wasi-loader.mjs ./scripts/smoke-test.js",
+    "smoke:fetch": "node --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls --loader ./scripts/wasi-loader.mjs ./scripts/smoke-test.js --fetch",
+    "smoke:http": "node --disable-warning=ExperimentalWarning --no-turbo-fast-api-calls --loader ./scripts/wasi-loader.mjs ./scripts/smoke-test.js --http"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.1",

@@ -10,6 +10,7 @@
     "extension:dev": "pnpm run --parallel --stream --filter=@tutorialkit-rb/types --filter='./extensions/**' dev",
     "extension:build": "pnpm run --filter='./extensions/**' build",
     "template:dev": "TUTORIALKIT_DEV=true pnpm run build && pnpm run --filter=tutorialkit-rb-starter dev",
+    "template:proxy:dev": "TUTORIALKIT_DEV=true pnpm run build && npm --prefix packages/template/cors-proxy run dev & pnpm run --filter=tutorialkit-rb-starter dev",
     "template:build": "pnpm run build && pnpm run --filter=tutorialkit-rb-starter build",
     "template:build:wasm": "pnpm run --filter=tutorialkit-rb-starter build:wasm",
     "cli:build-release": "pnpm run --filter=@tutorialkit-rb/cli build-release",

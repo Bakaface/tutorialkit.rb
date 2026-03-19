@@ -293,14 +293,43 @@ export const createRackServer = async (vm, opts = {}) => {
 
   const app = express();
 
+  // --- Observability: log every request before anything else ---
+  app.use((req, res, next) => {
+    const start = Date.now();
+    console.log(`[express] --> ${req.method} ${req.url}`);
+    res.on('finish', () => {
+      console.log(`[express] <-- ${req.method} ${req.url} ${res.statusCode} (${Date.now() - start}ms)`);
+    });
+    next();
+  });
+
+  // --- Health endpoint: bypasses Rails entirely ---
+  app.get('/__healthz', (req, res) => {
+    res.json({ status: 'ok', uptime: process.uptime() });
+  });
+
   const upload = multer({ storage: multer.memoryStorage() });
   app.use(upload.any());
   app.use(createFrameLocationTrackingMiddleware());
 
   const queue = new RequestQueue((req, res) => requestHandler(vm, req, res));
 
+  // --- Request timeout: never hang forever ---
+  const REQUEST_TIMEOUT_MS = 60000;
+
   app.all('*path', async (req, res) => {
-    await queue.respond(req, res)
+    const timer = setTimeout(() => {
+      if (!res.headersSent) {
+        console.error(`[express] TIMEOUT ${req.method} ${req.url} after ${REQUEST_TIMEOUT_MS}ms`);
+        res.status(504).json({ error: 'Request timed out', url: req.url, timeout_ms: REQUEST_TIMEOUT_MS });
+      }
+    }, REQUEST_TIMEOUT_MS);
+
+    try {
+      await queue.respond(req, res);
+    } finally {
+      clearTimeout(timer);
+    }
   });
 
   return app;

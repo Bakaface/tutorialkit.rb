@@ -1,0 +1,7 @@
+name = "cors-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+# Comma-separated list of allowed target hosts (empty = allow all)
+ALLOWED_HOSTS = "httpbin.org"

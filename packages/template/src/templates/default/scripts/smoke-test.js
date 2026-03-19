@@ -7,6 +7,7 @@
  * Usage:
  *   npm run smoke                    # full boot: VM + Rails + version check
  *   npm run smoke -- --skip-rails    # VM init only (no Rails bootstrap)
+ *   npm run smoke -- --fetch         # full boot + outbound HTTP fetch test
  *   npm run smoke -- --http          # full boot + Express/Rack bridge test
  *
  * WASM binary resolution (first match wins):
@@ -27,6 +28,7 @@ import { performance } from 'node:perf_hooks';
 const args = new Set(process.argv.slice(2));
 const skipRails = args.has('--skip-rails');
 const httpTest = args.has('--http');
+const fetchTest = args.has('--fetch');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -105,7 +107,24 @@ if (skipRails) {
   log(`Rails.version = ${version}`);
 }
 
-// --- Step 3 (optional): HTTP bridge test ---
+// --- Step 3 (optional): Fetch bridge test ---
+if (fetchTest) {
+  log('Testing HTTP fetch bridge...');
+  const fetchResult = await vm.evalAsync(`
+    require "net/http"
+    require "uri"
+    require "json"
+    response = Net::HTTP.get(URI("https://httpbin.org/get?source=smoke_test"))
+    parsed = JSON.parse(response)
+    parsed["args"]["source"]
+  `);
+  if (fetchResult.toString() !== "smoke_test") {
+    throw new Error("HTTP fetch bridge test failed");
+  }
+  log('HTTP fetch bridge: PASS');
+}
+
+// --- Step 4 (optional): HTTP bridge test ---
 if (httpTest) {
   log('Starting HTTP bridge test...');
   const { createRackServer } = await import('../lib/server.js');

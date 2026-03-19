@@ -3,6 +3,7 @@ import { RubyVM } from "@ruby/wasm-wasi";
 import { WASI } from "wasi";
 import fs from "fs/promises";
 import { PGLite4Rails } from "./database.js";
+import { initHttpBridge } from './http-bridge.js';
 
 function timer() {
   const start = performance.now();
@@ -69,6 +70,9 @@ export default async function initVM(vmopts = {}) {
     const pglite = new PGLite4Rails(pgDataDir);
     global.pglite = pglite;
 
+    initHttpBridge();
+
+    const httpBridgePatch = await fs.readFile(new URL("./patches/http_bridge.rb", import.meta.url).pathname, 'utf8');
     const authenticationPatch = await fs.readFile(new URL("./patches/authentication.rb", import.meta.url).pathname, 'utf8');
     const appGeneratorPatch = await fs.readFile(new URL("./patches/app_generator.rb", import.meta.url).pathname, 'utf8');
 
@@ -88,6 +92,8 @@ export default async function initVM(vmopts = {}) {
       _boot_time("require /rails-vm/boot") { require "/rails-vm/boot" }
 
       require "js"
+
+      ${httpBridgePatch}
 
       Wasmify::ExternalCommands.register(:server, :console)
 

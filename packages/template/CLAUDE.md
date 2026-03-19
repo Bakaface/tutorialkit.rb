@@ -16,7 +16,8 @@ bin/build-wasm            ← Rebuild WASM after Gemfile changes
 - **All Rails app files go under `workspace/`** — this is the WASI filesystem boundary
 - **Each lesson should be self-contained** — don't rely on user actions from previous lessons persisting
 - **Gems require a WASM rebuild** — edit `ruby-wasm/Gemfile`, then run `bin/build-wasm`
-- **No outbound HTTP, threading, or process spawning** from Ruby — see `rails-wasm-author-constraints`
+- **Outbound HTTP works** (`Net::HTTP`, Faraday, etc.) via JS fetch bridge — CORS restrictions apply, see `rails-wasm-author-constraints`
+- **No threading or process spawning** from Ruby — see `rails-wasm-author-constraints`
 - **Database resets on page reload** — use `prepareCommands` with `db:prepare` for lessons that need data
 - **Use `node scripts/rails.js <cmd>`** in frontmatter commands, not bare `rails <cmd>`
 

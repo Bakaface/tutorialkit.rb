@@ -1,0 +1,172 @@
+<% content_for(:title) { "Outbound HTTP Demo" } %>
+
+<div class="http-demo">
+  <h1>Outbound HTTP from Rails WASM</h1>
+  <p class="subtitle">
+    These buttons make real HTTP requests from Ruby to
+    <a href="https://httpbin.org" target="_blank">httpbin.org</a>
+    — routed through a CORS proxy.
+  </p>
+
+  <div class="actions">
+    <button id="btn-get" class="btn btn--primary" onclick="makeRequest('get')">
+      Fetch from httpbin.org
+    </button>
+    <button id="btn-post" class="btn btn--secondary" onclick="makeRequest('post')">
+      Post to httpbin.org
+    </button>
+  </div>
+
+  <div id="status" class="status" style="display: none;"></div>
+
+  <pre id="result" class="result"><span class="placeholder">Click a button above to make a request...</span></pre>
+</div>
+
+<script>
+  async function makeRequest(type) {
+    const resultEl = document.getElementById("result");
+    const statusEl = document.getElementById("status");
+    const btnGet = document.getElementById("btn-get");
+    const btnPost = document.getElementById("btn-post");
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    // Disable buttons
+    btnGet.disabled = true;
+    btnPost.disabled = true;
+
+    // Show loading
+    statusEl.style.display = "block";
+    statusEl.className = "status status--loading";
+    statusEl.textContent = "Sending request...";
+    resultEl.textContent = "";
+
+    try {
+      const url = type === "get" ? "/http_demo/fetch_get" : "/http_demo/fetch_post";
+      const options = {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": csrfToken || "",
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      if (data.error) {
+        statusEl.className = "status status--error";
+        statusEl.textContent = "Error";
+        resultEl.textContent = data.error;
+      } else {
+        statusEl.className = "status status--success";
+        statusEl.textContent = `${type.toUpperCase()} request succeeded (HTTP ${data.status})`;
+        resultEl.textContent = JSON.stringify(data.body, null, 2);
+      }
+    } catch (err) {
+      statusEl.className = "status status--error";
+      statusEl.textContent = "Request failed";
+      resultEl.textContent = err.message;
+    } finally {
+      btnGet.disabled = false;
+      btnPost.disabled = false;
+    }
+  }
+</script>
+
+<style>
+  .http-demo {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .http-demo h1 {
+    margin-bottom: var(--space-xs);
+  }
+
+  .subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  .subtitle a {
+    color: var(--color-primary);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn--primary {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .btn--secondary {
+    background: var(--color-bg-white);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .status {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  .status--loading {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+  }
+
+  .status--success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #28a745;
+  }
+
+  .status--error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #dc3545;
+  }
+
+  .result {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    overflow-x: auto;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 8rem;
+    max-height: 24rem;
+    overflow-y: auto;
+  }
+
+  .placeholder {
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+</style>

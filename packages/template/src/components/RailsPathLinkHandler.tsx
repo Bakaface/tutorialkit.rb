@@ -67,8 +67,8 @@ export default function RailsPathLinkHandler() {
 
           try {
             await ensureRailsServerStarted(railsPreview);
-          } catch (e) {
-            console.error('failed to start Rails server', e);
+          } catch (error) {
+            console.error('failed to start Rails server', error);
             return;
           }
 

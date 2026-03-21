@@ -9,6 +9,28 @@ const GEMFILE_HASH_URL = `/ruby.wasm.hash`;
 const WC_WASM_LOG_PATH = `/ruby.wasm.log.txt`;
 const WC_WASM_PATH = `/ruby.wasm`;
 
+async function clearWasmCache(): Promise<void> {
+  const opfsRoot = await navigator.storage.getDirectory();
+  let count = 0;
+
+  for await (const [name] of opfsRoot.entries()) {
+    if (name.includes('ruby') && name.endsWith('.wasm')) {
+      await opfsRoot.removeEntry(name);
+      console.log(`Deleted: ${name}`);
+      count++;
+    }
+  }
+
+  if (count === 0) {
+    console.log('No cached WASM files found.');
+  } else {
+    console.log(`Cleared ${count} cached WASM file(s). Hard-refresh the page (Cmd+Shift+R) to download a fresh binary.`);
+  }
+}
+
+// Expose to browser console: type clearWasmCache() to purge cached WASM binaries
+(window as any).clearWasmCache = clearWasmCache;
+
 export function FileManager() {
   const lessonLoaded = useStore(tutorialStore.lessonFullyLoaded);
   const files = useStore(tutorialStore.files);

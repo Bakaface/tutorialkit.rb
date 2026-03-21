@@ -1,0 +1,16 @@
+source "https://rubygems.org"
+gem "js"
+
+# Gems with C extensions that must be statically linked into the base binary.
+# WASI has no dlopen() — C extensions cannot be loaded at runtime from the
+# filesystem. They must be compiled and linked during `rbwasm build`.
+# Pure Ruby gems are handled by the dynamic packing layer (bin/pack-gems).
+gem "bcrypt", "~> 3.1.7"
+gem "websocket-driver", "~> 0.7"
+
+# Pin to < 2.8: ruby_wasm 2.8+ adds ac_cv_func_chmod=no which causes Ruby
+# to generate its own chmod stub (returns ENOSYS) that shadows wasi-libc's
+# stub (returns ENOTSUP). FileUtils rescues ENOTSUP but not ENOSYS, so
+# `rails new` crashes. Without the flag, wasi-libc's ENOTSUP stub is used
+# and FileUtils handles it — matching the monolithic approach.
+gem "ruby_wasm", "2.7.1", group: :development

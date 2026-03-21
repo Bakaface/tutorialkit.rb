@@ -85,17 +85,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
-    event_stream_parser (1.0.0)
-    faraday (2.14.1)
-      faraday-net_http (>= 2.0, < 3.5)
-      json
-      logger
-    faraday-multipart (1.2.0)
-      multipart-post (~> 2.0)
-    faraday-net_http (3.4.2)
-      net-http (~> 0.5)
-    faraday-retry (2.4.0)
-      faraday (~> 2.0)
+    ffi (1.17.1)
     ffi (1.17.1-aarch64-linux-gnu)
     ffi (1.17.1-aarch64-linux-musl)
     ffi (1.17.1-arm-linux-gnu)
@@ -140,10 +130,8 @@ GEM
     marcel (1.0.4)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (5.25.5)
-    multipart-post (2.4.1)
-    net-http (0.9.1)
-      uri (>= 0.11.1)
     net-imap (0.5.8)
       date
       net-protocol
@@ -154,6 +142,9 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
+    nokogiri (1.18.8)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.8-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.8-aarch64-linux-musl)
@@ -228,17 +219,6 @@ GEM
     ruby-vips (2.2.2)
       ffi (~> 1.12)
       logger
-    ruby_llm (1.14.0)
-      base64
-      event_stream_parser (~> 1)
-      faraday (>= 1.10.0)
-      faraday-multipart (>= 1)
-      faraday-net_http (>= 1)
-      faraday-retry (>= 1)
-      marcel (~> 1)
-      ruby_llm-schema (~> 0)
-      zeitwerk (~> 2)
-    ruby_llm-schema (0.3.0)
     ruby_wasm (2.7.1)
     ruby_wasm (2.7.1-aarch64-linux)
     ruby_wasm (2.7.1-aarch64-linux-musl)
@@ -294,6 +274,7 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
+  wasm32-wasi
   x86_64-darwin
   x86_64-linux
   x86_64-linux-gnu
@@ -307,7 +288,6 @@ DEPENDENCIES
   json (< 2.8)
   propshaft
   rails (~> 8.0.0)
-  ruby_llm
   solid_cable
   solid_cache
   solid_queue

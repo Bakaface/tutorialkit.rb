@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -e
+
+# Dynamic gem packing: cross-compile gems and pack them into a pre-built
+# Ruby WASM base binary via wasi-vfs.
+#
+# This is the fast path (~30s) compared to the monolithic `bin/build-wasm`
+# (~5-20min). Requires a pre-built base binary (from bin/build-ruby-base
+# or the @tutorialkit-rb/ruby-3.3 npm package).
+#
+# Usage: ./bin/build-pack
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
+RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+
+echo "=== Dynamic gem packing ==="
+echo
+
+# --- Preflight checks --------------------------------------------------------
+
+if ! command -v wasi-vfs &> /dev/null; then
+  echo "Error: wasi-vfs CLI not found"
+  echo "Install it with: cargo install wasi-vfs-cli"
+  echo "See: https://github.com/aspect-build/aspect-workflows/tree/main/packages/wasi-vfs"
+  exit 1
+fi
+
+# --- Resolve base binary -----------------------------------------------------
+
+echo "Resolving base binary..."
+BASE_WASM=""
+
+# 1. Local build
+if [ -f "$RUBY_WASM_DIR/dist/ruby-base.wasm" ]; then
+  BASE_WASM="$RUBY_WASM_DIR/dist/ruby-base.wasm"
+  echo "  Found: local build (dist/ruby-base.wasm)"
+fi
+
+# 2. npm package fallback
+if [ -z "$BASE_WASM" ]; then
+  NPM_BASE="$RUBY_WASM_DIR/node_modules/@tutorialkit-rb/ruby-3.3/dist/ruby-base.wasm"
+  if [ -f "$NPM_BASE" ]; then
+    BASE_WASM="$NPM_BASE"
+    echo "  Found: @tutorialkit-rb/ruby-3.3 npm package"
+  fi
+fi
+
+if [ -z "$BASE_WASM" ]; then
+  echo
+  echo "Error: No base WASM binary found."
+  echo "Either run 'bin/build-ruby-base' to build one,"
+  echo "or install @tutorialkit-rb/ruby-3.3 npm package."
+  exit 1
+fi
+
+echo
+
+# --- Cross-compile gems + pack -----------------------------------------------
+
+echo "Installing host gems for cross-compilation..."
+cd "$RUBY_WASM_DIR"
+bundle install --path vendor/bundle
+echo
+
+echo "Running pack-gems..."
+bundle exec ruby bin/pack-gems
+echo
+
+# --- Copy output to public/ --------------------------------------------------
+
+echo "Copying ruby.wasm to public directory..."
+cp "$RUBY_WASM_DIR/dist/ruby.wasm" "$TEMPLATE_DIR/public/ruby.wasm"
+echo "  ruby.wasm → public/"
+
+# Generate hash of Gemfile.lock for cache versioning
+GEMFILE_HASH=$(shasum -a 256 "$RUBY_WASM_DIR/Gemfile.lock" | cut -c1-16)
+echo "$GEMFILE_HASH" > "$TEMPLATE_DIR/public/ruby.wasm.hash"
+echo "  ruby.wasm.hash: $GEMFILE_HASH"
+
+echo
+echo "=== Done ==="
+echo "Run 'npm run dev' to test your tutorial."

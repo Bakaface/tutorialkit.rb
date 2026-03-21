@@ -1,0 +1,50 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    base64 (0.3.0)
+    bcrypt (3.1.22)
+    js (2.8.1)
+    ruby_wasm (2.7.1)
+    ruby_wasm (2.7.1-aarch64-linux)
+    ruby_wasm (2.7.1-aarch64-linux-musl)
+    ruby_wasm (2.7.1-arm64-darwin)
+    ruby_wasm (2.7.1-x86_64-darwin)
+    ruby_wasm (2.7.1-x86_64-linux)
+    ruby_wasm (2.7.1-x86_64-linux-musl)
+    websocket-driver (0.8.0)
+      base64
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.5)
+
+PLATFORMS
+  aarch64-linux
+  aarch64-linux-musl
+  arm64-darwin
+  ruby
+  wasm32-wasi
+  x86_64-darwin
+  x86_64-linux
+  x86_64-linux-musl
+
+DEPENDENCIES
+  bcrypt (~> 3.1.7)
+  js
+  ruby_wasm (= 2.7.1)
+  websocket-driver (~> 0.7)
+
+CHECKSUMS
+  base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
+  bcrypt (3.1.22) sha256=1f0072e88c2d705d94aff7f2c5cb02eb3f1ec4b8368671e19112527489f29032
+  js (2.8.1) sha256=d323712badd700346c6fc1e4f053d48c4ed68a51b6aa259455a80effd7bc4338
+  ruby_wasm (2.7.1) sha256=b3c9c6cfab73c3c47924cde88c552487fb2ff15d69f9dff3a812372ea4af1c33
+  ruby_wasm (2.7.1-aarch64-linux) sha256=e4c7984effc226308d245237205a607f88956b4e6cda08c911e411a16ea45b27
+  ruby_wasm (2.7.1-aarch64-linux-musl) sha256=46123cfcc66db9f18c39c640edc26578ce441311dd44051d2f76d4eab289d561
+  ruby_wasm (2.7.1-arm64-darwin) sha256=f46a720d6375ad246c8a19da47dc15aad3ae51e01f893a84b02890d75aac9ce0
+  ruby_wasm (2.7.1-x86_64-darwin) sha256=d41b5e18aa6f5da8aee736e5373305695b6e15db0874d4e3443837c635d7d0e8
+  ruby_wasm (2.7.1-x86_64-linux) sha256=22390b51ae5eb437eb50aff773c89b75cca53188c9bb641265eb128406598d22
+  ruby_wasm (2.7.1-x86_64-linux-musl) sha256=245e75ee1ce23340c2f7a75916a8ddf03ff37fbed1360f23bb19270d38b412fe
+  websocket-driver (0.8.0) sha256=ed0dba4b943c22f17f9a734817e808bc84cdce6a7e22045f5315aa57676d4962
+  websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241
+
+BUNDLED WITH
+  4.0.7

@@ -3,7 +3,7 @@ GEM
   specs:
     base64 (0.3.0)
     bcrypt (3.1.22)
-    js (2.8.1)
+    js (2.7.1)
     ruby_wasm (2.7.1)
     ruby_wasm (2.7.1-aarch64-linux)
     ruby_wasm (2.7.1-aarch64-linux-musl)
@@ -28,14 +28,14 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
-  js
+  js (= 2.7.1)
   ruby_wasm (= 2.7.1)
   websocket-driver (~> 0.7)
 
 CHECKSUMS
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bcrypt (3.1.22) sha256=1f0072e88c2d705d94aff7f2c5cb02eb3f1ec4b8368671e19112527489f29032
-  js (2.8.1) sha256=d323712badd700346c6fc1e4f053d48c4ed68a51b6aa259455a80effd7bc4338
+  js (2.7.1) sha256=a609ea04ae96f67f2005f339f2400f3a6e52002cadaac59e7718bc63d13d45f0
   ruby_wasm (2.7.1) sha256=b3c9c6cfab73c3c47924cde88c552487fb2ff15d69f9dff3a812372ea4af1c33
   ruby_wasm (2.7.1-aarch64-linux) sha256=e4c7984effc226308d245237205a607f88956b4e6cda08c911e411a16ea45b27
   ruby_wasm (2.7.1-aarch64-linux-musl) sha256=46123cfcc66db9f18c39c640edc26578ce441311dd44051d2f76d4eab289d561

@@ -1,5 +1,8 @@
 source "https://rubygems.org"
-gem "js"
+
+# Pin to match monolithic pipeline's Gemfile.lock. Unpinned, Bundler resolves
+# to the latest (2.8.1), which may differ from the monolithic lockfile (2.7.1).
+gem "js", "2.7.1"
 
 # Gems with C extensions that must be statically linked into the base binary.
 # WASI has no dlopen() — C extensions cannot be loaded at runtime from the

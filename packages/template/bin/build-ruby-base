@@ -69,11 +69,60 @@ mkdir -p "$(dirname "$OUTPUT")"
 # Without it, rbwasm's `defined?(Bundler)` check returns nil, causing it to
 # skip gem resolution entirely — the js gem won't be statically linked, and
 # the binary will be missing ABI exports (_initialize, canonical_abi_drop_rb-abi-value).
-bundle exec rbwasm build \
+#
+# We invoke rbwasm via a Ruby wrapper instead of the CLI directly, because
+# ruby_wasm hardcodes the Ruby tarball URL for `--ruby-version 3.3` as 3.3.3.
+# The monolithic pipeline uses wasmify-rails which monkey-patches this to 3.3.8.
+# We apply the same monkey-patch here to ensure version parity.
+# See: wasmify-rails-0.4.0/lib/wasmify/rails/builder.rb:9-16
+bundle exec ruby -e '
+require "ruby_wasm"
+require "ruby_wasm/cli"
+
+# Monkey-patch: override Ruby 3.3 tarball URL to 3.3.8 (matches wasmify-rails)
+RubyWasm::CLI.singleton_class.prepend(Module.new do
+  def build_source_aliases(root)
+    super.tap do |sources|
+      sources["3.3"][:url] = "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.8.tar.gz"
+    end
+  end
+end)
+
+RubyWasm::CLI.new(stdout: $stdout, stderr: $stderr).run(ARGV)
+' -- build \
   --ruby-version 3.3 \
   --target wasm32-unknown-wasip1 \
   --build-profile full \
   -o "$OUTPUT"
+
+# --- Use raw pre-VFS binary (Strategy A) -----------------------------------
+# rbwasm build outputs a VFS-packed binary (stdlib + js gem embedded).
+# Using that as input to a second wasi-vfs pack causes double-packing, which
+# crashes in WebContainer. Instead, we use the raw pre-VFS binary that rbwasm
+# left in its rubies/ directory and do a single wasi-vfs pack in pack-gems.
+
+RAW_BINARY=$(find "$RUBY_WASM_DIR/rubies" -name "ruby" -path "*/usr/local/bin/ruby" -type f 2>/dev/null | head -1)
+
+if [ -z "$RAW_BINARY" ]; then
+  echo
+  echo "ERROR: Could not find raw pre-VFS binary in rubies/ directory."
+  echo "Expected: $RUBY_WASM_DIR/rubies/ruby-3.3-wasm32-unknown-wasip1-full-*/usr/local/bin/ruby"
+  echo
+  echo "The rbwasm build may have failed or cleaned up its build directory."
+  exit 1
+fi
+
+echo "Found raw pre-VFS binary: $RAW_BINARY"
+
+# Record the usr/ directory path so pack-gems can map /usr in the single pack
+# RAW_BINARY is at .../usr/local/bin/ruby — go up 3 levels to get .../usr/
+USR_DIR="$(dirname "$(dirname "$(dirname "$RAW_BINARY")")")"
+echo "$USR_DIR" > "$RUBY_WASM_DIR/dist/usr-dir.txt"
+echo "Saved usr/ path to dist/usr-dir.txt: $USR_DIR"
+
+# Overwrite the VFS-packed output with the raw binary
+cp "$RAW_BINARY" "$OUTPUT"
+echo "Replaced VFS-packed output with raw pre-VFS binary (single-pack strategy)"
 
 SIZE=$(du -h "$OUTPUT" | cut -f1)
 
@@ -123,7 +172,9 @@ echo "  $VERIFY_RESULT"
 
 echo
 echo "=== Build Complete ==="
-echo "  Output: $OUTPUT"
-echo "  Size:   $SIZE"
+echo "  Output:  $OUTPUT (raw pre-VFS binary)"
+echo "  Size:    $SIZE"
+echo "  usr dir: $USR_DIR"
 echo
 echo "Now run 'npm run build:wasm:pack' to cross-compile gems and pack the final binary."
+echo "(pack-gems will map /usr from the rubies/ directory for a single wasi-vfs pack)"

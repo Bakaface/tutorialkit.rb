@@ -2,16 +2,16 @@
 # frozen_string_literal: true
 
 # Cross-compile gems for wasm32-wasi and pack them into a Ruby WASM base
-# binary via wasi-vfs.
+# binary via wasi-vfs (single-pack strategy).
 #
 # This replaces the monolithic wasmify-rails build with a faster approach:
-# a pre-built base binary (Ruby 3.3 + stdlib + js gem) gets gems packed
-# on top in ~30 seconds.
+# a raw pre-VFS base binary (Ruby + statically-linked C extensions) gets
+# all gems + stdlib + config packed in a single wasi-vfs pass (~30 seconds).
 #
-# The key insight: we pack cross-compiled gems at /bundle/ which shadows
-# the base binary's /bundle/ (that only knows about the js gem). Our
-# generated setup.rb adds all 93+ gems to $LOAD_PATH, so shim.rb's
-# `require "/bundle/setup"` loads everything correctly.
+# The base binary has NO embedded VFS data. This script does the only
+# wasi-vfs pack, mapping three directories: /bundle (gems), /usr (stdlib),
+# /rails-vm (boot config). Uses RubyWasmExt::WasiVfs (bundled in ruby_wasm
+# gem) to ensure version parity with the monolithic pipeline.
 #
 # Usage: bundle exec ruby bin/pack-gems
 #   (called from bin/build-pack orchestrator)
@@ -19,6 +19,18 @@
 require "bundler/setup"
 require "fileutils"
 require "find"
+
+# Load RubyWasmExt::WasiVfs — the bundled wasi-vfs implementation from the
+# ruby_wasm gem. This ensures version parity with the monolithic pipeline
+# (wasi-vfs 0.5.3-p1 + Wizer 6.0.0) instead of using the Homebrew CLI
+# (wasi-vfs 0.5.5 + Wizer 7.0.0) which produces different binary layouts.
+require "ruby_wasm"
+begin
+  RUBY_VERSION =~ /(\d+\.\d+)/
+  require "ruby_wasm/#{$1}/ruby_wasm.so"
+rescue LoadError
+  require "ruby_wasm/ruby_wasm.so"
+end
 
 # --- Configuration -----------------------------------------------------------
 
@@ -91,6 +103,26 @@ def find_base_wasm
   exit 1
 end
 
+def find_usr_dir
+  # 1. Path recorded by build-ruby-base (local build, single-pack strategy)
+  txt = File.join(SCRIPT_DIR, "dist", "usr-dir.txt")
+  if File.exist?(txt)
+    path = File.read(txt).strip
+    return path if Dir.exist?(path)
+  end
+
+  # 2. From @tutorialkit-rb/ruby-3.3 npm package
+  npm_pkg = File.join(SCRIPT_DIR, "node_modules", "@tutorialkit-rb", "ruby-3.3",
+                      "rubies", "usr")
+  return npm_pkg if Dir.exist?(npm_pkg)
+
+  # 3. Fallback: glob for the rubies/ directory left by rbwasm
+  candidates = Dir.glob(File.join(SCRIPT_DIR, "rubies", "ruby-3.3-wasm32-unknown-wasip1-full-*", "usr"))
+  return candidates.first if candidates.any?
+
+  nil
+end
+
 # --- Main --------------------------------------------------------------------
 
 puts "=== Cross-compiling gems + wasi-vfs pack ==="
@@ -109,6 +141,16 @@ puts "rbconfig: #{rbconfig_path}"
 # 2. Find base WASM binary
 base_wasm = find_base_wasm
 puts "base WASM: #{base_wasm} (#{human_size(File.size(base_wasm))})"
+
+# 2b. Find usr/ directory for single-pack /usr mapping
+usr_dir = find_usr_dir
+if usr_dir
+  puts "usr dir:   #{usr_dir} (will map to /usr in wasi-vfs pack)"
+else
+  $stderr.puts "Warning: Could not find usr/ directory for /usr mapping."
+  $stderr.puts "  The packed binary may be missing Ruby stdlib at /usr."
+  $stderr.puts "  Run 'bin/build-ruby-base' or install @tutorialkit-rb/ruby-3.3."
+end
 puts
 
 # 3. Add wasm32-wasi platform to lockfile if missing
@@ -268,26 +310,57 @@ FileUtils.mkdir_p(RAILS_VM_DIR)
   end
 end
 
-# 10. Pack via wasi-vfs
+# 11. Stage usr/ directory (strip non-runtime files to reduce binary size)
+#
+# The rubies/ directory has the full install tree including bin/ruby (32MB),
+# include/ (headers), and libruby-static.a — none of which are needed at
+# runtime. We create a staging copy with only the runtime lib/ files,
+# matching what rbwasm's remove_non_runtime_files() does.
+usr_staging_dir = nil
+if usr_dir
+  puts
+  puts "Staging usr/ directory (stripping non-runtime files)..."
+  usr_staging_dir = File.join(TMP_DIR, "usr_staging", "usr")
+  FileUtils.rm_rf(File.join(TMP_DIR, "usr_staging"))
+  FileUtils.mkdir_p(usr_staging_dir)
+
+  # Copy only local/lib/ and local/share/ (runtime files)
+  %w[local/lib local/share].each do |subdir|
+    src = File.join(usr_dir, subdir)
+    if Dir.exist?(src)
+      dest = File.join(usr_staging_dir, subdir)
+      FileUtils.mkdir_p(File.dirname(dest))
+      FileUtils.cp_r(src, dest)
+    end
+  end
+
+  # Remove libruby-static.a (not needed at runtime)
+  Dir.glob(File.join(usr_staging_dir, "**/libruby-static.a")).each do |f|
+    FileUtils.rm(f)
+  end
+
+  staged_size = `du -sh "#{usr_staging_dir}" 2>/dev/null`.split("\t").first rescue "?"
+  puts "  Staged usr/ size: #{staged_size} (stripped bin/, include/, libruby-static.a)"
+end
+
+# 12. Pack via RubyWasmExt::WasiVfs (bundled in ruby_wasm gem)
+#
+# Uses the same wasi-vfs implementation as the monolithic pipeline
+# (RubyWasmExt::WasiVfs from ruby_wasm 2.7.1, which bundles wasi-vfs 0.5.3
+# and Wizer 6.0.0) instead of shelling out to the Homebrew wasi-vfs CLI
+# (v0.5.5 + Wizer 7.0.0). This ensures identical binary layout.
 puts
-puts "Packing with wasi-vfs..."
+puts "Packing with RubyWasmExt::WasiVfs (bundled wasi-vfs)..."
 
 FileUtils.mkdir_p(OUTPUT_DIR)
 
-wasi_vfs_cmd = [
-  "wasi-vfs", "pack",
-  base_wasm,
-  "--dir", "#{BUNDLE_DIR}::/bundle",
-  "--dir", "#{RAILS_VM_DIR}::/rails-vm",
-  "-o", OUTPUT_FILE
-]
+wasi_vfs = RubyWasmExt::WasiVfs.new
+wasi_vfs.map_dir("/bundle", BUNDLE_DIR)
+wasi_vfs.map_dir("/rails-vm", RAILS_VM_DIR)
+wasi_vfs.map_dir("/usr", usr_staging_dir) if usr_staging_dir
 
-success = system(*wasi_vfs_cmd)
-unless success
-  $stderr.puts "wasi-vfs pack failed"
-  $stderr.puts "Make sure wasi-vfs CLI is installed: cargo install wasi-vfs-cli"
-  exit 1
-end
+wasm_bytes = wasi_vfs.pack(File.binread(base_wasm))
+File.binwrite(OUTPUT_FILE, wasm_bytes)
 
 puts
 puts "=== Pack Complete ==="

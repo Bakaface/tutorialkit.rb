@@ -330,5 +330,20 @@ if (runHttp) {
   });
 }
 
+// --- Cleanup: remove PGLite data created during smoke test ---
+{
+  const { existsSync: existsSyncFs, rmSync, readdirSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const pgDataDir = new URL('../pgdata', import.meta.url).pathname;
+
+  if (existsSyncFs(pgDataDir)) {
+    for (const entry of readdirSync(pgDataDir)) {
+      if (entry === '.keep') continue;
+      rmSync(join(pgDataDir, entry), { recursive: true, force: true });
+    }
+    log('Cleaned up pgdata/');
+  }
+}
+
 console.log(`\n=== PASSED (total ${totalTimer()}) ===\n`);
 process.exit(0);

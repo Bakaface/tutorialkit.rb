@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/types",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Types for TutorialKit",
   "author": "StackBlitz Inc.",
   "type": "module",

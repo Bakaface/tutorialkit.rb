@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/ruby-3.3",
-  "version": "3.3.0",
+  "version": "0.1.8",
   "description": "Pre-built Ruby 3.3 WASM base binary for tutorialkit.rb dynamic packing",
   "license": "MIT",
   "files": [

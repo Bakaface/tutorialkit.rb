@@ -1,3 +1,7 @@
+[build]
+  publish = "./dist"
+  command = "# no build needed — CI handles the build"
+
 [[headers]]
   for = "/*"
   [headers.values]

@@ -21,6 +21,8 @@ export class Package {
     this.path = pkgPath;
     this.pkgJSON = pkgJSON;
     this.changelogPath = path.join(pkgPath, 'CHANGELOG.md');
+    this.sameAs = pkg.sameAs;
+    this.gitPath = undefined;
   }
 
   write() {

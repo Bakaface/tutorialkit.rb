@@ -1,9 +1,9 @@
 name: Resolve version
-description: Read "version" of "@tutorialkit/astro" to "steps.resolve-release-version.outputs.version"
+description: Read unified release version from @tutorialkit-rb/astro
 
 outputs:
   version:
-    description: 'Version of @tutorialkit/astro'
+    description: 'Unified release version'
     value: ${{ steps.resolve-release-version.outputs.version }}
 
 runs:

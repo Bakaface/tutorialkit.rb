@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+        type: string
+  push:
+    branches:
+      - main
+
+jobs:
+  prepare_release:
+    name: Prepare Release PR
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-and-build
+
+      - name: Bump versions
+        run: >
+          pnpm --recursive
+          --filter "@tutorialkit-rb/*"
+          --filter "create-tutorialkit-rb"
+          exec pnpm version --no-git-tag-version --allow-same-version ${{ inputs.version }}
+
+      - name: Update CLI template versions
+        working-directory: ./packages/cli
+        run: pnpm build-release
+
+      - name: Generate changelogs
+        run: node scripts/changelog.mjs
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
+        with:
+          commit-message: 'chore: release v${{ inputs.version }}'
+          title: 'chore: release v${{ inputs.version }}'
+          body: 'Bump all packages to version ${{ inputs.version }}.'
+          branch: chore/release-${{ inputs.version }}
+          token: ${{ secrets.GITOPS_REPO_PAT }}
+
+  publish_release:
+    name: Publish Release
+    if: "${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'chore: release v') }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-and-build
+
+      # sets steps.resolve-release-version.outputs.version
+      - uses: ./.github/actions/resolve-release-version
+        id: resolve-release-version
+
+      - name: Update CLI template versions
+        working-directory: ./packages/cli
+        run: pnpm build-release
+
+      - name: Publish to npm
+        run: >
+          pnpm --recursive
+          --filter "@tutorialkit-rb/*"
+          --filter "create-tutorialkit-rb"
+          exec pnpm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create and push git tag
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@users.noreply.github.com'
+          git tag v${{ steps.resolve-release-version.outputs.version }}
+          git push origin v${{ steps.resolve-release-version.outputs.version }}

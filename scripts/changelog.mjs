@@ -20,7 +20,7 @@ const PACKAGES = [
   { path: './packages/template', excluded: true },
 
   // the CHANGELOG of this one is the same as the one from the cli so it's also excluded from this list
-  { path: './packages/create-tutorial', sameAs: 'tutorialkit' },
+  { path: './packages/create-tutorial', sameAs: '@tutorialkit-rb/cli' },
 ];
 
 processPackages();
@@ -34,15 +34,6 @@ async function processPackages() {
     const pkg = new Package(pkgDef);
     packages.set(pkg.name, pkg);
   }
-
-  // overwrites temporarily the version on the `@tutorialkit/cli` package as it's released separately later
-  const tutorialkitCli = packages.get('@tutorialkit/cli');
-  const tutorialkitAstro = packages.get('@tutorialkit/astro');
-
-  const originalVersion = tutorialkitCli.version;
-  tutorialkitCli.version = tutorialkitAstro.version;
-
-  tutorialkitCli.write();
 
   // generate change logs
   await Promise.all(
@@ -65,17 +56,15 @@ async function processPackages() {
   }
 
   // generate root changelog
+  const astro = packages.get('@tutorialkit-rb/astro');
+
   await generateChangelog(
     {
-      version: tutorialkitCli.version,
-      path: tutorialkitCli.path,
+      version: astro.version,
+      path: astro.path,
       gitPath: '.',
       changelogPath: 'CHANGELOG.md',
     },
     PRESET,
   );
-
-  // reset the version of the CLI:
-  tutorialkitCli.version = originalVersion;
-  tutorialkitCli.write();
 }

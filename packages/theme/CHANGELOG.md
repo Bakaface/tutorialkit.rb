@@ -1,3 +1,7 @@
+## [0.1.9](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.9) "@tutorialkit-rb/theme" (2026-03-22)
+
+
+
 ## [0.1.8](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.8) "@tutorialkit-rb/theme" (2026-03-22)
 
 

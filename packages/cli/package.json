@@ -1,6 +1,6 @@
 {
   "name": "@tutorialkit-rb/cli",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Interactive tutorials powered by WebContainer API",
   "author": "StackBlitz Inc.",
   "type": "module",

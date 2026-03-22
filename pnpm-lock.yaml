@@ -524,6 +524,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5(@types/node@22.9.0)
 
+  packages/ruby-base: {}
+
   packages/runtime:
     dependencies:
       '@tutorialkit-rb/types':

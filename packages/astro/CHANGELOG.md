@@ -1,3 +1,12 @@
+## [0.1.9](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.9) "@tutorialkit-rb/astro" (2026-03-22)
+
+
+### Features
+
+* **astro:** add deferred activation via ?activate= query param ([f130517](https://github.com/Bakaface/tutorialkit.rb/commit/f1305179cd8d67073386c025225eae91fe1ebaad))
+
+
+
 ## [0.1.8](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.8) "@tutorialkit-rb/astro" (2026-03-22)
 
 

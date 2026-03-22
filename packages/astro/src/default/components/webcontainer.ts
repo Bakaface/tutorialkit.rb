@@ -4,6 +4,7 @@ import { useAuth } from './setup.js';
 import { safeBoot, TutorialStore } from '@tutorialkit-rb/runtime';
 import { auth, WebContainer } from '@webcontainer/api';
 import { joinPaths } from '../utils/url.js';
+import { activationPromise } from '../stores/deferred-store.js';
 
 interface WebContainerContext {
   readonly useAuth: boolean;
@@ -16,7 +17,9 @@ export let webcontainer: Promise<WebContainer> = new Promise(() => {
 });
 
 if (!import.meta.env.SSR) {
-  webcontainer = Promise.resolve(useAuth ? auth.loggedIn() : null).then(() => safeBoot({ workdirName: 'tutorial' }));
+  webcontainer = activationPromise
+    .then(() => (useAuth ? auth.loggedIn() : null))
+    .then(() => safeBoot({ workdirName: 'tutorial' }));
 
   webcontainer.then(() => {
     webcontainerContext.loaded = true;

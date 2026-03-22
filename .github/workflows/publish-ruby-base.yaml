@@ -1,0 +1,55 @@
+name: Publish Ruby Base Binary
+
+on:
+  workflow_dispatch:
+    inputs:
+      ruby_version:
+        description: 'Ruby version to build'
+        required: true
+        default: '3.3.8'
+        type: string
+
+jobs:
+  build_and_publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install ruby_wasm gem
+        run: gem install ruby_wasm
+
+      - name: Build base binary
+        working-directory: ./packages/template
+        run: ./bin/build-ruby-base
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          cp packages/template/ruby-wasm/dist/ruby-base.wasm release-assets/
+          cp packages/template/ruby-wasm/rbconfig/wasm32-wasi/rbconfig.rb release-assets/
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="ruby-base-v${{ inputs.ruby_version }}"
+
+          # Delete existing release if it exists
+          gh release delete "$TAG" --yes 2>/dev/null || true
+          git tag -d "$TAG" 2>/dev/null || true
+          git push origin ":refs/tags/$TAG" 2>/dev/null || true
+
+          gh release create "$TAG" \
+            --title "Ruby Base Binary v${{ inputs.ruby_version }}" \
+            --notes "Pre-built Ruby ${{ inputs.ruby_version }} WASM base binary for dynamic gem packing." \
+            release-assets/ruby-base.wasm \
+            release-assets/rbconfig.rb

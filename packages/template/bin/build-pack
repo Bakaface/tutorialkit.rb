@@ -7,7 +7,7 @@ set -e
 #
 # This is the fast path (~30s) compared to the monolithic `bin/build-wasm`
 # (~5-20min). Requires a pre-built base binary (from bin/build-ruby-base
-# or the @tutorialkit-rb/ruby-3.3 npm package).
+# or downloaded from GitHub Releases).
 #
 # Usage: ./bin/build-pack
 
@@ -38,12 +38,34 @@ if [ -f "$RUBY_WASM_DIR/dist/ruby-base.wasm" ]; then
   echo "  Found: local build (dist/ruby-base.wasm)"
 fi
 
-# 2. npm package fallback
+# 2. GitHub Releases fallback
 if [ -z "$BASE_WASM" ]; then
-  NPM_BASE="$RUBY_WASM_DIR/node_modules/@tutorialkit-rb/ruby-3.3/dist/ruby-base.wasm"
-  if [ -f "$NPM_BASE" ]; then
-    BASE_WASM="$NPM_BASE"
-    echo "  Found: @tutorialkit-rb/ruby-3.3 npm package"
+  echo "  Not found locally, downloading from GitHub Releases..."
+  DOWNLOAD_DIR="$RUBY_WASM_DIR/dist"
+  mkdir -p "$DOWNLOAD_DIR"
+  DOWNLOAD_PATH="$DOWNLOAD_DIR/ruby-base.wasm"
+
+  REPO="Bakaface/tutorialkit.rb"
+
+  if command -v gh &> /dev/null; then
+    TAG=$(gh release list --repo "$REPO" --json tagName --jq '[.[] | select(.tagName | startswith("ruby-base-"))][0].tagName' 2>/dev/null)
+
+    if [ -n "$TAG" ]; then
+      echo "  Release: $TAG"
+      gh release download "$TAG" --repo "$REPO" --pattern "ruby-base.wasm" --dir "$DOWNLOAD_DIR" --clobber 2>/dev/null
+
+      # Also download rbconfig if not present locally
+      RBCONFIG_DIR="$RUBY_WASM_DIR/rbconfig/wasm32-wasi"
+      if [ ! -f "$RBCONFIG_DIR/rbconfig.rb" ]; then
+        mkdir -p "$RBCONFIG_DIR"
+        gh release download "$TAG" --repo "$REPO" --pattern "rbconfig.rb" --dir "$RBCONFIG_DIR" --clobber 2>/dev/null
+      fi
+    fi
+  fi
+
+  if [ -f "$DOWNLOAD_PATH" ]; then
+    BASE_WASM="$DOWNLOAD_PATH"
+    echo "  Downloaded from GitHub Releases"
   fi
 fi
 
@@ -51,7 +73,7 @@ if [ -z "$BASE_WASM" ]; then
   echo
   echo "Error: No base WASM binary found."
   echo "Either run 'bin/build-ruby-base' to build one,"
-  echo "or install @tutorialkit-rb/ruby-3.3 npm package."
+  echo "or ensure a ruby-base release exists on GitHub."
   exit 1
 fi
 

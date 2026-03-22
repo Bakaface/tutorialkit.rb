@@ -1,6 +1,3 @@
 {
-  "private": true,
-  "optionalDependencies": {
-    "@tutorialkit-rb/ruby-3.3": "^3.3.0"
-  }
+  "private": true
 }

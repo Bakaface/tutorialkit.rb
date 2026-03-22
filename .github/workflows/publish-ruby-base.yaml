@@ -2,12 +2,10 @@ name: Publish Ruby Base Binary
 
 on:
   workflow_dispatch:
-    inputs:
-      ruby_version:
-        description: 'Ruby version to build'
-        required: true
-        default: '3.3.8'
-        type: string
+
+# Must match the version in packages/template/bin/build-ruby-base
+env:
+  RUBY_BASE_VERSION: '3.3.8'
 
 jobs:
   build_and_publish:
@@ -19,13 +17,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.74.0
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
+        env:
+          BUNDLE_GEMFILE: packages/template/ruby-wasm/Gemfile.base
         with:
           ruby-version: '3.3'
+          bundler-cache: true
 
-      - name: Install ruby_wasm gem
-        run: gem install ruby_wasm
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache ruby.wasm build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            packages/template/ruby-wasm/build
+            packages/template/ruby-wasm/rubies
+          key: ${{ runner.os }}-ruby-base-${{ hashFiles('packages/template/ruby-wasm/Gemfile.base.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-base-
 
       - name: Build base binary
         working-directory: ./packages/template
@@ -41,7 +59,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="ruby-base-v${{ inputs.ruby_version }}"
+          TAG="ruby-base-v${RUBY_BASE_VERSION}"
 
           # Delete existing release if it exists
           gh release delete "$TAG" --yes 2>/dev/null || true
@@ -49,7 +67,7 @@ jobs:
           git push origin ":refs/tags/$TAG" 2>/dev/null || true
 
           gh release create "$TAG" \
-            --title "Ruby Base Binary v${{ inputs.ruby_version }}" \
-            --notes "Pre-built Ruby ${{ inputs.ruby_version }} WASM base binary for dynamic gem packing." \
+            --title "Ruby Base Binary v${RUBY_BASE_VERSION}" \
+            --notes "Pre-built Ruby ${RUBY_BASE_VERSION} WASM base binary for dynamic gem packing." \
             release-assets/ruby-base.wasm \
             release-assets/rbconfig.rb

@@ -202,10 +202,11 @@ function updatePackageJson(dest: string, projectName: string, flags: CreateOptio
   updateWorkspaceVersions(pkgJson.dependencies, TUTORIALKIT_VERSION);
   updateWorkspaceVersions(pkgJson.devDependencies, TUTORIALKIT_VERSION);
 
-  if (provider.toLowerCase() === 'cloudflare') {
-    pkgJson.scripts = pkgJson.scripts || {};
-    pkgJson.scripts.postbuild = 'cp _headers ./dist/';
-  }
+  // TODO: re-enable when Cloudflare deployment pipeline is added
+  // if (provider.toLowerCase() === 'cloudflare') {
+  //   pkgJson.scripts = pkgJson.scripts || {};
+  //   pkgJson.scripts.postbuild = 'cp _headers ./dist/';
+  // }
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkgJson, null, 2));
 

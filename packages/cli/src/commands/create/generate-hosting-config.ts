@@ -5,6 +5,9 @@ import chalk from 'chalk';
 import { warnLabel } from 'src/utils/messages.js';
 import { runTask } from 'src/utils/tasks.js';
 import cloudflareConfigRaw from './hosting-config/_headers.txt?raw';
+import dockerfileRaw from './hosting-config/Dockerfile.txt?raw';
+import deployFlyioRaw from './hosting-config/deploy_flyio_yml.txt?raw';
+import flyConfigRaw from './hosting-config/fly_toml.txt?raw';
 import netlifyConfigRaw from './hosting-config/netlify_toml.txt?raw';
 import vercelConfigRaw from './hosting-config/vercel.json?raw';
 import { DEFAULT_VALUES, readFlag, type CreateOptions } from './options.js';
@@ -16,9 +19,11 @@ export async function generateHostingConfig(dest: string, flags: CreateOptions) 
     provider = await prompts.select({
       message: 'Select hosting providers for automatic configuration:',
       options: [
-        { value: 'Vercel', label: 'Vercel' },
         { value: 'Netlify', label: 'Netlify' },
-        { value: 'Cloudflare', label: 'Cloudflare' },
+        { value: 'Fly.io', label: 'Fly.io' },
+        // TODO: re-enable when full deployment pipelines are added
+        // { value: 'Vercel', label: 'Vercel' },
+        // { value: 'Cloudflare', label: 'Cloudflare' },
         { value: 'skip', label: 'Skip hosting configuration' },
       ],
       initialValue: DEFAULT_VALUES.provider,
@@ -47,21 +52,32 @@ export async function generateHostingConfig(dest: string, flags: CreateOptions) 
 
   let config: string | undefined;
   let filename: string | undefined;
+  let extraFiles: Array<{ filename: string; content: string }> | undefined;
 
   switch (provider.toLowerCase()) {
-    case 'vercel': {
-      config = typeof vercelConfigRaw === 'string' ? vercelConfigRaw : JSON.stringify(vercelConfigRaw, null, 2);
-      filename = 'vercel.json';
-      break;
-    }
     case 'netlify': {
       config = netlifyConfigRaw;
       filename = 'netlify.toml';
       break;
     }
-    case 'cloudflare': {
-      config = cloudflareConfigRaw;
-      filename = '_headers';
+    // TODO: re-enable when full deployment pipelines are added
+    // case 'vercel': {
+    //   config = typeof vercelConfigRaw === 'string' ? vercelConfigRaw : JSON.stringify(vercelConfigRaw, null, 2);
+    //   filename = 'vercel.json';
+    //   break;
+    // }
+    // case 'cloudflare': {
+    //   config = cloudflareConfigRaw;
+    //   filename = '_headers';
+    //   break;
+    // }
+    case 'fly.io': {
+      config = flyConfigRaw;
+      filename = 'fly.toml';
+      extraFiles = [
+        { filename: 'Dockerfile', content: dockerfileRaw },
+        { filename: path.join('.github', 'workflows', 'deploy.yml'), content: deployFlyioRaw },
+      ];
       break;
     }
   }
@@ -75,7 +91,18 @@ export async function generateHostingConfig(dest: string, flags: CreateOptions) 
         const filepath = path.join(resolvedDest, filename);
         fs.writeFileSync(filepath, config);
 
-        return `Added ${filepath}`;
+        const added = [filepath];
+
+        if (extraFiles) {
+          for (const extra of extraFiles) {
+            const extraPath = path.join(resolvedDest, extra.filename);
+            fs.mkdirSync(path.dirname(extraPath), { recursive: true });
+            fs.writeFileSync(extraPath, extra.content);
+            added.push(extraPath);
+          }
+        }
+
+        return added.map((f) => `Added ${f}`).join('\n');
       },
     });
   }

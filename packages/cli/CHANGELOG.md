@@ -1,3 +1,18 @@
+# [0.2.0](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.2.0) "@tutorialkit-rb/cli" (2026-03-22)
+
+
+### Bug Fixes
+
+* **cli:** add missing [build] section to netlify config ([3f5104f](https://github.com/Bakaface/tutorialkit.rb/commit/3f5104f95860f08857aeef6e550c23590c92175c))
+
+
+### Features
+
+* **cli:** add fly.io deployment pipeline configs ([0a83d9d](https://github.com/Bakaface/tutorialkit.rb/commit/0a83d9d85a2ce87126693304cabc3d7bae1a2171))
+* **cli:** add fly.io hosting option, disable vercel/cloudflare ([7f3d0a4](https://github.com/Bakaface/tutorialkit.rb/commit/7f3d0a4402815eb81c463a9c1fabd0fa2e06832f))
+
+
+
 ## [0.1.9](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.9) "@tutorialkit-rb/cli" (2026-03-22)
 
 

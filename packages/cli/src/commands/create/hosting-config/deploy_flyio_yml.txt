@@ -1,0 +1,69 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.74.0
+
+      - name: Install wasi-vfs
+        env:
+          WASI_VFS_VERSION: 0.5.4
+        run: |
+          curl -LO "https://github.com/kateinoigakukun/wasi-vfs/releases/download/v${WASI_VFS_VERSION}/wasi-vfs-cli-x86_64-unknown-linux-gnu.zip"
+          unzip wasi-vfs-cli-x86_64-unknown-linux-gnu.zip
+          mv wasi-vfs /usr/local/bin/wasi-vfs
+
+      - uses: ruby/setup-ruby@v1
+        env:
+          BUNDLE_GEMFILE: ruby-wasm/Gemfile
+          BUNDLE_PATH: ruby-wasm/vendor
+        with:
+          ruby-version: 3.3
+          bundler-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Cache ruby.wasm build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ruby-wasm/build
+            ruby-wasm/rubies
+          key: ${{ runner.os }}-ruby-wasm-${{ hashFiles('ruby-wasm/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-wasm-
+
+      - name: Build ruby.wasm
+        run: npm run build:wasm
+
+      - name: Build tutorial
+        run: |
+          npm install
+          npm run build
+
+      - name: Setup flyctl
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        run: flyctl deploy --local-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

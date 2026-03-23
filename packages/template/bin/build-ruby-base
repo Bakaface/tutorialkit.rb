@@ -124,6 +124,17 @@ echo "Saved usr/ path to dist/usr-dir.txt: $USR_DIR"
 cp "$RAW_BINARY" "$OUTPUT"
 echo "Replaced VFS-packed output with raw pre-VFS binary (single-pack strategy)"
 
+# Copy rbconfig.rb for release (needed by dynamic gem packing)
+RBCONFIG_SRC="$USR_DIR/local/lib/ruby/3.3.0/wasm32-wasi/rbconfig.rb"
+RBCONFIG_DST="$RUBY_WASM_DIR/rbconfig/wasm32-wasi/rbconfig.rb"
+if [ -f "$RBCONFIG_SRC" ]; then
+  mkdir -p "$(dirname "$RBCONFIG_DST")"
+  cp "$RBCONFIG_SRC" "$RBCONFIG_DST"
+  echo "Copied rbconfig.rb to $RBCONFIG_DST"
+else
+  echo "WARNING: rbconfig.rb not found at $RBCONFIG_SRC"
+fi
+
 SIZE=$(du -h "$OUTPUT" | cut -f1)
 
 # --- Post-build verification ------------------------------------------------

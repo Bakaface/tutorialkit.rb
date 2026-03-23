@@ -29,15 +29,15 @@ Learners open a URL and get a live Rails 8 app with an editor, terminal, and bro
 npx create-tutorialkit-rb my-tutorial
 cd my-tutorial
 
-# Build the WASM binary (first time only, 5-20 min)
-npm run build:wasm
-
-# Or, pack gems onto the prebuilt base binary (~30 seconds)
-npm run pack:wasm
+# Build the WASM binary — pick ONE of the two approaches:
+npm run build:wasm    # Full build from source (5-20 min, supports C extension gems)
+npm run pack:wasm     # Pack gems onto prebuilt base binary (~30s, pure-Ruby gems only)
 
 # Start the dev server
 npm run dev
 ```
+
+You only need to rebuild when you change the Gemfile. Day-to-day lesson authoring (Markdown, Ruby app code) requires no WASM rebuilds.
 
 Open `http://localhost:4321/` — you'll see the tutorial UI with a live Rails app running in your browser.
 

@@ -32,12 +32,14 @@ TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
 RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
 OUTPUT="$RUBY_WASM_DIR/dist/ruby-base.wasm"
 
+export BUNDLE_GEMFILE="$RUBY_WASM_DIR/Gemfile.base"
+
 echo "=== Building custom Ruby WASM base binary (with JS interop) ==="
 echo
 
 # --- Preflight checks --------------------------------------------------------
 
-if ! command -v rbwasm &> /dev/null; then
+if ! bundle exec rbwasm --version &> /dev/null && ! command -v rbwasm &> /dev/null; then
   echo "Error: rbwasm CLI not found"
   echo "Install it with: gem install ruby_wasm"
   exit 1
@@ -46,7 +48,6 @@ fi
 # --- Prepare Gemfile.base lockfile -------------------------------------------
 
 echo "Resolving Gemfile.base dependencies..."
-export BUNDLE_GEMFILE="$RUBY_WASM_DIR/Gemfile.base"
 bundle lock --add-platform wasm32-wasi 2>/dev/null || bundle lock
 echo
 

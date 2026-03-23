@@ -1,3 +1,38 @@
+# [0.2.0](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.2.0) (2026-03-22)
+
+
+### Bug Fixes
+
+* **cli:** add missing [build] section to netlify config ([3f5104f](https://github.com/Bakaface/tutorialkit.rb/commit/3f5104f95860f08857aeef6e550c23590c92175c))
+* **template:** auto-install deps in smoke test instead of requiring manual npm install ([12b92d0](https://github.com/Bakaface/tutorialkit.rb/commit/12b92d015d31949cdeebd0cb7dd925852ef8a79e))
+* **template:** clean additional build artifacts in wasm scripts ([1c464c8](https://github.com/Bakaface/tutorialkit.rb/commit/1c464c858d13b0f823e1e46ee3fc4476f9f6587d))
+* **template:** clean pgdata in smoke test, revert gitignore ([da036e6](https://github.com/Bakaface/tutorialkit.rb/commit/da036e6a47be630b8adf2bb4aa09d7a3d9813424))
+* **template:** ensure version parity with monolithic wasm pipeline ([834e64c](https://github.com/Bakaface/tutorialkit.rb/commit/834e64c5a87a5130fd0d845a28c9572367bc299c))
+* **template:** gitignore ruby-wasm symlinks and dirs ([59aa959](https://github.com/Bakaface/tutorialkit.rb/commit/59aa959cf29992392ffc3e6df967e4f12e899048))
+* **template:** handle https:// redirects in server.js ([755d6f7](https://github.com/Bakaface/tutorialkit.rb/commit/755d6f7a1405d6e168faec59471620eb0eec5999))
+* **template:** move skills to template root for cli ([6c4724e](https://github.com/Bakaface/tutorialkit.rb/commit/6c4724ef0f74ac0ae3a10b2f4ac056eed845ddb8))
+* **template:** prevent minitest parallel mode in wasm ([c73cab4](https://github.com/Bakaface/tutorialkit.rb/commit/c73cab4e41a23bc124d2a261a5062f4300c26478))
+
+
+### Features
+
+* add setup-worktree.sh for development environment configuration ([118a327](https://github.com/Bakaface/tutorialkit.rb/commit/118a32709676ec8beb373e3943bd416cb095f27a))
+* add smoke test & boot logging ([ceb5373](https://github.com/Bakaface/tutorialkit.rb/commit/ceb5373e0cbe6780b98f15d009283b80477cc9ff))
+* **astro:** add deferred activation via ?activate= query param ([f130517](https://github.com/Bakaface/tutorialkit.rb/commit/f1305179cd8d67073386c025225eae91fe1ebaad))
+* **cli:** add fly.io deployment pipeline configs ([0a83d9d](https://github.com/Bakaface/tutorialkit.rb/commit/0a83d9d85a2ce87126693304cabc3d7bae1a2171))
+* **cli:** add fly.io hosting option, disable vercel/cloudflare ([7f3d0a4](https://github.com/Bakaface/tutorialkit.rb/commit/7f3d0a4402815eb81c463a9c1fabd0fa2e06832f))
+* **ruby-base:** add npm package scaffold for base binary distribution ([8e10017](https://github.com/Bakaface/tutorialkit.rb/commit/8e10017a6129baaa3ef1fb2be5d6b0cee5caad4e))
+* **template:** add .btn--success and .btn[disabled] styles ([cad53a8](https://github.com/Bakaface/tutorialkit.rb/commit/cad53a8668f155c8009761039ae53232e885a0c0))
+* **template:** add claude code skills for tutorial authoring ([be24bc7](https://github.com/Bakaface/tutorialkit.rb/commit/be24bc77d2f313ddf315611426baef424f28e444))
+* **template:** add dynamic gems packing pipeline and smoke tests ([b245acb](https://github.com/Bakaface/tutorialkit.rb/commit/b245acbd55c112dfe7f62d35ac0373c52b6af387))
+* **template:** add inheritance rules, defaults, constraints, and validation to skills ([510b8b3](https://github.com/Bakaface/tutorialkit.rb/commit/510b8b3ee375a9d6929bd3e4a63865650320b6ff))
+* **template:** add netlify deploy workflow ([b0092da](https://github.com/Bakaface/tutorialkit.rb/commit/b0092da7df81f49e1eeb99d3943a56b1959d5747))
+* **template:** add OG meta frontmatter to tutorial root ([670551b](https://github.com/Bakaface/tutorialkit.rb/commit/670551be3b010ed6f47cde93cb444c60bb7621be))
+* **template:** flatten workspace, add CSS design system, update skills ([b42e092](https://github.com/Bakaface/tutorialkit.rb/commit/b42e092a8280d0c73f603f75ff244d58c48f3ba3))
+* **template:** introduce http support ([2012419](https://github.com/Bakaface/tutorialkit.rb/commit/2012419e62ca115095d20de04eb3d82d482667ad))
+
+
+
 ## [0.1.9](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.1.9) (2026-03-22)
 
 

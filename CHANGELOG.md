@@ -1,3 +1,14 @@
+# [1.0.0-rc.1](https://github.com/Bakaface/tutorialkit.rb/compare/v0.2.0...v1.0.0-rc.1) (2026-03-23)
+
+
+### Bug Fixes
+
+* **ci:** copy rbconfig.rb for release assets ([7b7a3c8](https://github.com/Bakaface/tutorialkit.rb/commit/7b7a3c8a5d6efe1ea74a73057a190496f5e19456))
+* **ci:** use bundle exec for rbwasm preflight check ([93cc3ef](https://github.com/Bakaface/tutorialkit.rb/commit/93cc3ef5ac2110ccc0263e1a4470f7257d6f894f))
+* **template:** cleanup gemfile ([d5cb6d5](https://github.com/Bakaface/tutorialkit.rb/commit/d5cb6d5ca66f86f0f0ea5dc6490f922c73cfd2b3))
+
+
+
 # [0.2.0](https://github.com/Bakaface/tutorialkit.rb/compare/0.1.7...0.2.0) (2026-03-22)
 
 

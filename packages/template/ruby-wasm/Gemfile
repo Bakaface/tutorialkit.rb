@@ -24,5 +24,3 @@ gem "tzinfo-data"
 # Pin json < 2.8 — newer versions redefine rb_hash_bulk_insert as static,
 # which conflicts with Ruby 3.3's headers during WASM cross-compilation.
 gem "json", "< 2.8"
-
-# gem "ruby_llm" — removed; outbound HTTP demo uses Net::HTTP only

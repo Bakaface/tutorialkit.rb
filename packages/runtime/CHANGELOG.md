@@ -1,3 +1,7 @@
+# [1.0.0-rc.2](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.1...v1.0.0-rc.2) "@tutorialkit-rb/runtime" (2026-07-14)
+
+
+
 # [1.0.0-rc.1](https://github.com/Bakaface/tutorialkit.rb/compare/v0.2.0...v1.0.0-rc.1) "@tutorialkit-rb/runtime" (2026-03-23)
 
 

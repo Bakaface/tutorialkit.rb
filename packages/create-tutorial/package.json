@@ -1,6 +1,6 @@
 {
   "name": "create-tutorialkit-rb",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Interactive tutorials powered by WebContainer API",
   "author": "StackBlitz Inc.",
   "type": "module",

@@ -174,10 +174,30 @@ echo ""
 if [[ "$SKIP_DEPS" == true ]]; then
   echo "  Skipped (--skip-deps)"
 else
+  # corepack pnpm honors the repo's packageManager pin (8.15.6) regardless of
+  # which pnpm is first in PATH.
   echo "  Running pnpm install..."
-  (cd "$WORKTREE_PATH" && pnpm install --frozen-lockfile 2>&1 | tail -5)
+  (cd "$WORKTREE_PATH" && corepack pnpm install --frozen-lockfile 2>&1 | tail -5)
   echo "  Dependencies installed"
 
+fi
+
+echo ""
+
+# ─── Step 4: Build packages ─────────────────────────────────────────────────
+
+echo "── Step 4: Build packages ──"
+echo ""
+
+# packages/*/dist are gitignored, and the template's astro.config.ts imports
+# @tutorialkit-rb/astro at startup — build once so `dev` doesn't race the
+# watch compilers in a fresh worktree.
+if [[ "$SKIP_DEPS" == true ]]; then
+  echo "  Skipped (--skip-deps)"
+else
+  echo "  Running pnpm run build..."
+  (cd "$WORKTREE_PATH" && corepack pnpm run build 2>&1 | tail -3)
+  echo "  Packages built"
 fi
 
 # ─── Done ────────────────────────────────────────────────────────────────────

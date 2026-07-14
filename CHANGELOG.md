@@ -1,3 +1,13 @@
+# [1.0.0-rc.2](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-07-14)
+
+
+### Bug Fixes
+
+* **template:** flatten crud-products workspace ([908096e](https://github.com/Bakaface/tutorialkit.rb/commit/908096e48756d6f88d7628e7ee0fc2ebb8aa7c17))
+* use corepack pnpm and prebuild packages in worktree setup ([04639e7](https://github.com/Bakaface/tutorialkit.rb/commit/04639e75a56f42896b338ea13f006229686b8347))
+
+
+
 # [1.0.0-rc.1](https://github.com/Bakaface/tutorialkit.rb/compare/v0.2.0...v1.0.0-rc.1) (2026-03-23)
 
 

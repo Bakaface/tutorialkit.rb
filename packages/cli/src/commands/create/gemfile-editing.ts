@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { execa } from 'execa';
 import { assertNotCanceled } from '../../utils/tasks.js';
 import { type CreateOptions } from './options.js';
+import { type PackageManager } from './package-manager.js';
 
 export async function promptGemfileEditing(dest: string, flags: CreateOptions) {
   if (flags.defaults || flags.dryRun) {
@@ -63,17 +64,23 @@ export async function promptGemfileEditing(dest: string, flags: CreateOptions) {
   return false;
 }
 
-export function printRubyNextSteps(dest: string) {
+export function printRubyNextSteps(dest: string, packageManager: PackageManager, depsInstalled: boolean) {
   let i = 0;
 
   prompts.log.message(chalk.bold.underline('Next Steps'));
 
-  const steps = [
-    [`cd ${dest}`, 'Navigate to project'],
-    ['npm run build:wasm', 'Build Ruby WebAssembly with your gems'],
-    ['npm run dev', 'Start development server'],
-    [, `Head over to ${chalk.underline('http://localhost:4321')}`],
-  ];
+  const pm = packageManager ?? 'npm';
+  const steps: Array<[string | undefined, string]> = [[`cd ${dest}`, 'Navigate to project']];
+
+  if (!depsInstalled) {
+    steps.push([`${pm} install`, 'Install dependencies']);
+  }
+
+  steps.push(
+    [`${pm} run pack:wasm`, 'Pack Ruby WebAssembly with your gems'],
+    [`${pm} run dev`, 'Start development server'],
+    [undefined, `Head over to ${chalk.underline('http://localhost:4321')}`],
+  );
 
   for (const [command, text] of steps) {
     i++;
@@ -81,6 +88,6 @@ export function printRubyNextSteps(dest: string) {
   }
 
   prompts.log.message('');
-  prompts.log.info('💡 The WASM build step may take several minutes the first time.');
-  prompts.log.info('💡 Subsequent builds will be faster thanks to caching.');
+  prompts.log.info(`💡 ${chalk.blue('pack:wasm')} downloads a prebuilt Ruby base binary and packs your gems into it (~1-4 min).`);
+  prompts.log.info('💡 It needs host Ruby 3.3.x (RubyGems >= 3.6, < 4) and a Rust toolchain — it checks and tells you what to fix.');
 }

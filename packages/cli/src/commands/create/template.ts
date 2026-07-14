@@ -45,21 +45,38 @@ export async function copyTemplate(dest: string, flags: CreateOptions) {
 }
 
 async function setExecutablePermissions(dest: string) {
-  const binScripts = [
-    path.join(dest, 'bin', 'build-wasm'),
-    path.join(dest, 'ruby-wasm', 'bin', 'pack'),
+  // chmod every file in the script directories rather than a hardcoded list —
+  // scripts added to the template after the list was written silently lost
+  // their executable bit
+  const binDirs = [
+    path.join(dest, 'bin'),
+    path.join(dest, 'ruby-wasm', 'bin'),
     // Node.js wrapper scripts for Rails in WebContainer
-    path.join(dest, 'src', 'templates', 'default', 'bin', 'rails'),
-    path.join(dest, 'src', 'templates', 'default', 'bin', 'ruby'),
-    path.join(dest, 'src', 'templates', 'default', 'bin', 'console'),
-    path.join(dest, 'src', 'templates', 'default', 'bin', 'rackup'),
+    path.join(dest, 'src', 'templates', 'default', 'bin'),
   ];
 
-  for (const script of binScripts) {
+  for (const dir of binDirs) {
+    let entries: string[];
+
     try {
-      await fsPromises.chmod(script, 0o755);
+      entries = await fsPromises.readdir(dir);
     } catch {
-      // Script may not exist in some templates, ignore
+      // Directory may not exist in some templates, ignore
+      continue;
+    }
+
+    for (const entry of entries) {
+      const entryPath = path.join(dir, entry);
+
+      try {
+        const stats = await fsPromises.stat(entryPath);
+
+        if (stats.isFile()) {
+          await fsPromises.chmod(entryPath, 0o755);
+        }
+      } catch {
+        // ignore unreadable entries
+      }
     }
   }
 }

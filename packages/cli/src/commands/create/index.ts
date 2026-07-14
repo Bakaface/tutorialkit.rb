@@ -12,6 +12,7 @@ import { setupEnterpriseConfig } from './enterprise.js';
 import { promptGemfileEditing, printRubyNextSteps } from './gemfile-editing.js';
 import { generateHostingConfig } from './generate-hosting-config.js';
 import { initGitRepo } from './git.js';
+import { installDependencies, promptInstallDependencies } from './install-start.js';
 import { DEFAULT_VALUES, type CreateOptions } from './options.js';
 import { selectPackageManager, type PackageManager } from './package-manager.js';
 import { copyTemplate } from './template.js';
@@ -27,6 +28,10 @@ export async function createTutorial(flags: yargs.Arguments) {
         Options: [
           ['--dir, -d', 'The folder in which the tutorial gets created'],
           ['--git, --no-git', `Initialize a local git repository (default ${chalk.yellow(DEFAULT_VALUES.git)})`],
+          [
+            '--install, --no-install',
+            `Install dependencies after scaffolding (default ${chalk.yellow(DEFAULT_VALUES.install)})`,
+          ],
           [
             '--provider <name>, --no-provider',
             `Select a hosting provider (default ${chalk.yellow(DEFAULT_VALUES.provider)})`,
@@ -153,7 +158,13 @@ async function _createTutorial(flags: CreateOptions): Promise<undefined> {
 
   await promptGemfileEditing(dest, flags);
 
-  printRubyNextSteps(dest);
+  const installDeps = await promptInstallDependencies(flags);
+
+  if (installDeps) {
+    await installDependencies(resolvedDest, selectedPackageManager, flags);
+  }
+
+  printRubyNextSteps(dest, selectedPackageManager, installDeps && !flags.dryRun);
 
   prompts.outro(`You're all set!`);
 

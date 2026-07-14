@@ -34,7 +34,7 @@ What works, what doesn't, and how to design lessons around the WASM environment.
 | Active Storage (upload) | Partial | Upload works but image processing is a no-op |
 | Background jobs | No | Single-threaded; Solid Queue won't process |
 | ActionCable / WebSockets | No | No `IO.select`, no real socket support |
-| External HTTP requests | No | No outbound networking from Ruby — sockets are unimplemented at the WASI level |
+| External HTTP requests | Yes | `Net::HTTP` and Faraday work via a JS `fetch` bridge; browser CORS applies, so many APIs need a proxy |
 | Threads / parallel processing | No | `Thread.new` uses fibers (cooperative, single-threaded) |
 | System commands from Ruby | No | `system()`, backticks, `Open3` are non-functional |
 
@@ -42,14 +42,11 @@ What works, what doesn't, and how to design lessons around the WASM environment.
 
 These are **impossible to work around** in the WASM environment. Do not write lessons that depend on them:
 
-### No Outbound Networking
+### No Raw Sockets
 
-Socket operations (`TCPSocket`, `UDPSocket`, and all socket classes) fail because the underlying WASI syscalls are unimplemented. `Net::HTTP` and `open-uri` will raise errors when attempting connections. You cannot:
-- Call external APIs from Ruby
-- Download files from the internet
-- Connect to external databases or services
+Socket operations (`TCPSocket`, `UDPSocket`, and all socket classes) fail because the underlying WASI syscalls are unimplemented. This rules out anything that needs a raw socket — connecting directly to an external database, a custom TCP protocol, etc.
 
-**Workaround for lessons:** If you want to teach API consumption, focus on the controller/model patterns and mock the responses. Show the code structure without executing real HTTP calls.
+`Net::HTTP` and Faraday are the exception: they're monkey-patched (`lib/patches/http_bridge.rb`) to route requests through a JS `fetch` bridge instead of opening a socket. See "Outbound HTTP" below.
 
 ### No Process Spawning
 
@@ -66,6 +63,22 @@ The `poll_oneoff` WASI syscall is unimplemented. This breaks gems like nio4r, Pu
 ### No chmod/fchmod
 
 POSIX permission calls are stubbed. Avoid `FileUtils.chmod` in tutorial code. The `rails new` generator is pre-patched to handle this.
+
+## Outbound HTTP
+
+`Net::HTTP` and Faraday work in WASM. `lib/patches/http_bridge.rb` prepends `Net::HTTP#request` (and registers a `Faraday::Adapter::WasmHTTP`) to call `JS.global[:wasmHttpBridge].fetch()` instead of opening a socket; `lib/http-bridge.js` runs the real browser `fetch()` on the other side.
+
+### Constraints
+
+- **CORS applies.** The request runs as a browser `fetch()`, so any API without permissive CORS headers will fail from the client side — this is most external APIs. Lessons that call third-party APIs typically need a CORS proxy in front of them.
+- **A CORS proxy is configurable**, not built-in per-API: set `WasmHTTP::Connection.proxy_url` and `WasmHTTP::Connection.proxy_hosts` to route matching hosts through a proxy (see `packages/template/cors-proxy`, a deployable Cloudflare Worker).
+- **No streaming.** Responses are buffered in full before returning to Ruby; binary bodies are base64-encoded across the bridge.
+- **Single-threaded.** Requests are serialized — no concurrent outbound calls.
+- **30-second timeout** per request (`AbortSignal.timeout(30000)` in `http-bridge.js`).
+
+### Teaching It
+
+A worked example ships at `src/content/tutorial/9-outbound-http/1-making-http-requests/`. For lessons that call real third-party APIs, still consider mocking the response for determinism/offline use — the bridge makes real calls possible, but a lesson that depends on a live third-party API's uptime and CORS policy is inherently less reliable than one that doesn't.
 
 ## Gem Compatibility
 

@@ -336,8 +336,8 @@ For a series of lessons that build on each other, use **template layering**:
 
 ```
 src/templates/
-  default/                  ← Base WASM runtime
-  rails-app/                ← Empty Rails app (extends default)
+  default/                  ← Base WASM runtime (implicit base for every lesson)
+  rails-app/                ← Empty Rails app (no .tk-config.json; layered in via lesson _files/.tk-config.json extends)
   blog-base/                ← Blog app with Post model (extends rails-app)
   blog-with-comments/       ← Blog app + Comment model (extends blog-base)
 

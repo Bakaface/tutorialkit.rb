@@ -2,20 +2,16 @@
 name: tutorial-quickstart
 description: |
   Use this skill whenever starting a new tutorial project, understanding the end-to-end
-  workflow from scaffold to deployment, or working with the rails-app template's built-in
-  features. Trigger when the user says 'new tutorial', 'create tutorial', 'getting started',
+  workflow from scaffold to deployment, or customizing the rails-app template's built-in
+  features. Trigger on: 'new tutorial', 'create tutorial', 'getting started',
   'npx create-tutorialkit-rb', 'scaffold', 'first lesson', 'deploy tutorial', 'build:wasm',
-  'COEP headers', 'COOP headers', 'hosting setup', 'CSS classes', 'BEM components',
-  'design system', 'application.css', 'customize demo app', 'rails-app template',
-  'branding', 'logo', 'favicon', 'accent color', 'theme color', 'look and feel',
-  'customize colors', or asks how to set up, build, style, brand, or deploy a Rails
-  tutorial from scratch — even if they don't explicitly mention quickstart. This skill
-  provides the exact CLI commands, project structure, WASM build steps, rails-app template
-  features (CSS design system, layout), branding customization (logos, favicons, accent
-  colors, top bar title, component colors), demo app customization steps, deployment header
-  configuration, and common issue troubleshooting. Do NOT attempt project setup or deployment
-  without this skill. Do NOT use for detailed frontmatter reference (use tutorial-lesson-config)
-  or WASM compatibility questions (use rails-wasm-author-constraints).
+  'COEP/COOP headers', 'hosting setup', 'CSS classes', 'design system', 'application.css',
+  'rails-app template', 'branding', 'logo', 'favicon', 'accent color', or asking how to
+  set up, build, style, brand, or deploy a Rails tutorial from scratch. Provides exact CLI
+  commands, project structure, WASM build steps, the rails-app CSS design system, branding
+  customization, deployment header configuration, and troubleshooting. Do NOT attempt
+  project setup or deployment without this skill. Do NOT use for frontmatter reference
+  (use tutorial-lesson-config) or WASM compatibility (use rails-wasm-author-constraints).
 ---
 
 # Tutorial Quickstart
@@ -34,7 +30,7 @@ The CLI prompts for:
 |--------|---------|-------|
 | Tutorial name | random (e.g., "fierce-turtle") | Used as `package.json` name |
 | Directory | `./{name}` | Where files are created |
-| Hosting provider | Skip | Vercel, Netlify, or Cloudflare — adds COEP/COOP headers |
+| Hosting provider | Skip | Netlify or Fly.io — adds COEP/COOP headers (and a Dockerfile + deploy workflow for Fly.io) |
 | Package manager | npm | npm, yarn, pnpm, or bun |
 | Init git repo? | Yes | Creates initial commit |
 | Edit Gemfile? | Yes | Opens `ruby-wasm/Gemfile` in `$EDITOR` |

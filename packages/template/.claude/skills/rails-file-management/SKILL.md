@@ -31,7 +31,7 @@ _solution/ (lesson)    ← Completed/answer code
 Files from each layer **overlay** the previous — same-path files are replaced, new files are added.
 
 **Two template mechanisms (don't confuse them):**
-- **`template` frontmatter field** (e.g., `template: default`) — selects which base template JSON is loaded as the "Template (base)" layer. Almost always set in the part's `meta.md`. The tutorial's root `meta.md` contains `rails-app`—a minimal demo app used in the tutotiral.
+- **`template` frontmatter field** (e.g., `template: default`) — selects which base template JSON is loaded as the "Template (base)" layer. If unset, it defaults to `default`. The tutorial's root `meta.md` sets no `template:` key, so the `default` template (the base WASM runtime) applies tutorial-wide unless a part, chapter, or lesson overrides it.
 - **`_files/.tk-config.json` with `extends`** — extends the `_files` layer with files from another template directory. These provide the source code that overlays on top of the template used. Use it to share many files between lessons. Otherwise, prefer duplication and the `template` frontmatter..
 
 IMPORTANT: Files added via the `template` frontmatter are not visible in the editor; only the `_files` contents (including `_files/.tk-config.json`'s contents) are shown in the editor.
@@ -44,8 +44,8 @@ Templates live in `src/templates/` and provide the base project structure for We
 
 | Template | Purpose | Inherits From |
 |----------|---------|---------------|
-| `default` | Base Rails WASM runtime — Node.js wrappers, Express server, PGLite, WASM loader. Selected via `template: default` in frontmatter (the default). | (none) |
-| `rails-app` | Pre-generated Rails app at `workspace/`. Update this template to set up the base Rails app for the tutorial | `default` |
+| `default` | Base Rails WASM runtime — Node.js wrappers, Express server, PGLite, WASM loader. Selected via the `template` frontmatter field, or implicitly since it's the default when `template` is unset. | (none) |
+| `rails-app` | Pre-generated Rails app at `workspace/`. Update this template to set up the base Rails app for the tutorial | (none) — has no `.tk-config.json`. It's layered on top of `default` at the lesson level via `_files/.tk-config.json` extends, not via template-to-template inheritance |
 
 ### Template Inheritance
 
@@ -143,10 +143,9 @@ Mirror the `_files/` directory structure:
 ```
 _solution/
   workspace/
-    store/
-      app/
-        controllers/
-          products_controller.rb      ← completed version
+    app/
+      controllers/
+        products_controller.rb      ← completed version
 ```
 
 ### When to Use

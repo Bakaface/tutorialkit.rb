@@ -4,7 +4,7 @@ description: |
   Use this skill whenever organizing files for Rails tutorial lessons — _files/, _solution/,
   templates, workspace paths. Trigger on: 'create _files', 'add _solution', 'template
   inheritance', '.tk-config.json', 'extends path', 'workspace path', 'which files go where',
-  'add a gem', 'Gemfile', 'build-wasm', 'create a template', 'protected files', 'do not
+  'add a gem', 'Gemfile', 'pack:wasm', 'build-wasm', 'create a template', 'protected files', 'do not
   override', or asking where to put Rails app code — even without mentioning file management.
   Covers the three-layer merge model, built-in templates, `.tk-config.json` path formula for
   different nesting depths, protected infrastructure files, and WASM gem build workflow. Do
@@ -181,7 +181,7 @@ The following files are **runtime infrastructure** provided by the `default` tem
 Gems are compiled into the WASM binary. To add a gem:
 
 1. Edit `ruby-wasm/Gemfile` in the project root
-2. Run `bin/build-wasm` to rebuild the WASM binary
+2. Run `npm run pack:wasm` to repack the WASM binary (~1–4 min)
 
 ```ruby
 # ruby-wasm/Gemfile
@@ -196,11 +196,29 @@ gem "friendly_id"         # Slugs
 gem "pagy"                # Pagination
 ```
 
+The pack step regenerates the boot require list from the Gemfile, so the new
+gem's railtie loads at boot automatically. Use `require: false` in the Gemfile
+for gems that should be packed but not auto-required at boot.
+
+Always verify a repack actually succeeded by its exit code, not by skimming
+output — and after adding a gem, confirm it loads (e.g. via the smoke test)
+before writing lessons around it.
+
+### Build Paths & Host Prerequisites
+
+- **`npm run pack:wasm` (default, fast)** — downloads a prebuilt Ruby base
+  binary + stdlib from GitHub Releases on first run, cross-compiles your gems,
+  and packs them in (~1–4 min). Host prerequisites: Ruby 3.3.x with
+  RubyGems ≥ 3.6 and < 4 (`gem update --system 3.6.9`), a Rust toolchain,
+  and the `gh` CLI. The script preflights these and tells you what to fix.
+- **`npm run build:wasm` (legacy, slow)** — full monolithic rebuild via
+  `rbwasm build` (5–20 min, compiles Ruby from source and leaves ~2 GB of
+  build artifacts). Only needed if the fast path fails.
+
 ### Gem Constraints
 
 - **Pure Ruby gems** work without issues
 - **Gems with native C extensions** need WASM-compatible builds — many common ones are already shimmed (see `rails-wasm-author-constraints` skill)
-- Rebuilding the WASM binary takes several minutes
 - The resulting binary is ~80MB and includes all gems
 
 ### Gemfile in Templates

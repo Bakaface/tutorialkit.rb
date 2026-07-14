@@ -52,8 +52,9 @@ my-tutorial/
 │   ├── templates/default/       ← WebContainer runtime (don't modify)
 │   └── components/              ← UI components
 ├── ruby-wasm/
-│   └── Gemfile                  ← Add gems here, then rebuild WASM
-├── bin/build-wasm               ← Rebuilds the WASM binary
+│   └── Gemfile                  ← Add gems here, then repack WASM
+├── bin/build-pack               ← Repacks the WASM binary (npm run pack:wasm, fast)
+├── bin/build-wasm               ← Legacy full WASM rebuild (npm run build:wasm)
 ├── astro.config.ts
 └── package.json
 ```
@@ -77,10 +78,10 @@ gem "devise"
 Then build the WASM binary:
 
 ```bash
-npm run build:wasm    # Takes up to 20 minutes on first run
+npm run pack:wasm     # ~1-4 minutes; downloads a prebuilt Ruby base binary on first run
 ```
 
-Subsequent rebuilds are faster thanks to caching, but still take a few minutes.
+Host prerequisites: Ruby 3.3.x with RubyGems >= 3.6 and < 4 (`gem update --system 3.6.9`), a Rust toolchain, and the `gh` CLI — the script preflights these and tells you what to fix. `npm run build:wasm` is the slow legacy fallback (5-20 min) if the fast path fails.
 
 ## Step 3: Start the Dev Server
 
@@ -418,9 +419,10 @@ Update the repo URL in `src/components/GitHubLink.astro`:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| `build:wasm` fails | Missing WASI SDK or build tools | Check `rbwasm` prerequisites |
+| `pack:wasm` fails preflight | Wrong host Ruby/RubyGems or missing Rust | Follow the script's message: Ruby 3.3.x, `gem update --system 3.6.9`, install Rust |
+| `build:wasm` fails | Missing WASI SDK or build tools | Check `rbwasm` prerequisites — or use `npm run pack:wasm` instead |
 | Preview shows nothing | Server not started | Add `mainCommand: ['node scripts/rails.js server', ...]` |
-| Terminal stuck on "Preparing" | WASM binary not built | Run `npm run build:wasm` first |
+| Terminal stuck on "Preparing" | WASM binary not built | Run `npm run pack:wasm` first |
 | Files not appearing in editor | Wrong path | All Rails files must be under `workspace/<app>/` |
 | Database empty | No `db:prepare` in prepareCommands | Add `['node scripts/rails.js db:prepare', '...']` |
 | Deploy fails with blank page | Missing COEP/COOP headers | Add headers per provider instructions above |

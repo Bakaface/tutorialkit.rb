@@ -8,14 +8,15 @@ You are authoring an interactive Ruby on Rails tutorial that runs entirely in th
 src/content/tutorial/     ← Your tutorial content (lessons, parts, chapters)
 src/templates/            ← WebContainer file templates (base app states)
 ruby-wasm/Gemfile         ← Gems compiled into the WASM binary
-bin/build-wasm            ← Rebuild WASM after Gemfile changes
+bin/build-pack            ← Repack WASM after Gemfile changes (npm run pack:wasm, fast)
+bin/build-wasm            ← Legacy full WASM rebuild (npm run build:wasm, 5-20 min)
 ```
 
 ## Key Constraints
 
 - **All Rails app files go under `workspace/`** — this is the WASI filesystem boundary
 - **Each lesson should be self-contained** — don't rely on user actions from previous lessons persisting
-- **Gems require a WASM rebuild** — edit `ruby-wasm/Gemfile`, then run `bin/build-wasm`
+- **Gems require a WASM repack** — edit `ruby-wasm/Gemfile`, then run `npm run pack:wasm` (~1-4 min; needs host Ruby 3.3.x with RubyGems >= 3.6 < 4, Rust, and the `gh` CLI — the script preflights and explains). `npm run build:wasm` is the slow legacy fallback. See `rails-file-management`
 - **Outbound HTTP works** (`Net::HTTP`, Faraday, etc.) via JS fetch bridge — CORS restrictions apply, see `rails-wasm-author-constraints`
 - **No threading or process spawning** from Ruby — see `rails-wasm-author-constraints`
 - **Database resets on page reload** — use `prepareCommands` with `db:prepare` for lessons that need data
@@ -25,6 +26,7 @@ bin/build-wasm            ← Rebuild WASM after Gemfile changes
 
 ```bash
 npm install         # Install dependencies (or pnpm/yarn/bun — whichever this project uses)
+npm run pack:wasm   # Build the Ruby WASM binary (first run, and after Gemfile changes)
 npm run dev         # Start dev server at http://localhost:4321/
 ```
 

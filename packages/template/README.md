@@ -37,10 +37,11 @@ This TutorialKit template includes support for running Ruby on Rails application
 ### Setting Up Ruby WASM
 
 1. **Configure Dependencies**: Edit `ruby-wasm/Gemfile` to add the Ruby gems needed for your tutorial
-2. **Build WASM Module**: Run the build command to compile Ruby and your dependencies:
+2. **Build WASM Module**: Pack your gems into the prebuilt Ruby WASM binary (~1-4 min; downloads the base binary on first run):
    ```bash
-   <% pkgManager %> run build:wasm
+   <% pkgManager %> run pack:wasm
    ```
+   Host prerequisites: Ruby 3.3.x with RubyGems >= 3.6 and < 4 (`gem update --system 3.6.9`), a Rust toolchain, and the `gh` CLI. The script checks these and tells you what to fix. (`<% pkgManager %> run build:wasm` is the slow legacy full rebuild.)
 3. **Start Development**: Run the dev server as usual:
    ```bash
    <% pkgManager %> run dev

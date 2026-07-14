@@ -84,7 +84,7 @@ A worked example ships at `src/content/tutorial/9-outbound-http/1-making-http-re
 
 ### Adding Gems
 
-Authors **can add gems** to their tutorial by editing `ruby-wasm/Gemfile` and running `bin/build-wasm` to rebuild the WASM binary. This bakes all gems into the binary at build time.
+Authors **can add gems** to their tutorial by editing `ruby-wasm/Gemfile` and running `npm run pack:wasm` to repack the WASM binary (~1-4 min). This bakes all gems into the binary at pack time and regenerates the boot require list so the gem loads at boot.
 
 ### Compatibility Tiers
 
@@ -92,7 +92,7 @@ Authors **can add gems** to their tutorial by editing `ruby-wasm/Gemfile` and ru
 |------|-------------|---------|
 | **Works** | Pure Ruby gems, no native extensions | `devise`, `friendly_id`, `pagy`, `pundit`, `draper`, `kaminari` |
 | **Shimmed** | Has native extensions but already patched | `nokogiri` (stub), `io-console` (stub), `bcrypt` |
-| **Needs testing** | May work if extension compiles for WASM | Test with `bin/build-wasm` |
+| **Needs testing** | May work if extension compiles for WASM | Test with `npm run pack:wasm` + the smoke test |
 | **Won't work** | Requires unsupported syscalls or networking | `pg` (native), `mysql2`, `redis`, `sidekiq`, `puma` |
 
 ### Pre-Shimmed Gems
@@ -113,8 +113,8 @@ These gems are already handled by the WASM runtime:
 # 1. Edit the Gemfile
 vim ruby-wasm/Gemfile
 
-# 2. Rebuild the WASM binary (takes several minutes)
-bin/build-wasm
+# 2. Repack the WASM binary (~1-4 minutes)
+npm run pack:wasm
 
 # 3. Test your tutorial locally
 npm run dev
@@ -188,7 +188,7 @@ Some tutorial operations are **conceptual** — they teach the correct pattern b
 
 | Operation in lesson content | Reality | What the author must do |
 |-----------------------------|---------|------------------------|
-| "Add `gem 'devise'` to your Gemfile" | Gems are baked into the WASM binary at build time | The gem must already be in `ruby-wasm/Gemfile` and rebuilt with `bin/build-wasm` **before** the tutorial is published |
+| "Add `gem 'devise'` to your Gemfile" | Gems are baked into the WASM binary at build time | The gem must already be in `ruby-wasm/Gemfile` and repacked with `npm run pack:wasm` **before** the tutorial is published |
 | "Run `bundle install`" | `bundle install` is a no-op in WASM — all gems come from the binary | Include it for pedagogical completeness; it will appear to succeed |
 | "Run `rails server`" | The Rails server runs through `node scripts/rails.js server` | Use `node scripts/rails.js server` in frontmatter `mainCommand`; in lesson content, show `rails server` since that's what the terminal wrapper understands |
 | "Edit `database.yml`" | Database adapter is PGLite, auto-configured by wasmify-rails | Pre-configure in the template; showing a `database.yml` edit is fine for teaching but won't change the runtime behavior |

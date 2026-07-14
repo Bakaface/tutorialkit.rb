@@ -21,11 +21,36 @@ echo "=== Dynamic gem packing ==="
 echo
 
 # --- Preflight checks --------------------------------------------------------
+# Packing uses RubyWasmExt::WasiVfs bundled inside the ruby_wasm gem (installed
+# by the bundle install below) — no wasi-vfs CLI is needed on the host.
+#
+# The cross-compile step (bundle install --target-rbconfig in pack-gems) only
+# works on host Ruby 3.3.x (must match the WASM Ruby's 3.3.8 lib version) with
+# RubyGems >= 3.6 (Gem.set_target_rbconfig API) and < 4 (Bundler 4 changes).
 
-if ! command -v wasi-vfs &> /dev/null; then
-  echo "Error: wasi-vfs CLI not found"
-  echo "Install it with: cargo install wasi-vfs-cli"
-  echo "See: https://github.com/aspect-build/aspect-workflows/tree/main/packages/wasi-vfs"
+ruby -e '
+  ok_ruby = RUBY_VERSION.start_with?("3.3.")
+  rg = Gem::Version.new(Gem::VERSION)
+  ok_gems = rg >= Gem::Version.new("3.6") && rg < Gem::Version.new("4.0")
+  unless ok_ruby && ok_gems
+    warn "Error: unsupported host Ruby toolchain for gem cross-compilation."
+    warn "  Host Ruby:     #{RUBY_VERSION}  (need 3.3.x to match the WASM Ruby)" unless ok_ruby
+    warn "  Host RubyGems: #{Gem::VERSION}  (need >= 3.6 and < 4)" unless ok_gems
+    warn ""
+    warn "  Install Ruby 3.3.x (e.g. via mise/rbenv), then update RubyGems into"
+    warn "  the supported band: gem update --system 3.6.9"
+    exit 1
+  end
+'
+
+# The cross-compile bundle builds the ruby_wasm gem's native extension from
+# source on the host (no precompiled variant matches under the wasm32-wasi
+# target platform). Without cargo that fails as a cryptic Gem::Ext::BuildError
+# deep inside bundler.
+if ! command -v cargo &> /dev/null; then
+  echo "Error: Rust toolchain (cargo) not found."
+  echo "Gem cross-compilation builds the ruby_wasm gem's native extension on the host."
+  echo "Install Rust: https://rustup.rs (or: brew install rust)"
   exit 1
 fi
 
@@ -61,6 +86,8 @@ if [ -z "$BASE_WASM" ]; then
         gh release download "$TAG" --repo "$REPO" --pattern "rbconfig.rb" --dir "$RBCONFIG_DIR" --clobber 2>/dev/null
       fi
     fi
+  else
+    echo "  gh CLI not found — cannot download the base binary (https://cli.github.com)"
   fi
 
   if [ -f "$DOWNLOAD_PATH" ]; then
@@ -72,8 +99,9 @@ fi
 if [ -z "$BASE_WASM" ]; then
   echo
   echo "Error: No base WASM binary found."
-  echo "Either run 'bin/build-ruby-base' to build one,"
-  echo "or ensure a ruby-base release exists on GitHub."
+  echo "Either run 'bin/build-ruby-base' to build one, or install the gh CLI"
+  echo "(https://cli.github.com) so it can be downloaded from the ruby-base"
+  echo "release on GitHub."
   exit 1
 fi
 
@@ -146,8 +174,9 @@ if [ -z "$USR_TREE" ]; then
   echo
   echo "Error: No usr/ (Ruby stdlib) tree found."
   echo "A binary packed without /usr boots but fails on the first stdlib require."
-  echo "Either run 'bin/build-ruby-base' to build it locally, or ensure the"
-  echo "ruby-base release on GitHub includes the usr.tar.gz asset."
+  echo "Either run 'bin/build-ruby-base' to build it locally, or install the"
+  echo "gh CLI (https://cli.github.com) and ensure the ruby-base release on"
+  echo "GitHub includes the usr.tar.gz asset."
   exit 1
 fi
 
@@ -157,7 +186,11 @@ echo
 
 echo "Installing host gems for cross-compilation..."
 cd "$RUBY_WASM_DIR"
-bundle install --path vendor/bundle
+# BUNDLE_PATH instead of --path: the flag was removed in Bundler 4. Exported
+# so pack-gems (and its bundle invocations) resolve the same vendored gems —
+# unlike --path, the env var writes no .bundle/config for later commands.
+export BUNDLE_PATH="vendor/bundle"
+bundle install
 echo
 
 echo "Running pack-gems..."

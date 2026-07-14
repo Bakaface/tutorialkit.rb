@@ -14,8 +14,10 @@ fi
 cd ruby-wasm
 
 echo "Installing Ruby gems..."
-# Install gems using bundle install
-bundle install --path vendor/bundle
+# BUNDLE_PATH instead of --path: the flag was removed in Bundler 4. Exported
+# so bin/pack's bundler/setup resolves the same vendored gems.
+export BUNDLE_PATH="vendor/bundle"
+bundle install
 
 echo "Building WASM module..."
 # Run the pack script to build ruby.wasm

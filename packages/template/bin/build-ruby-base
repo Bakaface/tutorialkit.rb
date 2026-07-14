@@ -37,14 +37,6 @@ export BUNDLE_GEMFILE="$RUBY_WASM_DIR/Gemfile.base"
 echo "=== Building custom Ruby WASM base binary (with JS interop) ==="
 echo
 
-# --- Preflight checks --------------------------------------------------------
-
-if ! bundle exec rbwasm --version &> /dev/null && ! command -v rbwasm &> /dev/null; then
-  echo "Error: rbwasm CLI not found"
-  echo "Install it with: gem install ruby_wasm"
-  exit 1
-fi
-
 # --- Prepare Gemfile.base lockfile -------------------------------------------
 
 echo "Resolving Gemfile.base dependencies..."
@@ -54,6 +46,15 @@ echo
 echo "Installing Gemfile.base gems (ensures js gem is available for static linking)..."
 bundle install
 echo
+
+# rbwasm comes from the ruby_wasm gem in Gemfile.base (dev group) — no global
+# install needed. Sanity-check it resolved before starting a long build.
+if ! bundle exec rbwasm --version &> /dev/null; then
+  echo "Error: rbwasm CLI not available via the Gemfile.base bundle."
+  echo "The ruby_wasm gem should have been installed by the bundle install above."
+  echo "As a fallback: gem install ruby_wasm -v 2.7.1  (the version pin matters)"
+  exit 1
+fi
 
 # --- Build -------------------------------------------------------------------
 

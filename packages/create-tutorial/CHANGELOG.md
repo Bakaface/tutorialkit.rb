@@ -1,3 +1,12 @@
+# [1.0.0-rc.3](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.2...v1.0.0-rc.3) "@tutorialkit-rb/cli" (2026-07-14)
+
+
+### Bug Fixes
+
+* **cli:** fix create install flow and next steps ([6b6dc5b](https://github.com/Bakaface/tutorialkit.rb/commit/6b6dc5bdac79b6c7bc7c1fb5628ab5491b71cb62))
+
+
+
 # [1.0.0-rc.2](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.1...v1.0.0-rc.2) "@tutorialkit-rb/cli" (2026-07-14)
 
 

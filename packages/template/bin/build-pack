@@ -14,6 +14,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATE_DIR="$(dirname "$SCRIPT_DIR")"
 RUBY_WASM_DIR="$TEMPLATE_DIR/ruby-wasm"
+REPO="Bakaface/tutorialkit.rb"
+TAG=""
 
 echo "=== Dynamic gem packing ==="
 echo
@@ -45,8 +47,6 @@ if [ -z "$BASE_WASM" ]; then
   mkdir -p "$DOWNLOAD_DIR"
   DOWNLOAD_PATH="$DOWNLOAD_DIR/ruby-base.wasm"
 
-  REPO="Bakaface/tutorialkit.rb"
-
   if command -v gh &> /dev/null; then
     TAG=$(gh release list --repo "$REPO" --json tagName --jq '[.[] | select(.tagName | startswith("ruby-base-"))][0].tagName' 2>/dev/null)
 
@@ -74,6 +74,80 @@ if [ -z "$BASE_WASM" ]; then
   echo "Error: No base WASM binary found."
   echo "Either run 'bin/build-ruby-base' to build one,"
   echo "or ensure a ruby-base release exists on GitHub."
+  exit 1
+fi
+
+echo
+
+# --- Resolve usr/ (Ruby stdlib) tree -------------------------------------------
+# pack-gems maps the stdlib tree to /usr in the same wasi-vfs pack as the gems.
+# A binary packed without it boots but fails on the first stdlib require, so
+# resolve it up front. Lookup order mirrors pack-gems' find_usr_dir.
+
+echo "Resolving usr/ (Ruby stdlib) tree..."
+USR_TREE=""
+
+# 1. Path recorded by build-ruby-base or a previous build-pack download
+if [ -f "$RUBY_WASM_DIR/dist/usr-dir.txt" ]; then
+  USR_PATH="$(cat "$RUBY_WASM_DIR/dist/usr-dir.txt")"
+  case "$USR_PATH" in
+    /*) ;;
+    *) USR_PATH="$RUBY_WASM_DIR/$USR_PATH" ;;
+  esac
+  if [ -d "$USR_PATH" ]; then
+    USR_TREE="$USR_PATH"
+    echo "  Found: dist/usr-dir.txt → $USR_PATH"
+  fi
+fi
+
+# 2. Tree extracted from a release's usr.tar.gz by a previous run
+if [ -z "$USR_TREE" ] && [ -d "$RUBY_WASM_DIR/dist/usr" ]; then
+  USR_TREE="$RUBY_WASM_DIR/dist/usr"
+  echo "dist/usr" > "$RUBY_WASM_DIR/dist/usr-dir.txt"
+  echo "  Found: dist/usr (extracted from release)"
+fi
+
+# 3. Leftover rbwasm build tree from a local build-ruby-base run
+if [ -z "$USR_TREE" ]; then
+  for d in "$RUBY_WASM_DIR"/rubies/ruby-3.3-wasm32-unknown-wasip1-full-*/usr; do
+    if [ -d "$d" ]; then
+      USR_TREE="$d"
+      echo "  Found: local rbwasm build ($d)"
+      break
+    fi
+  done
+fi
+
+# 4. GitHub Releases fallback (usr.tar.gz asset)
+if [ -z "$USR_TREE" ] && command -v gh &> /dev/null; then
+  echo "  Not found locally, downloading usr.tar.gz from GitHub Releases..."
+
+  if [ -z "$TAG" ]; then
+    TAG=$(gh release list --repo "$REPO" --json tagName --jq '[.[] | select(.tagName | startswith("ruby-base-"))][0].tagName' 2>/dev/null)
+  fi
+
+  if [ -n "$TAG" ]; then
+    gh release download "$TAG" --repo "$REPO" --pattern "usr.tar.gz" --dir "$RUBY_WASM_DIR/dist" --clobber 2>/dev/null || true
+
+    if [ -f "$RUBY_WASM_DIR/dist/usr.tar.gz" ]; then
+      rm -rf "$RUBY_WASM_DIR/dist/usr"
+      tar -xzf "$RUBY_WASM_DIR/dist/usr.tar.gz" -C "$RUBY_WASM_DIR/dist"
+      rm "$RUBY_WASM_DIR/dist/usr.tar.gz"
+      echo "dist/usr" > "$RUBY_WASM_DIR/dist/usr-dir.txt"
+      USR_TREE="$RUBY_WASM_DIR/dist/usr"
+      echo "  Downloaded and extracted to dist/usr"
+    else
+      echo "  Release $TAG has no usr.tar.gz asset (re-run the publish-ruby-base workflow to add it)"
+    fi
+  fi
+fi
+
+if [ -z "$USR_TREE" ]; then
+  echo
+  echo "Error: No usr/ (Ruby stdlib) tree found."
+  echo "A binary packed without /usr boots but fails on the first stdlib require."
+  echo "Either run 'bin/build-ruby-base' to build it locally, or ensure the"
+  echo "ruby-base release on GitHub includes the usr.tar.gz asset."
   exit 1
 fi
 

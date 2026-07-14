@@ -55,6 +55,18 @@ jobs:
           cp packages/template/ruby-wasm/dist/ruby-base.wasm release-assets/
           cp packages/template/ruby-wasm/rbconfig/wasm32-wasi/rbconfig.rb release-assets/
 
+          # Stage the runtime subset of the usr/ tree (Ruby stdlib). pack-gems
+          # maps it to /usr in the same wasi-vfs pack as the gems; without it
+          # the packed binary boots but fails on the first stdlib require.
+          # Mirrors pack-gems' own staging: local/lib + local/share only,
+          # without bin/, include/, and libruby-static.a.
+          USR_DIR="$(cat packages/template/ruby-wasm/dist/usr-dir.txt)"
+          mkdir -p usr-staging/usr/local
+          cp -R "$USR_DIR/local/lib" usr-staging/usr/local/
+          cp -R "$USR_DIR/local/share" usr-staging/usr/local/
+          find usr-staging -name 'libruby-static.a' -delete
+          tar -czf release-assets/usr.tar.gz -C usr-staging usr
+
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,6 +80,7 @@ jobs:
 
           gh release create "$TAG" \
             --title "Ruby Base Binary v${RUBY_BASE_VERSION}" \
-            --notes "Pre-built Ruby ${RUBY_BASE_VERSION} WASM base binary for dynamic gem packing." \
+            --notes "Pre-built Ruby ${RUBY_BASE_VERSION} WASM base binary for dynamic gem packing. Assets: ruby-base.wasm (raw pre-VFS binary), rbconfig.rb (cross-compile config), usr.tar.gz (stripped stdlib tree, mapped to /usr at pack time)." \
             release-assets/ruby-base.wasm \
-            release-assets/rbconfig.rb
+            release-assets/rbconfig.rb \
+            release-assets/usr.tar.gz

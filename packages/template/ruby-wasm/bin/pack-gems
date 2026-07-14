@@ -94,14 +94,19 @@ def find_base_wasm
 end
 
 def find_usr_dir
-  # 1. Path recorded by build-ruby-base (local build, single-pack strategy)
+  # 1. Path recorded by build-ruby-base or build-pack (relative paths resolve
+  #    against ruby-wasm/, e.g. "dist/usr" written after a release download)
   txt = File.join(SCRIPT_DIR, "dist", "usr-dir.txt")
   if File.exist?(txt)
-    path = File.read(txt).strip
+    path = File.expand_path(File.read(txt).strip, SCRIPT_DIR)
     return path if Dir.exist?(path)
   end
 
-  # 2. Fallback: glob for the rubies/ directory left by rbwasm
+  # 2. Tree extracted from the release's usr.tar.gz by build-pack
+  extracted = File.join(SCRIPT_DIR, "dist", "usr")
+  return extracted if Dir.exist?(extracted)
+
+  # 3. Fallback: glob for the rubies/ directory left by rbwasm
   candidates = Dir.glob(File.join(SCRIPT_DIR, "rubies", "ruby-3.3-wasm32-unknown-wasip1-full-*", "usr"))
   return candidates.first if candidates.any?
 
@@ -129,13 +134,14 @@ puts "base WASM: #{base_wasm} (#{human_size(File.size(base_wasm))})"
 
 # 2b. Find usr/ directory for single-pack /usr mapping
 usr_dir = find_usr_dir
-if usr_dir
-  puts "usr dir:   #{usr_dir} (will map to /usr in wasi-vfs pack)"
-else
-  $stderr.puts "Warning: Could not find usr/ directory for /usr mapping."
-  $stderr.puts "  The packed binary may be missing Ruby stdlib at /usr."
-  $stderr.puts "  Run 'bin/build-ruby-base' to generate it."
+unless usr_dir
+  $stderr.puts "Error: Could not find usr/ directory (Ruby stdlib) for /usr mapping."
+  $stderr.puts "  A binary packed without /usr boots but fails on the first stdlib require."
+  $stderr.puts "  Run 'bin/build-pack' (downloads usr.tar.gz from the ruby-base release),"
+  $stderr.puts "  or 'bin/build-ruby-base' to build the tree locally."
+  exit 1
 end
+puts "usr dir:   #{usr_dir} (will map to /usr in wasi-vfs pack)"
 puts
 
 # 3. Add wasm32-wasi platform to lockfile if missing

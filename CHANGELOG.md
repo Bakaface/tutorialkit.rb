@@ -1,3 +1,16 @@
+# [1.0.0-rc.3](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-07-14)
+
+
+### Bug Fixes
+
+* **cli:** fix create install flow and next steps ([6b6dc5b](https://github.com/Bakaface/tutorialkit.rb/commit/6b6dc5bdac79b6c7bc7c1fb5628ab5491b71cb62))
+* **template:** auto-require packed gems at boot ([dd36979](https://github.com/Bakaface/tutorialkit.rb/commit/dd36979db86060926d9d57432f77f3156ae709b9))
+* **template:** fix fresh-machine wasm build scripts ([a03ad70](https://github.com/Bakaface/tutorialkit.rb/commit/a03ad709daa0f00f33b04d0714290061bb909b83))
+* **template:** raise node stack size for smoke test ([bb1fc1c](https://github.com/Bakaface/tutorialkit.rb/commit/bb1fc1cc5d7a257b000b7f47f0b399428842f520))
+* **template:** ship usr stdlib tree for dynamic packing ([c3fc180](https://github.com/Bakaface/tutorialkit.rb/commit/c3fc180da0eac4248ec450f85d0fd45db9369c82))
+
+
+
 # [1.0.0-rc.2](https://github.com/Bakaface/tutorialkit.rb/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-07-14)
 
 
